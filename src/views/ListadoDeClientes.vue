@@ -21,6 +21,20 @@
                             <template v-slot:item.actions="{ item }">
                                 <v-icon small class="mr-2" @click="editarCliente(item)" color="blue">mdi-pencil</v-icon>
                                 <v-icon small @click="eliminarCliente(item)" color="red">mdi-delete</v-icon>
+                                <v-menu>
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn v-bind="props" variant="flat">Cuenta</v-btn>
+                                    </template>
+                                    <v-list>
+                                        <v-list-item>
+                                            <v-list-item-title>Ver cuenta</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item>
+                                            <v-list-item-title>Ver movimientos</v-list-item-title>
+                                        </v-list-item>
+                                    </v-list>
+
+                                </v-menu>
                             </template>
                         </v-data-table>
                     </v-card>
@@ -79,6 +93,9 @@ export default {
                 })
                 .finally(() => this.cargando = false);
 
+        },
+        eliminarCliente(cliente) {
+            alert('eliminar cliente' + cliente.nombre)
         },
         buscar() {
             console.log('buscando');

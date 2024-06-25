@@ -6,14 +6,15 @@
                 <v-col>
                     <v-card elevation="3">
                         <v-data-table :headers="headers" :items="articulos" item-key="codigo" :loading="cargando"
-                            :hover=true loading-text="cargando artículos..." :items-per-page-text="textoItems" :no-data-text="sinDatos">
+                            :hover=true loading-text="cargando artículos..." :items-per-page-text="textoItems"
+                            :no-data-text="sinDatos">
                             <template v-slot:top>
                                 <v-toolbar>
                                     <v-toolbar-title>Listado de Articulos</v-toolbar-title>
                                     <v-divider class="mx-4" inset vertical></v-divider>
 
-                                    <v-btn @click="dialogoNuevo = true" prepend-icon="mdi-plus" class="mr-4 border" tonal
-                                        color="primary">Nuevo</v-btn>
+                                    <v-btn @click="dialogoNuevo = true" prepend-icon="mdi-plus" class="mr-4 border"
+                                        tonal color="primary">Nuevo</v-btn>
                                     <NuevoArticuloComponent v-if="dialogoNuevo" @cerrar-modal="dialogoNuevo = false"
                                         @actualizar-articulos="getArticulos" />
                                     <v-spacer></v-spacer>
@@ -48,7 +49,8 @@
                                 </v-dialog>
                             </template>
                             <template v-slot:item.actions="{ item }">
-                                <v-icon small class="mr-2" @click="editarArticulo(item)" color="blue">mdi-pencil</v-icon>
+                                <v-icon small class="mr-2" @click="editarArticulo(item)"
+                                    color="blue">mdi-pencil</v-icon>
                                 <v-icon small @click="eliminarArticulo(item)" color="red">mdi-delete</v-icon>
                             </template>
                         </v-data-table>
@@ -56,8 +58,8 @@
                 </v-col>
             </v-row>
         </v-container>
-        <EditarArticuloComponent v-if="dialogoEditar" @cerrar-modal="dialogoEditar = false" :articulo="articuloParaEditar"
-            @actualizar="getArticulos" />
+        <EditarArticuloComponent v-if="dialogoEditar" @cerrar-modal="dialogoEditar = false"
+            :articulo="articuloParaEditar" @actualizar="getArticulos" />
     </div>
 </template>
 
@@ -72,11 +74,12 @@ export default {
         return {
             search: '',
             headers: [
-                { title: 'Cod', value: 'codigo', sortable:true  },
-                { title: 'Nombre', value: 'descripcion', sortable:true },
+                { title: 'Cod', value: 'codigo', sortable: true },
+                { title: 'Nombre', value: 'descripcion', sortable: true },
                 { title: 'Precio', value: 'precio' },
                 { title: 'Costo', value: 'costo' },
                 { title: 'Stock', value: 'stock' },
+                { title: 'Categoria', value: 'categoria.nombre', sortable: false },
                 { title: 'Foto', value: 'foto', width: '100px', sortable: false },
                 { title: 'Acciones', value: 'actions', sortable: false },
             ],

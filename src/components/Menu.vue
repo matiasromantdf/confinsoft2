@@ -31,6 +31,8 @@
                     </template> -->
                 <v-list-item title="Articulos" prepend-icon="mdi-view-list" value="listadoArticulos"
                     @click="$router.push('listado-de-articulos')"></v-list-item>
+                <v-list-item title="Categorias" prepend-icon="mdi-shape-outline" value="listadoCategorias"
+                    @click="$router.push('listado-de-categorias')"></v-list-item>
                 <v-list-item title="Proveedores" prepend-icon="mdi-truck-outline" value="listadoProveedores"
                     @click="$router.push('listado-de-proveedores')"></v-list-item>
                 <v-list-item title="Clientes" prepend-icon="mdi-account-multiple" value="listadoClientes"

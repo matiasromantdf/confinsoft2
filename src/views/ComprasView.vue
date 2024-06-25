@@ -286,62 +286,88 @@ export default {
             this.detalle = this.detalle.filter(det => det.codigo !== item.codigo);
         },
         guardarCompra() {
-            console.log(this.detalle);
-            console.log(this.proveedor);
+            if (this.proveedor.id === 0 || this.detalle.length === 0) {
+                this.$swal('Error', 'Debe seleccionar Proveedor y el detalle no puede estar vacío', 'error');
+                return;
+            }
+            console.log(this.abonado < this.total);
+            if (this.abonado < this.total) {
+                //consultar si quiere proseguir a pesar de que el monto abonado es menor al total
+                this.$swal({
+                    title: '¿Estás seguro?',
+                    text: 'No se indicó monto abonado, ¿deseas continuar?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, continuar',
+                    cancelButtonText: 'No, cancelar'
+                })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+                            this.enviarDatos();
+                            return;
 
-            this.$swal({
-                title: '¿Estás seguro?',
-                text: '¿Deseas guardar la compra?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, guardar',
-                cancelButtonText: 'No, cancelar'
-            })
-                .then((result) => {
-                    if (result.isConfirmed) {
-                        axios.post(this.url + '/' + this.usuario.tpv + '/compras',
-                            {
-                                proveedor_id: this.proveedor,
-                                monto: this.total,
-                                fecha: this.fecha,
-                                detalle: JSON.stringify(this.detalle)
-                            },
-                            {
-                                headers: {
-                                    Authorization: this.usuario.token
-                                }
-                            }
-                        )
-                            .then(response => {
-                                if (response.data == 'ok') {
-                                    this.$swal('Compra guardada', 'La compra se guardó correctamente', 'success');
-                                    this.detalle = [];
-                                    this.proveedor = {
-                                        id: 0,
-                                        nombre: ''
-                                    };
-                                    this.fecha = new Date().toISOString().substr(0, 10);
-                                }
-                                else {
-                                    this.$swal('Error', 'No se pudo guardar la compra', 'error');
+                        }
+                    });
 
-                                }
-                            })
-                            .catch(error => {
-                                this.$swal('Error', 'No se pudo guardar la compra', 'error');
-                                console.log(error);
-                            });
+            }
+            else {
+                this.$swal({
+                    title: '¿Estás seguro?',
+                    text: '¿Deseas guardar la compra?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, guardar',
+                    cancelButtonText: 'No, cancelar'
+                })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+                            enviarDatos();
+                        }
+
+                    });
+            }
+
+
+        },
+        enviarDatos() {
+            axios.post(this.url + '/' + this.usuario.tpv + '/compras',
+                {
+                    proveedor_id: this.proveedor,
+                    monto: this.total,
+                    fecha: this.fecha,
+                    detalle: JSON.stringify(this.detalle)
+                },
+                {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
+                }
+            )
+                .then(response => {
+                    if (response.data == 'ok') {
+                        this.$swal('Compra guardada', 'La compra se guardó correctamente', 'success');
+                        this.detalle = [];
+                        this.proveedor = {
+                            id: 0,
+                            nombre: ''
+                        };
+                        this.fecha = new Date().toISOString().substr(0, 10);
                     }
                     else {
-                        this.$swal('Error', 'Debe seleccionar Proveedor y el detalle no puede estar vacío', 'error');
+                        this.$swal('Error', 'No se pudo guardar la compra', 'error');
+
                     }
+                })
+                .catch(error => {
+                    this.$swal('Error', 'No se pudo guardar la compra', 'error');
+                    console.log(error);
                 });
         }
 
     },
     computed: {
         total() {
-            return this.detalle.reduce((acc, item) => acc + item.subtotal, 0);
+            return this.detalle.reduce((acc, item) => acc + item.subtotal, 0) * 1;
         }
     },
     setup() {
