@@ -34,12 +34,12 @@
                     <v-chip class="bg-green mr-1" color="black" label>Abona: {{ formatear(montoAAbonar) }}</v-chip>
                     <v-chip v-if="descuentoPesos > 0 || variacion < 0" class="bg-blue-grey-lighten-3 mr-1"
                         color="primary" label>Descuento:{{ formatear(descuentoPesos + (parseFloat(variacion) < 0 ?
-            (variacion * -1) : 0)) }}</v-chip>
+                            (variacion * -1) : 0)) }}</v-chip>
                             <v-chip v-if="totalPagos > montoAAbonar" class="bg-orange-accent-1" color="black"
                                 label>Vuelto:
                                 {{
-            formatear(totalPagos - montoAAbonar)
-        }}
+                                    formatear(totalPagos - montoAAbonar)
+                                }}
                             </v-chip>
 
 
@@ -61,7 +61,7 @@
                             </v-select>
                         </v-col>
                     </v-row>
-                    <v-row v-for="(pago, i) in  pagos " class="bg-teal-lighten-5 border">
+                    <v-row v-for="(pago, i) in pagos " class="bg-teal-lighten-5 border">
                         <v-col cols="4">
                             <v-select variant="underlined" v-model="pago.medio" :items="mediosDePago"
                                 label="Medio de pago" item-title="nombre" item-value="id"
@@ -95,8 +95,8 @@
                         </v-col>
                         <v-col cols="6" v-if="pago.recargo > 0" offset="4" style="height: 50px; margin-top: -40px;">
                             <v-chip class="" color="primary" label>monto a cobrar: {{
-            formatear(parseFloat(pago.monto) + parseFloat(pago.recargo))
-        }}</v-chip>
+                                formatear(parseFloat(pago.monto) + parseFloat(pago.recargo))
+                            }}</v-chip>
                         </v-col>
 
 
@@ -211,7 +211,6 @@ export default {
             return hayRecargo;
         },
         registrarVenta() {
-
             //verificar que todos los pagos tengan un medio de pago
             for (let i = 0; i < this.pagos.length; i++) {
                 if (this.pagos[i].medio == '') {
@@ -223,7 +222,6 @@ export default {
                     return
                 }
             }
-
             //verificar que se pueda dar vuelto si es necesario
             if (this.totalPagos > this.montoAAbonar && !this.hayPagosConRecargo()) {
                 console.log('hay vuelto');
