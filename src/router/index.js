@@ -56,6 +56,21 @@ const router = createRouter({
       name: 'listado-de-categorias',
       component: () => import('../views/ListadoDeCategoriasView.vue')
     },
+    {
+      path: '/listado-de-comisionistas',
+      name: 'listado-de-comisionistas',
+      component: () => import('../views/ListadoDeComisionistasView.vue')
+    },
+    {
+      path:'/reporte-de-comisiones',
+      name:'reporte-de-comisiones',
+      component: () => import('../views/ReporteDeComisionesView.vue')
+    },
+    {
+      path:'/pagos-y-gastos',
+      name:'pagos-y-gastos',
+      component: () => import('../views/PagosYGastosView.vue')
+    }
     
 
   ]

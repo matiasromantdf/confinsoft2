@@ -50,6 +50,7 @@
                                     <v-text-field v-model="articulo.stock" label="Stock" required
                                         variant="outlined"></v-text-field>
                                 </v-col>
+
                                 <v-row>
                                     <!--imagen-->
                                     <v-col cols="12">
@@ -59,6 +60,16 @@
                                     </v-col>
                                 </v-row>
                             </v-row>
+                            <v-row>
+                                <v-col cols="6">
+                                    <v-text-field v-model="articulo.comision" label="Comisión" required
+                                        variant="outlined" type="number"></v-text-field>
+                                </v-col>
+                                <v-col cols="6">
+                                    <v-checkbox v-model="articulo.es_servicio" label="Es un servicio"></v-checkbox>
+                                </v-col>
+                            </v-row>
+
 
 
                         </v-container>
@@ -92,6 +103,8 @@ export default {
                 proveedor_id: '',
                 categoria_id: '',
                 iva: '',
+                comision: '',
+                es_servicio: false,
             },
             proveedores: [],
             categorias: [],
@@ -150,6 +163,9 @@ export default {
             formData.append('stock', this.articulo.stock);
             formData.append('proveedor_id', this.articulo.proveedor_id);
             formData.append('categoria_id', this.articulo.categoria_id);
+            formData.append('iva', this.articulo.iva);
+            formData.append('comision', this.articulo.comision);
+            formData.append('es_servicio', this.articulo.es_servicio ? 1 : 0);
             let foto = document.getElementById('foto-articulo').files[0];
             formData.append('foto', foto);
 

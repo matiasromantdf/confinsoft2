@@ -48,6 +48,10 @@
                                     </template>
                                 </v-dialog>
                             </template>
+                            <template v-slot:item.es_servicio="{ item }">
+                                <v-chip color="primary" v-if="item.es_servicio == 1">Servicio</v-chip>
+                                <v-chip color="success" v-else>Producto</v-chip>
+                            </template>
                             <template v-slot:item.actions="{ item }">
                                 <v-icon small class="mr-2" @click="editarArticulo(item)"
                                     color="blue">mdi-pencil</v-icon>
@@ -77,9 +81,11 @@ export default {
                 { title: 'Cod', value: 'codigo', sortable: true },
                 { title: 'Nombre', value: 'descripcion', sortable: true },
                 { title: 'Precio', value: 'precio' },
+                { title: 'Comisión', value: 'comision' },
                 { title: 'Costo', value: 'costo' },
                 { title: 'Stock', value: 'stock' },
-                { title: 'Categoria', value: 'categoria.nombre', sortable: false },
+                { title: 'Tipo', value: 'es_servicio', sortable: true },
+                { title: 'Categoria', value: 'categoria.nombre', sortable: true },
                 { title: 'Foto', value: 'foto', width: '100px', sortable: false },
                 { title: 'Acciones', value: 'actions', sortable: false },
             ],
@@ -103,12 +109,12 @@ export default {
             let id = item.id;
             swal.fire({
                 title: '¿Estás seguro?',
-                text: "No podrás revertir esto!",
+                text: "No se puede revertir esto!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, bórralo!'
+                confirmButtonText: 'Sí, borralo!'
             }).then((result) => {
                 if (result.isConfirmed) {
                     axios.delete(this.url + '/' + this.usuario.tpv + '/articulos/' + id, {
@@ -140,7 +146,7 @@ export default {
                 }
             })
                 .then(response => {
-                    this.articulos = response.data.data;
+                    this.articulos = response.data;
                 })
                 .catch(error => {
                     console.log(error);

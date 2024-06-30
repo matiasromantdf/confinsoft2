@@ -17,7 +17,7 @@
 
                         <v-row>
                             <v-col cols="4">
-                                <v-text-field v-model="articulo.codigo" label="Codigo" 
+                                <v-text-field v-model="articulo.codigo" label="Codigo"
                                     variant="outlined"></v-text-field>
                             </v-col>
                             <v-col cols="5">
@@ -44,18 +44,27 @@
                                     variant="outlined"></v-text-field>
                             </v-col>
                         </v-row>
-
-
+                        <v-row>
+                            <v-col cols="6">
+                                <v-text-field v-model="articulo.comision" label="Comisión"
+                                    variant="outlined"></v-text-field>
+                            </v-col>
+                            <v-col cols="6">
+                                <v-checkbox label="Es servicio" v-model="articulo.es_servicio"></v-checkbox>
+                            </v-col>
+                        </v-row>
                         <v-row>
                             <v-col cols="6" v-if="articulo.foto != ''">
                                 <v-img :src="articulo.foto" aspect-ratio="1" height="100"></v-img>
-                                <button @click="eliminarFoto" class="ml-6 mt-1">Eliminar foto</button>
+                                <v-btn @click="eliminarFoto" class="ml-6 mt-3 bg-deep-orange-lighten-1">Eliminar
+                                    foto</v-btn>
                             </v-col>
                             <v-col cols="6">
                                 <v-file-input v-model="nuevaFoto" label="actualizar imagen" accept="image/jpeg"
                                     required></v-file-input>
                             </v-col>
                         </v-row>
+
 
                     </v-container>
                 </v-card-text>
@@ -88,7 +97,9 @@ export default {
                     proveedor_id: '',
                     categoria_id: '',
                     foto: '',
-                    iva: 0
+                    iva: 0,
+                    comision: 0,
+                    es_servicio: 0
                 }
             }
         }
@@ -179,6 +190,8 @@ export default {
             datos.append('proveedor_id', this.articulo.proveedor_id);
             datos.append('categoria_id', this.articulo.categoria_id);
             datos.append('iva', this.articulo.iva);
+            datos.append('comision', this.articulo.comision);
+            datos.append('es_servicio', this.articulo.es_servicio ? 1 : 0);
             if (this.nuevaFoto.length > 0) {
                 datos.append('foto', this.nuevaFoto[0]);
             }
@@ -206,6 +219,7 @@ export default {
     mounted() {
         this.getProveedores();
         this.getCategorias();
+        this.articulo.es_servicio == 1 ? this.articulo.es_servicio = true : this.articulo.es_servicio = false;
     },
     setup() {
         const usuario = useUserStore();

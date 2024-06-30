@@ -60,6 +60,14 @@
                                 </template>
                             </v-select>
                         </v-col>
+                        <v-col cols="5">
+                            <v-select variant="underlined" v-model="comisionista" :items="comisionistas" label="Barbero"
+                                item-title="nombre" item-value="id">
+                                <template v-slot:item="{ props, item }">
+                                    <v-list-item v-bind="props" :subtitle="item.raw.apellido"></v-list-item>
+                                </template>
+                            </v-select>
+                        </v-col>
                     </v-row>
                     <v-row v-for="(pago, i) in pagos " class="bg-teal-lighten-5 border">
                         <v-col cols="4">
@@ -96,7 +104,7 @@
                         <v-col cols="6" v-if="pago.recargo > 0" offset="4" style="height: 50px; margin-top: -40px;">
                             <v-chip class="" color="primary" label>monto a cobrar: {{
                                 formatear(parseFloat(pago.monto) + parseFloat(pago.recargo))
-                            }}</v-chip>
+                                }}</v-chip>
                         </v-col>
 
 
@@ -178,11 +186,13 @@ export default {
                     nombre: 'Cuenta Corriente'
                 }
             ],
+            comisionistas: [],
             modalRecargoPago: false,
             porcentajeRecargo: 0,
             porcentajeDeDescuento: 0,
             indexRecargo: 0,
             registrandoVenta: false,
+            comisionista: null,
 
 
 
@@ -242,6 +252,14 @@ export default {
                 }
 
             }
+            if (this.comisionista == null) {
+                this.$swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Debe seleccionar un barbero!',
+                });
+                return
+            }
 
             //si hay un descuento total, cargarlo a los items del detalle
             if (this.porcentajeDeDescuento > 0) {
@@ -279,6 +297,8 @@ export default {
                 tpv: this.usuario.tpv,
                 usuario: this.usuario.id,
                 token_caja: this.usuario.token_caja,
+                comisionista_id: this.comisionista,
+                descuento: this.descuentoPesos,
             };
             axios.post(this.url + '/' + this.usuario.tpv + '/ventas', venta, {
                 headers: {
@@ -342,6 +362,21 @@ export default {
                 }
             });
             return resultado;
+        },
+        getComisionistas() {
+            this.cargando = true;
+            axios.get(this.url + '/' + this.usuario.tpv + '/comisionistas', {
+                headers: {
+                    Authorization: this.usuario.token
+                }
+            })
+                .then(response => {
+                    this.comisionistas = response.data;
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+                .finally(() => this.cargando = false);
         }
 
     },
@@ -404,6 +439,9 @@ export default {
     emits: ['venta-registrada', 'cerrar-modal-pagos'],
     created() {
         this.vaciarPagos();
+    },
+    mounted() {
+        this.getComisionistas();
     }
 }
 </script>

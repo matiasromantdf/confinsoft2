@@ -56,7 +56,12 @@ export default {
     methods: {
         buscarCliente() {
             this.buscandoCliente = true;
-            axios.get(this.url + '/' + this.usuario.tpv + '/clientes/' + this.cliente.dni)
+            axios.get(this.url + '/' + this.usuario.tpv + '/clientes/' + this.cliente.dni, {
+                headers: {
+                    Authorization: this.usuario.token
+                }
+
+            })
                 .then(response => {
                     if (response.data.dni == this.cliente.dni) {
                         this.cliente.nombre = response.data.nombre;
@@ -124,7 +129,7 @@ export default {
     padding: 20px;
     border-radius: 10px;
     width: 400px;
-    height: 270px;
+    height: fit-content;
     z-index: 1000;
     border: 1px solid #838282;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);

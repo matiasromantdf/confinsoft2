@@ -24,29 +24,21 @@
                 <v-divider class="mt-6"></v-divider>
                 <v-list-item title="Vender" prepend-icon="mdi-cash-register" value="inicio"
                     @click="$router.push('/')"></v-list-item>
-
-                <!-- <v-list-group value="Listas">
+                <v-list-group value="Articulos">
                     <template v-slot:activator="{ props }">
-                        <v-list-item v-bind="props" prepend-icon="" title="Listas"></v-list-item>
-                    </template> -->
-                <v-list-item title="Articulos" prepend-icon="mdi-view-list" value="listadoArticulos"
-                    @click="$router.push('listado-de-articulos')"></v-list-item>
-                <v-list-item title="Categorias" prepend-icon="mdi-shape-outline" value="listadoCategorias"
-                    @click="$router.push('listado-de-categorias')"></v-list-item>
-                <v-list-item title="Proveedores" prepend-icon="mdi-truck-outline" value="listadoProveedores"
-                    @click="$router.push('listado-de-proveedores')"></v-list-item>
-                <v-list-item title="Clientes" prepend-icon="mdi-account-multiple" value="listadoClientes"
-                    @click="$router.push('listado-de-clientes')"></v-list-item>
+                        <v-list-item v-bind="props" prepend-icon="" title="Articulos"></v-list-item>
+                    </template>
+                    <v-list-item title="Listado" prepend-icon="mdi-view-list" value="listadoArticulos"
+                        @click="$router.push('listado-de-articulos')"></v-list-item>
+                    <v-list-item title="Categorias" prepend-icon="mdi-shape-outline" value="listadoCategorias"
+                        @click="$router.push('listado-de-categorias')"></v-list-item>
+                </v-list-group>
+
+
+
+
 
                 <!-- </v-list-group> -->
-                <v-list-group value="Compras">
-                    <template v-slot:activator="{ props }">
-                        <v-list-item v-bind="props" prepend-icon="" title="Compras"></v-list-item>
-                    </template>
-                    <v-list-item title="Registrar" prepend-icon="mdi-truck-cargo-container" value="registrar"
-                        :to="{ name: 'compras' }"></v-list-item>
-                    <v-list-item title="Listar" prepend-icon="mdi-view-list" value="listar"></v-list-item>
-                </v-list-group>
                 <v-list-group value="Ventas">
                     <template v-slot:activator="{ props }">
                         <v-list-item v-bind="props" prepend-icon="" title="Ventas"></v-list-item>
@@ -55,7 +47,36 @@
                         :to="{ name: 'caja' }"></v-list-item>
                     <v-list-item title="Historial" prepend-icon="mdi-calendar-month-outline" value="listar-ventas"
                         :to="{ name: 'historial-de-ventas' }"></v-list-item>
+                    <v-list-item title="Comisiones" prepend-icon="mdi-chart-pie" value="comisiones"
+                        :to="{ name: 'reporte-de-comisiones' }"></v-list-item>
+
                 </v-list-group>
+
+
+                <v-list-group value="Proveedores">
+                    <template v-slot:activator="{ props }">
+                        <v-list-item v-bind="props" prepend-icon="" title="Proveedores"></v-list-item>
+                    </template>
+                    <v-list-item title="Proveedores" prepend-icon="mdi-truck-outline" value="listadoProveedores"
+                        @click="$router.push('listado-de-proveedores')"></v-list-item>
+                    <v-list-item title="Compras" prepend-icon="mdi-truck-cargo-container" value="registrar"
+                        :to="{ name: 'compras' }"></v-list-item>
+
+                </v-list-group>
+                <v-list-item title="Clientes" prepend-icon="mdi-account-multiple" value="listadoClientes"
+                    @click="$router.push('listado-de-clientes')"></v-list-item>
+                <v-list-item title="Barberos" prepend-icon="mdi-account-group" value="listadoComisionistas"
+                    @click="$router.push('listado-de-comisionistas')"></v-list-item>
+
+                <!--               
+                <v-list-group value="Pagos y Gastos">
+                    <template v-slot:activator="{ props }">
+                        <v-list-item v-bind="props" prepend-icon="" title="Pagos y Gastos"></v-list-item>
+                    </template>
+                    <v-list-item title="Registrar" prepend-icon="mdi-swap-vertical-bold" value="registrar"
+                        :to="{ name: 'pagos-y-gastos' }">
+                    </v-list-item>
+                </v-list-group> -->
 
 
             </v-list>
