@@ -17,7 +17,8 @@
                                 </v-toolbar>
                             </template>
                             <template v-slot:item.actions="{ item }">
-                                <v-icon small class="mr-2" @click="editarProveedor(item)" color="blue">mdi-pencil</v-icon>
+                                <v-icon small class="mr-2" @click="editarProveedor(item)"
+                                    color="blue">mdi-pencil</v-icon>
                                 <v-icon small @click="eliminarProveedor(item)" color="red">mdi-delete</v-icon>
                             </template>
                         </v-data-table>
@@ -123,7 +124,11 @@ export default {
         }
     },
     mounted() {
-        this.getProveedores();
+        if (this.usuario.rol != 1) {
+            this.$router.push('/no-autorizado');
+        } else {
+            this.getProveedores();
+        }
     },
     components: {
         NuevoProveedorComponent,

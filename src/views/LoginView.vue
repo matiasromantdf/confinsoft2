@@ -2,8 +2,8 @@
     <v-container>
         <v-row>
             <v-col align="center">
-                <v-card class="mt-6 px-6 py-6" max-width="344" title="Ingreso al sistema" subtitle=" " :loading="loading"
-                    elevation="6">
+                <v-card class="mt-6 px-6 py-6" max-width="344" title="Ingreso al sistema" subtitle=" "
+                    :loading="loading" elevation="6">
                     <template v-slot:append>
                         <v-avatar size="32">
                             <v-icon size="x-large">mdi-lock-outline</v-icon>
@@ -14,7 +14,7 @@
                             label="Usuario"></v-text-field>
 
                         <v-text-field v-model="password" :readonly="loading" :rules="[required]" clearable
-                            label="Contraseña" placeholder="Ingrese su clave"></v-text-field>
+                            label="Contraseña" placeholder="Ingrese su clave" type="password"></v-text-field>
 
                         <br>
 
@@ -36,8 +36,8 @@ export default {
     data: () => ({
         form: false,
         loading: false,
-        username: 'prueba',
-        password: 'prueba',
+        username: '',
+        password: '',
         url: import.meta.env.VITE_URL,
     }),
 
@@ -57,12 +57,27 @@ export default {
                     this.loading = false;
                     if (response.status == '200') {
                         // console.log(response.data);
-                        this.usuario.setUsuario(response.data);
-                        let usuario = response.data;
-                        let fecha = new Date(usuario.vence);
-                        // alert('Bienvenido ' + usuario.username + ' tu suscripción vence el ' + fecha.getDate() + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear());
+                        let tpv = response.data.tpv;
+                        let token = response.data.token;
+                        let datosUsuario = response.data;
 
-                        this.$router.push('/');
+                        axios.get(this.url + '/' + tpv + '/comercio', {
+                            headers: {
+                                Authorization: token
+                            }
+                        })
+                            .then(response => {
+                                datosUsuario.comercio = response.data;
+                                this.usuario.setUsuario(datosUsuario);
+                                this.$router.push('/');
+
+
+                            })
+
+
+                        // let usuario = response.data;
+                        // let fecha = new Date(usuario.vence);
+                        // alert('Bienvenido ' + usuario.username + ' tu suscripción vence el ' + fecha.getDate() + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear());
                     }
 
                 })
@@ -87,6 +102,12 @@ export default {
     setup() {
         const usuario = useUserStore();
         return { usuario };
+    },
+    mounted() {
+        if (import.meta.env.MODE == 'development') {
+            this.username = 'prueba';
+            this.password = 'prueba';
+        }
     }
 }
 </script>

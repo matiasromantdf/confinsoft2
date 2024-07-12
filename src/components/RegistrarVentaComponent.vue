@@ -33,14 +33,12 @@
                     <v-chip class="bg-brown-lighten-2 mr-1" color="black" label>Total: {{ formatear(total) }}</v-chip>
                     <v-chip class="bg-green mr-1" color="black" label>Abona: {{ formatear(montoAAbonar) }}</v-chip>
                     <v-chip v-if="descuentoPesos > 0 || variacion < 0" class="bg-blue-grey-lighten-3 mr-1"
-                        color="primary" label>Descuento:{{ formatear(descuentoPesos + (parseFloat(variacion) < 0 ?
-                            (variacion * -1) : 0)) }}</v-chip>
-                            <v-chip v-if="totalPagos > montoAAbonar" class="bg-orange-accent-1" color="black"
-                                label>Vuelto:
-                                {{
-                                    formatear(totalPagos - montoAAbonar)
-                                }}
-                            </v-chip>
+                        color="primary" label>Descuento:{{ formatear(descuentoPesos) }}</v-chip>
+                    <v-chip v-if="totalPagos > montoAAbonar" class="bg-orange-accent-1" color="black" label>Vuelto:
+                        {{
+                            formatear(totalPagos - montoAAbonar)
+                        }}
+                    </v-chip>
 
 
                 </v-card-subtitle>
@@ -54,10 +52,8 @@
                         </v-col>
                         <v-col cols="4">
                             <v-select variant="underlined" v-model="tipo_cbte" :items="comprobantes"
-                                label="Tipo de comprobante" item-title="nombre" item-value="id">
-                                <template v-slot:item="{ props, item }">
-                                    <v-list-item v-bind="props" :subtitle="item.id"></v-list-item>
-                                </template>
+                                label="Tipo de comprobante" item-title="Desc" item-value="Id" :tiems-props="true"
+                                @click="console.log(tipo_cbte)">
                             </v-select>
                         </v-col>
                         <v-col cols="5">
@@ -104,7 +100,7 @@
                         <v-col cols="6" v-if="pago.recargo > 0" offset="4" style="height: 50px; margin-top: -40px;">
                             <v-chip class="" color="primary" label>monto a cobrar: {{
                                 formatear(parseFloat(pago.monto) + parseFloat(pago.recargo))
-                                }}</v-chip>
+                            }}</v-chip>
                         </v-col>
 
 
@@ -146,20 +142,6 @@ export default {
             ],
             url: import.meta.env.VITE_URL,
             tipo_cbte: 0,
-            comprobantes: [
-                {
-                    id: 0,
-                    nombre: 'No Fiscal'
-                },
-                {
-                    id: 1,
-                    nombre: 'Factura A'
-                },
-                {
-                    id: 2,
-                    nombre: 'Factura B'
-                }
-            ],
             mediosDePago: [
                 {
                     id: 1,
@@ -186,7 +168,6 @@ export default {
                     nombre: 'Cuenta Corriente'
                 }
             ],
-            comisionistas: [],
             modalRecargoPago: false,
             porcentajeRecargo: 0,
             porcentajeDeDescuento: 0,
@@ -273,24 +254,26 @@ export default {
 
 
             //procesar
-            if (this.tipo_cbte == 0) {//si es no fiscal
-                this.registrarVentaEnBD();
+            if (this.tipo_cbte == '0') {//si es no fiscal
+                console.log('registrando venta no fiscal');
+                console.log('el tipo de comp es :' + this.tipo_cbte);
+                this.registrarVentaEnBD(false);
             }
             else {
-                //se debe solicitar el CAE y una vez obtenido, registrar la venta en la BD
-                //manejando la asincronía
-                //this.solicitarCAE();
-                //this.registrarVentaEnBD();
+                console.log('el tipo de comp es :' + this.tipo_cbte);
+                console.log('registrando venta fiscal');
+                // this.registrarVentaEnBD(true);
+
+
             }
 
         },
-
         //crear funcion registrarVentaFiscal, la cual primero llama a la funcion registrarVentaEnBD y luego a la funcion solicitarCAE
-        registrarVentaEnBD() {
+        registrarVentaEnBD(fiscal) {
             this.registrandoVenta = true;
             let venta = {
                 cliente_id: this.clienteId,
-                total: this.total,
+                total: this.total - this.descuentoPesos,
                 costo: this.costo,
                 detalle: JSON.stringify(this.detalle),
                 pagos: JSON.stringify(this.pagos),
@@ -299,6 +282,7 @@ export default {
                 token_caja: this.usuario.token_caja,
                 comisionista_id: this.comisionista,
                 descuento: this.descuentoPesos,
+                usuario_id: this.usuario.id
             };
             axios.post(this.url + '/' + this.usuario.tpv + '/ventas', venta, {
                 headers: {
@@ -307,14 +291,53 @@ export default {
             })
                 .then(response => {
                     if (response.data.id) {
-                        this.$swal.fire({
-                            icon: 'success',
-                            title: 'Venta registrada',
-                            text: 'La venta se ha registrado correctamente',
-                        });
-                        this.$emit('venta-registrada');
-                        this.registrandoVenta = false;
-                        this.$emit('cerrar-modal-pagos');
+                        if (fiscal) {
+                            let datosFiscal = {
+                                venta_id: response.data.id,
+                                tipo_cbte: this.tipo_cbte,
+                            };
+                            axios.post(this.url + '/' + this.usuario.tpv + '/facturas/facturar', datosFiscal, {
+                                headers: {
+                                    Authorization: this.usuario.token
+                                }
+                            })
+                                .then(response => {
+                                    this.$swal.fire({
+                                        icon: 'success',
+                                        title: 'Venta registrada',
+                                        text: response.data.message,
+                                    });
+                                    this.$emit('venta-registrada');
+                                    this.registrandoVenta = false;
+                                    this.$emit('cerrar-modal-pagos');
+                                })
+                                .catch(error => {
+                                    this.$swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: error.response.data.message,
+                                    })
+                                })
+                                .finally(() => {
+                                    this.registrandoVenta = false;
+                                });
+
+
+                        }
+                        else {
+                            this.$swal.fire({
+                                icon: 'success',
+                                title: 'Venta registrada',
+                                text: 'La venta se ha registrado correctamente',
+                            });
+                            this.$emit('venta-registrada');
+                            this.registrandoVenta = false;
+                            this.$emit('cerrar-modal-pagos');
+
+                        }
+
+                        this.imprimirComprobante(response.data.id);
+
                     }
                 })
                 .catch(error => {
@@ -322,6 +345,13 @@ export default {
                     this.registrandoVenta = false;
                 })
 
+        },
+        imprimirComprobante(id) {
+            let token = this.usuario.token;
+            //abrir nueva ventana con el comprobante pdf, enviando las credenciales del token
+            let url = this.url + '/' + this.usuario.tpv + '/ventas/imprimirCbte/' + id + '/' + token;
+
+            window.open(url, '_blank');
         },
         formatear(valor) {
             return formatoARS.format(valor);
@@ -363,21 +393,7 @@ export default {
             });
             return resultado;
         },
-        getComisionistas() {
-            this.cargando = true;
-            axios.get(this.url + '/' + this.usuario.tpv + '/comisionistas', {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            })
-                .then(response => {
-                    this.comisionistas = response.data;
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => this.cargando = false);
-        }
+
 
     },
     computed: {
@@ -390,7 +406,12 @@ export default {
             return total;
         },
         descuentoPesos() {
-            return this.total * (this.porcentajeDeDescuento / 100);
+            if (this.variacion != '0') {
+                return this.variacion * -1;
+            }
+            else {
+                return this.total * (this.porcentajeDeDescuento / 100);
+            }
         },
         recargoPesos() {
             let recargo = 0;
@@ -427,12 +448,17 @@ export default {
         variacion: {
             type: Number
         },
+        comprobantes: {
+            type: Array
+        },
+        comisionistas: {
+            type: Array
+        }
+
     },
     setup() {
 
         const usuario = useUserStore();
-
-
         return { usuario };
 
     },
@@ -441,7 +467,8 @@ export default {
         this.vaciarPagos();
     },
     mounted() {
-        this.getComisionistas();
+        // console.log(this.comprobantes);
+        console.log('la variacion es: ' + this.variacion);
     }
 }
 </script>

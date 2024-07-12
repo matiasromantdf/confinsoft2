@@ -1,21 +1,19 @@
 <template>
-    <div>
-        <v-container fluid>
-            <v-tabs v-model="tabsModel">
-                <v-tab text="Ingreso de mercadería" :value="1">
-                </v-tab>
-                <v-tab text="Registrar Pagos" :value="2">
-                </v-tab>
-            </v-tabs>
+    <v-card class="bg-grey-lighten-2 pl-5 pr-5 mt-1" elevation="0">
+        <v-tabs v-model="tab" class="bg-white">
+            <v-tab value="one">Ingreso de mercadería</v-tab>
+            <v-tab value="two">Pagos a proveedores</v-tab>
+        </v-tabs>
 
-            <v-tabs-window v-model="tabsModel">
-                <v-tab-window-item value="1">
-                    <v-row class="mt-2">
+        <v-card-text class="pt-0">
+            <v-tabs-window v-model="tab">
+                <v-tabs-window-item value="one">
+                    <v-row class="mt-2" justify="center">
                         <v-col cols="12" md="9">
                             <v-card>
-                                <v-card-title>
+                                <!-- <v-card-title>
                                     Ingreso de mercadería
-                                </v-card-title>
+                                </v-card-title> -->
 
                                 <v-card-text>
                                     <v-container>
@@ -23,10 +21,11 @@
                                             <v-col md="6" cols="12">
                                                 <v-select :items="proveedores" label="Proveedor" item-title="nombre"
                                                     item-value="id" variant="outlined" v-model="proveedor"></v-select>
-                                                <p class="text-caption">Si es un nuevo proveedor, podes <router-link
-                                                        class="text-caption"
+                                                <p class="text-caption">Si es un nuevo proveedor, podes
+                                                    <router-link class="text-caption"
                                                         :to="{ name: 'listado-de-proveedores' }">agregarlo
-                                                        aquí</router-link></p>
+                                                        aquí</router-link>
+                                                </p>
                                             </v-col>
                                             <v-col md="6" cols="12">
                                                 <v-text-field label="Fecha de ingreso" type="date" variant="outlined"
@@ -43,7 +42,8 @@
                                                 <v-dialog v-model="modalBusquedaArticulo" max-width="800">
                                                     <v-card>
                                                         <v-card-title>
-                                                            <span class="headline">Buscar artículo</span>
+                                                            <span class="headline">Buscar
+                                                                artículo</span>
                                                         </v-card-title>
                                                         <v-card-text>
                                                             <v-text-field label="Buscar" v-model="search"
@@ -150,8 +150,8 @@
 
                             </v-card>
                         </v-col>
-                        <v-col cols="12" md="3">
-                            <v-card>
+                        <!-- <v-col cols="12" md="3"> -->
+                        <!-- <v-card>
                                 <v-card-title>
                                     Total
                                 </v-card-title>
@@ -170,7 +170,9 @@
                                         <v-col>
                                             <v-text-field label="Monto abonado" v-model="abonado"
                                                 variant="outlined"></v-text-field>
-                                            <p class="text-caption">Ingrese el monto abonado para el registro de caja.
+                                            <p class="text-caption">Ingrese el monto abonado para el
+                                                registro de
+                                                caja.
                                                 <b>Si no
                                                     se
                                                     abonó dejar en 0</b>
@@ -184,20 +186,67 @@
                                         </v-col>
                                     </v-row>
                                 </v-card-text>
+                            </v-card> -->
+                        <!-- </v-col> -->
+                    </v-row>
+
+                </v-tabs-window-item>
+
+                <v-tabs-window-item value="two">
+                    <v-row class="mt-2 justify-center">
+                        <v-col cols="8">
+                            <v-card>
+                                <v-card-title>
+                                    Registro de movimientos de caja
+                                </v-card-title>
+                                <v-card-text>
+                                    <v-container>
+                                        <v-row>
+                                            <v-col md="6" cols="12">
+                                                <v-select :items="proveedores" label="Proveedor" item-title="nombre"
+                                                    item-value="id" variant="outlined" v-model="proveedor"></v-select>
+                                                <p class="text-caption">Si es un nuevo proveedor, podes
+                                                    <router-link class="text-caption"
+                                                        :to="{ name: 'listado-de-proveedores' }">agregarlo
+                                                        aquí</router-link>
+                                                </p>
+                                            </v-col>
+                                            <v-col md="6" cols="12">
+                                                <v-text-field label="Fecha de ingreso" type="date" variant="outlined"
+                                                    v-model="fecha"></v-text-field>
+                                            </v-col>
+                                            <v-divider></v-divider>
+                                        </v-row>
+                                        <v-row>
+                                            <v-col md="4" cols="12">
+                                                <v-text-field label="Comprobante" v-model="comprobante"
+                                                    variant="outlined"
+                                                    hint="(opcional) N° de factura o remito "></v-text-field>
+                                            </v-col>
+                                            <v-col md="4" cols="12">
+                                                <v-text-field label="Monto abonado" v-model="abonado"
+                                                    variant="outlined"></v-text-field>
+
+                                            </v-col>
+
+                                        </v-row>
+                                        <v-row justify="end">
+                                            <v-col cols="12" md="2">
+                                                <v-btn color="primary" @click="guardarPago()" variant="tonal"
+                                                    prepend-icon="mdi-content-save">Guardar</v-btn>
+                                            </v-col>
+                                        </v-row>
+                                    </v-container>
+                                </v-card-text>
                             </v-card>
                         </v-col>
                     </v-row>
-                </v-tab-window-item>
-                <v-tab-window-item value="2">
-                    ss
-                </v-tab-window-item>
+                </v-tabs-window-item>
 
             </v-tabs-window>
-        </v-container>
-
-    </div>
+        </v-card-text>
+    </v-card>
 </template>
-
 <script>
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
@@ -225,7 +274,8 @@ export default {
             proveedor: '',
             abonado: 0,
             comprobante: '',
-            tabsModel: null
+            tab: 'one',
+
 
         }
     },
@@ -320,42 +370,20 @@ export default {
                 this.$swal('Error', 'Debe seleccionar Proveedor y el detalle no puede estar vacío', 'error');
                 return;
             }
-            console.log(this.abonado < this.total);
-            if (this.abonado < this.total) {
-                //consultar si quiere proseguir a pesar de que el monto abonado es menor al total
-                this.$swal({
-                    title: '¿Estás seguro?',
-                    text: 'No se indicó monto abonado, ¿deseas continuar?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, continuar',
-                    cancelButtonText: 'No, cancelar'
-                })
-                    .then((result) => {
-                        if (result.isConfirmed) {
-                            this.enviarDatos();
-                            return;
+            this.$swal({
+                title: '¿Estás seguro?',
+                text: '¿Deseas guardar la compra?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, guardar',
+                cancelButtonText: 'No, cancelar'
+            })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        this.enviarDatos();
+                    }
 
-                        }
-                    });
-
-            }
-            else {
-                this.$swal({
-                    title: '¿Estás seguro?',
-                    text: '¿Deseas guardar la compra?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, guardar',
-                    cancelButtonText: 'No, cancelar'
-                })
-                    .then((result) => {
-                        if (result.isConfirmed) {
-                            this.enviarDatos();
-                        }
-
-                    });
-            }
+                });
 
 
         },
@@ -376,13 +404,22 @@ export default {
             )
                 .then(response => {
                     if (response.data == 'ok') {
-                        this.$swal('Compra guardada', 'La compra se guardó correctamente', 'success');
                         this.detalle = [];
-                        this.proveedor = {
-                            id: 0,
-                            nombre: ''
-                        };
                         this.fecha = new Date().toISOString().substr(0, 10);
+                        //consultar si quiere registrar el pago
+                        this.$swal({
+                            title: 'Se ha registrado la compra!',
+                            text: '¿Desea registrar el pago de la compra?',
+                            icon: 'info',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sí, registrar',
+                            cancelButtonText: 'No'
+                        })
+                            .then((result) => {
+                                if (result.isConfirmed) {
+                                    this.tab = 'two';
+                                }
+                            });
                     }
                     else {
                         this.$swal('Error', 'No se pudo guardar la compra', 'error');
@@ -392,6 +429,58 @@ export default {
                 .catch(error => {
                     this.$swal('Error', 'No se pudo guardar la compra', 'error');
                     console.log(error);
+                });
+        },
+        guardarPago() {
+            if (this.proveedor.id === 0) {
+                this.$swal('Error', 'Debe seleccionar Proveedor', 'error');
+                return;
+            }
+            this.$swal({
+                title: '¿Estás seguro?',
+                text: '¿Deseas guardar el pago?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, guardar',
+                cancelButtonText: 'No, cancelar'
+            })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        axios.post(this.url + '/' + this.usuario.tpv + '/pagos',
+                            {
+                                proveedor_id: this.proveedor,
+                                monto: this.abonado,
+                                fecha: this.fecha,
+                                comprobante: this.comprobante
+                            },
+                            {
+                                headers: {
+                                    Authorization: this.usuario.token
+                                }
+                            }
+                        )
+                            .then(response => {
+                                if (response.data.id) {
+                                    this.$swal('Pago guardado', 'El pago se guardó correctamente', 'success');
+                                    this.proveedor = {
+                                        id: 0,
+                                        nombre: ''
+                                    };
+                                    this.fecha = new Date().toISOString().substr(0, 10);
+                                    this.abonado = 0;
+                                    this.comprobante = '';
+                                }
+                                else {
+                                    this.$swal('Error', 'No se pudo guardar el pago', 'error');
+
+                                }
+                            })
+                            .catch(error => {
+                                this.$swal('Error', 'No se pudo guardar el pago', 'error');
+                                console.log(error);
+                            });
+                    }
+
                 });
         }
 

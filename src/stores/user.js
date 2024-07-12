@@ -8,6 +8,7 @@ export const useUserStore = defineStore('usuario', {
     token_caja: '',
     rol: null,
     tpv: null,
+    comercio: null
   }),
   getters: {
     isLogged: (state) => {
@@ -16,9 +17,9 @@ export const useUserStore = defineStore('usuario', {
       }
       return true
     },
-    // getRol: (state) => {
-    //     return state.rol
-    // }
+    getComercio: (state) => {
+      return state.comercio
+    }
   },
   actions: {
     setUsuario(data) {
@@ -28,14 +29,17 @@ export const useUserStore = defineStore('usuario', {
       this.token_caja = data.token_caja
       this.rol = data.rol
       this.tpv = data.tpv
+      this.comercio = data.comercio
 
-      //this.rol = rol
     },
     logOff() {
       this.username = null
       this.id = null
       this.token = null
       this.token_caja = null
+      this.rol = null
+      this.tpv = null
+      this.comercio = null
 
     }
 

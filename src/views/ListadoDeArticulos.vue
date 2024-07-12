@@ -52,7 +52,7 @@
                                 <v-chip color="primary" v-if="item.es_servicio == 1">Servicio</v-chip>
                                 <v-chip color="success" v-else>Producto</v-chip>
                             </template>
-                            <template v-slot:item.actions="{ item }">
+                            <template v-slot:item.actions="{ item }" v-if="this.usuario.rol == 1">
                                 <v-icon small class="mr-2" @click="editarArticulo(item)"
                                     color="blue">mdi-pencil</v-icon>
                                 <v-icon small @click="eliminarArticulo(item)" color="red">mdi-delete</v-icon>

@@ -10,23 +10,28 @@
         </div>
         <v-container>
             <v-row>
-                <v-col cols="12" md="8">
+                <v-col cols="12" md="6">
                     <v-text-field label="DNI/CUIT" v-model="cliente.dni" variant="underlined"></v-text-field>
                 </v-col>
-                <v-col cols="12" md="4">
+                <v-col cols="12" md="3">
                     <v-btn color="primary" @click="buscarCliente()" :loading="buscandoCliente" class="mt-3"><v-icon
                             size="x-large">mdi-account-search</v-icon>
                     </v-btn>
                 </v-col>
+                <v-col cols="12" md="3" v-if="cliente.error">
+                    <v-btn color="success" @click="agregarCliente()" :loading="buscandoCliente" class="mt-3"><v-icon
+                            size="x-large">mdi-account-plus</v-icon>
+                    </v-btn>
+                </v-col>
             </v-row>
-            <v-row>
+            <v-row v-if="cliente.nombre != ''">
                 <v-col cols="12" md="12">
                     <p style="height: 20px;">{{ cliente.nombre }} {{ cliente.apellido }}</p>
                 </v-col>
             </v-row>
-            <v-row justify="end">
+            <v-row justify="end" v-if="cliente.nombre != ''">
                 <v-col cols="4">
-                    <v-btn v-if="cliente.nombre != ''" color="success" @click="devolverCliente()"><v-icon
+                    <v-btn color="success" @click="devolverCliente()"><v-icon
                             size="x-large">mdi-account-check-outline</v-icon></v-btn>
                 </v-col>
             </v-row>
@@ -74,7 +79,7 @@ export default {
                             title: 'Error',
                             text: 'El cliente no esta registrado!',
                         });
-                        this.cliente = { id: '', nombre: '', direccion: '' };
+                        this.cliente = { id: '', nombre: '', direccion: '', error: true };
                     }
                 })
                 .catch(error => {
@@ -84,7 +89,7 @@ export default {
                         title: 'Error',
                         text: 'El cliente no esta registrado!',
                     });
-                    this.cliente = { id: '', nombre: '', direccion: '', dni: '' };
+                    this.cliente = { id: '', nombre: '', direccion: '', dni: '', error: true };
                 })
                 .finally(() => {
                     this.buscandoCliente = false;
@@ -96,6 +101,9 @@ export default {
         devolverCliente() {
             this.$emit('cliente', this.cliente);
             this.closeModal();
+        },
+        agregarCliente() {
+            this.$router.push({ name: 'listado-de-clientes' });
         }
     },
     setup() {

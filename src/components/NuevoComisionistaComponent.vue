@@ -15,7 +15,7 @@
                             </v-row>
                             <v-row>
                                 <v-col cols="9">
-                                    <v-text-field v-model="comisionista.apellido" label="Nombre" variant="outlined"
+                                    <v-text-field v-model="comisionista.apellido" label="Apellido" variant="outlined"
                                         required :rules="apellidoRule"></v-text-field>
                                 </v-col>
                             </v-row>

@@ -4,31 +4,31 @@
             <v-col>
                 <v-card>
                     <v-card-title>
-                        <h3>Reporte de comisiones</h3>
+                        <h3>Historial de ventas</h3>
                     </v-card-title>
                     <v-card-text>
                         <v-row class="mt-1">
-                            <v-col cols="12" md="3">
+                            <v-col cols="12" md="4">
                                 <v-text-field label="desde" v-model="desde" type="date"
                                     variant="outlined"></v-text-field>
                             </v-col>
-                            <v-col cols="12" md="3">
+                            <v-col cols="12" md="4">
                                 <v-text-field label="hasta" v-model="hasta" type="date"
                                     variant="outlined"></v-text-field>
                             </v-col>
-                            <v-col cols="12" md="2">
-                                <!-- <v-select v-model="comisionista" :items="comisionistas" label="Barbero"
+                            <!-- <v-col cols="12" md="2">
+                                <v-select v-model="comisionista" :items="comisionistas" label="Barbero"
                                     variant="outlined" item-title="nombre" :disabled="todos">
                                     <template v-slot:item="{ props, item }">
                                         <v-list-item v-bind="props" :subtitle="item.raw.apellido"></v-list-item>
                                     </template>
 
-</v-select> -->
-                            </v-col>
-                            <v-col cols="12" md="2">
-                                <!-- <v-checkbox label="Todos" v-model="todos"></v-checkbox> -->
-                            </v-col>
-                            <v-col cols="12" md="2" class="text-center">
+</v-select>
+</v-col> -->
+                            <!-- <v-col cols="12" md="2">
+                                <v-checkbox label="Todos" v-model="todos"></v-checkbox>
+                            </v-col> -->
+                            <v-col cols="12" md="4" class="text-center">
                                 <v-btn :loading="cargando" color="primary" @click="getVentas()">Buscar</v-btn>
                             </v-col>
                         </v-row>
@@ -40,7 +40,7 @@
                                             <tr>
                                                 <th class="text-left">Total</th>
                                                 <th class="text-left">Ganancia</th>
-                                                <th class="text-left">Comisiones</th>
+                                                <th class="text-left">Medios de pago</th>
                                             </tr>
 
                                         </thead>
@@ -49,10 +49,9 @@
                                                 <td>{{ ventas.total }}</td>
                                                 <td>{{ ventas.ganancia }}</td>
                                                 <td>
-                                            <tr v-for="comision in ventas.comisionistas"
-                                                class="d-flex align-start flex-row">
-                                                <td>{{ comision.nombre }} : </td>
-                                                <td class="ml-4">${{ comision.comision }}</td>
+                                            <tr v-for="medio in ventas.medios">
+                                                <td>{{ medio.medio }} :</td>
+                                                <td>{{ medio.monto }}</td>
                                             </tr>
                                             </td>
 
@@ -113,7 +112,7 @@ export default {
                 params: {
                     desde: this.desde,
                     hasta: this.hasta,
-                    param: 'periodoYcomisiones'
+                    param: 'periodo'
                 }
             })
                 .then(response => {

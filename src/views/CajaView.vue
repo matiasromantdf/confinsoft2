@@ -27,7 +27,8 @@
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="warning" variant="outlined" @click="cerrarCaja()">Cerrar caja</v-btn>
+                            <v-btn color="warning" variant="outlined" @click="cerrarCaja()" :loading="cargando">Cerrar
+                                caja</v-btn>
                             <!-- <v-btn color="primary" variant="outlined">Imprimir</v-btn> -->
 
                         </v-card-actions>
@@ -46,15 +47,16 @@ export default {
         return {
             url: import.meta.env.VITE_URL,
             caja: [],
-
             hprops: {
                 class: 'bg-grey',
-            }
+            },
+            cargando: false
 
         };
     },
     methods: {
         getCaja() {
+            this.cargando = true;
             axios.get(this.url + '/' + this.usuario.tpv + '/caja/' + this.usuario.token_caja, {
                 headers: {
                     Authorization: this.usuario.token
@@ -63,7 +65,9 @@ export default {
                 this.caja = response.data;
             }).catch(error => {
                 console.log(error);
-            });
+            }).finally(() => this.cargando = false);
+
+
         },
         cerrarCaja() {
             //pedir confirmacion

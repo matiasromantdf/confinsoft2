@@ -9,7 +9,7 @@ import Caja from '@/views/CajaView.vue'
 import HistorialDeVentas from '@/views/HistorialVentasView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
@@ -70,6 +70,21 @@ const router = createRouter({
       path:'/pagos-y-gastos',
       name:'pagos-y-gastos',
       component: () => import('../views/PagosYGastosView.vue')
+    },
+    {
+      path:'/no-autorizado',
+      name:'no-autorizado',
+      component: () => import('../views/NoAutorizadoView.vue')
+    },
+    {
+      path:'/usuarios',
+      name:'usuarios',
+      component: () => import('../views/UsuariosView.vue')
+    },
+    {
+      path:'/ventas-totales',
+      name:'ventas-totales',
+      component: () => import('../views/VentasTotalesView.vue')
     }
     
 

@@ -24,7 +24,8 @@
                     <v-col cols="8" md="7">
                       <v-text-field label="Código" outlined v-model="articulo.codigo" id="codigo"
                         append-icon="mdi-magnify" @click:append="modalBusquedaArticulo = true"
-                        @keydown="checkEnter($event)" variant="outlined"></v-text-field>
+                        @keydown="checkEnter($event)" variant="outlined" :hint="articulo.descripcion" persistent-hint
+                        :loading="buscandoArticulo"></v-text-field>
                       <v-dialog v-model="modalBusquedaArticulo" max-width="800">
                         <v-card>
                           <v-card-title>
@@ -52,11 +53,12 @@
                     </v-col>
                     <v-col cols="4" md="3">
                       <v-text-field label="Cantidad" outlined v-model="articulo.cantidad" :disabled="buscandoArticulo"
-                        variant="outlined"></v-text-field>
+                        variant="outlined" id="campoCantidad" @keydown="checkEnter2($event)"
+                        @focus="buscarArticulo()"></v-text-field>
                     </v-col>
                     <v-col cols="6" md="2">
                       <v-btn class="ml-1 mt-2" color="primary" dark :loading="buscandoArticulo"
-                        @click="agregarArticulo()" variant="tonal">agregar</v-btn>
+                        @click="agregarAlDetalle()" variant="tonal">agregar</v-btn>
                     </v-col>
                   </v-row>
                   <v-row>
@@ -201,11 +203,11 @@
       <!-- abrir componente con una transicion-->
       <transition>
 
-        <RegistrarVentaComponent :detalle="detalle" :clienteId="cliente.id" :total="total" :costo="costo"
+        <RegistrarVentaComponent :detalle="detalle" :clienteId="cliente.id" :total="total + (variacion * -1)" :costo="costo"
           :usuario="usuario" v-if="modalRegistroVenta && detalle.length > 0"
-          @cerrarModalPagos="modalRegistroVenta = false" :variacion="variacion" @venta-registrada="reinicializar()" />
+          @cerrarModalPagos="modalRegistroVenta = false" :variacion="variacion" @venta-registrada="reinicializar()"
+          :comprobantes="comprobantes" :comisionistas="comisionistas" />
       </transition>
-
     </v-container>
   </div>
 </template>
@@ -257,6 +259,8 @@ export default {
       ],
       articulos: [],
       cargando: false,
+      comprobantes: [],
+      comisionistas: [],
 
 
     };
@@ -305,7 +309,15 @@ export default {
     },
     checkEnter(event) {
       if (event.key === 'Enter') {
-        this.agregarArticulo();
+        document.getElementById('campoCantidad').focus();
+
+      }
+    },
+    checkEnter2(event) {
+      if (event.key === 'Enter') {
+        if (this.articulo.codigo != '') {
+          this.agregarAlDetalle();
+        }
       }
     },
     setCliente(cliente) {
@@ -313,17 +325,15 @@ export default {
       this.cliente = cliente;
       console.log(this.cliente);
     },
-    agregarArticulo() {
-      document.getElementById('codigo').disabled = true;
+    buscarArticulo() {
       if (this.articulo.codigo != '') {
         this.buscandoArticulo = true;
+        document.getElementById('codigo').disabled = true;
 
         axios.get(this.url + '/' + this.usuario.tpv + '/articulos/' + this.articulo.codigo, { headers: { Authorization: this.usuario.token } })
           .then(response => {
             if (response.data.codigo == this.articulo.codigo) {
               this.buscandoArticulo = false;
-
-
               this.articulo.id = response.data.id;
               this.articulo.codigo = response.data.codigo;
               this.articulo.descripcion = response.data.descripcion;
@@ -333,12 +343,12 @@ export default {
               this.articulo.iva = response.data.iva;
               this.articulo.foto = response.data.foto;
 
-              this.agregarAlDetalle();
-
-
+              let campoCantidad = document.getElementById('campoCantidad');
+              this.$nextTick(() => {
+                campoCantidad.focus();
+              });
             }
             else {
-              this.buscandoArticulo = false;
               this.$swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -351,11 +361,15 @@ export default {
                 stock: '',
                 costo: '',
                 cantidad: 1,
+                codigo: '',
               };
+
+              this.$nextTick(() => {
+                document.getElementById('codigo').focus();
+              });
             }
           })
           .catch(error => {
-            this.buscandoArticulo = false;
             console.log(error);
             this.$swal.fire({
               icon: 'error',
@@ -370,18 +384,26 @@ export default {
               costo: '',
               cantidad: 1,
             };
+
+
           })
+          .finally(() => {
+            this.buscandoArticulo = false;
+          });
 
       }
       document.getElementById('codigo').disabled = false;
-      document.getElementById('codigo').focus();
     },
     agregarAlDetalle() {
       if (isNaN(this.articulo.precio) || this.articulo.cantidad == 0 || isNaN(this.articulo.cantidad)) {
         this.$swal.fire('Hay un error en la cantidad');
         return;
-
       }
+      if (this.articulo.descripcion == '') {
+        this.$swal.fire('Debe seleccionar un artículo');
+        return;
+      }
+
       let yaExiste = false;
       this.detalle.forEach(item => {
         if (item.codigo == this.articulo.codigo) {
@@ -402,6 +424,8 @@ export default {
 
       });
       if (yaExiste) {
+        var elemCodigo = document.getElementById('codigo');
+        elemCodigo.focus();
         return;
       }
 
@@ -465,8 +489,41 @@ export default {
         }
       });
       this.variacion = varia;
+    },
+    getComisionistas() {
+      this.cargando = true;
+      axios.get(this.url + '/' + this.usuario.tpv + '/comisionistas', {
+        headers: {
+          Authorization: this.usuario.token
+        }
+      })
+        .then(response => {
+          this.comisionistas = response.data;
+        })
+        .catch(error => {
+          console.log(error);
+        })
+        .finally(() => this.cargando = false);
+    },
+    getTiposDeComprobante() {
+      axios.get(this.url + '/' + this.usuario.tpv + '/facturas/tiposDeComprobantes', {
+        headers: {
+          Authorization: this.usuario.token
+        }
+      })
+        .then(response => {
+          this.comprobantes = response.data;
+          this.comprobantes.unshift({ Id: 0, Desc: 'No fiscal' });
+        })
+        .catch(error => {
+          console.log(error);
+        })
     }
 
+  },
+  mounted() {
+    this.getComisionistas();
+    this.getTiposDeComprobante();
   },
   setup() {
     const usuario = useUserStore();

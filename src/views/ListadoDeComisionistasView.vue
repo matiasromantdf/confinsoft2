@@ -96,6 +96,9 @@ export default {
         }
     },
     mounted() {
+        if (this.usuario.rol != 1) {
+            this.$router.push('/no-autorizado');
+        }
         this.getComisionistas();
     },
     components: {

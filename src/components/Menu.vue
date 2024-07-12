@@ -4,9 +4,19 @@
             <v-app-bar-nav-icon @click="drawer = !drawer" />
             <v-toolbar-title>ConFin Soft</v-toolbar-title>
             <template v-slot:append>
-                <v-btn icon>
-                    <v-icon>mdi-account-circle-outline</v-icon>
-                </v-btn>
+                <v-menu v-if="this.usuario.token != ''">
+                    <template v-slot:activator="{ props }">
+                        <v-btn icon v-bind="props">
+                            <v-icon>mdi-account-circle</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list>
+                        <v-list-item @click="cerrarSesion" value="cerrar">
+                            <v-list-item-title>Cerrar sesión</v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+
+                </v-menu>
                 <v-btn icon>
                     <v-icon>mdi-email-outline</v-icon>
                 </v-btn>
@@ -18,8 +28,8 @@
 
 
             <v-list v-model:opened="open">
-                <v-list-item prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg" title="un User"
-                    subtitle="user@gmail.com"></v-list-item>
+                <v-list-item prepend-avatar="" :title="usuario.comercio.nombre"
+                    :subtitle="usuario.username"></v-list-item>
 
                 <v-divider class="mt-6"></v-divider>
                 <v-list-item title="Vender" prepend-icon="mdi-cash-register" value="inicio"
@@ -28,15 +38,11 @@
                     <template v-slot:activator="{ props }">
                         <v-list-item v-bind="props" prepend-icon="" title="Articulos"></v-list-item>
                     </template>
-                    <v-list-item title="Listado" prepend-icon="mdi-view-list" value="listadoArticulos"
+                    <v-list-item title="Articulos" prepend-icon="mdi-view-list" value="listadoArticulos"
                         @click="$router.push('listado-de-articulos')"></v-list-item>
                     <v-list-item title="Categorias" prepend-icon="mdi-shape-outline" value="listadoCategorias"
                         @click="$router.push('listado-de-categorias')"></v-list-item>
                 </v-list-group>
-
-
-
-
 
                 <!-- </v-list-group> -->
                 <v-list-group value="Ventas">
@@ -49,6 +55,8 @@
                         :to="{ name: 'historial-de-ventas' }"></v-list-item>
                     <v-list-item title="Comisiones" prepend-icon="mdi-chart-pie" value="comisiones"
                         :to="{ name: 'reporte-de-comisiones' }"></v-list-item>
+                    <v-list-item title="Ventas totales" prepend-icon="mdi-sigma" value="ventas-totales"
+                        :to="{ name: 'ventas-totales' }"></v-list-item>
 
                 </v-list-group>
 
@@ -59,7 +67,7 @@
                     </template>
                     <v-list-item title="Proveedores" prepend-icon="mdi-truck-outline" value="listadoProveedores"
                         @click="$router.push('listado-de-proveedores')"></v-list-item>
-                    <v-list-item title="Compras" prepend-icon="mdi-truck-cargo-container" value="registrar"
+                    <v-list-item title="Compras" prepend-icon="mdi-package-variant-closed-plus" value="registrar"
                         :to="{ name: 'compras' }"></v-list-item>
 
                 </v-list-group>
@@ -78,6 +86,16 @@
                     </v-list-item>
                 </v-list-group> -->
 
+                <v-list-group value="Configuración">
+                    <template v-slot:activator="{ props }">
+                        <v-list-item v-bind="props" prepend-icon="" title="Configuración"></v-list-item>
+                    </template>
+                    <v-list-item title="Usuarios" prepend-icon="mdi-account-multiple" value="usuarios"
+                        @click="$router.push('usuarios')"></v-list-item>
+
+
+                </v-list-group>
+
 
             </v-list>
 
@@ -85,12 +103,8 @@
 
     </div>
 </template>
-<script setup>
-import { useUserStore } from '../stores/user';
-const usuario = useUserStore();
-
-</script>
 <script>
+import { useUserStore } from '../stores/user';
 export default {
     data() {
         return {
@@ -98,6 +112,21 @@ export default {
             open: [],
         };
     },
+    setup() {
+        let usuario = useUserStore();
+        return { usuario };
+    },
+    computed: {
+
+    },
+    methods: {
+        cerrarSesion() {
+            this.usuario.logOff();
+            this.$router.push({ name: 'login' });
+        }
+    }
+
+
 }
 </script>
 
