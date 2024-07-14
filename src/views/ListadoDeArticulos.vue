@@ -1,6 +1,5 @@
 <template>
     <div>
-
         <v-container>
             <v-row>
                 <v-col>
@@ -10,7 +9,7 @@
                             :no-data-text="sinDatos">
                             <template v-slot:top>
                                 <v-toolbar>
-                                    <v-toolbar-title>Listado de Articulos</v-toolbar-title>
+                                    <v-toolbar-title>Articulos</v-toolbar-title>
                                     <v-divider class="mx-4" inset vertical></v-divider>
 
                                     <v-btn @click="dialogoNuevo = true" prepend-icon="mdi-plus" class="mr-4 border"

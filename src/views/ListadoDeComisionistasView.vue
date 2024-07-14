@@ -9,7 +9,7 @@
                             :items-per-page-text="textoItems">
                             <template v-slot:top>
                                 <v-toolbar>
-                                    <v-toolbar-title>Listado de Barberos</v-toolbar-title>
+                                    <v-toolbar-title>Barberos</v-toolbar-title>
                                     <v-divider class="mx-4" inset vertical></v-divider>
                                     <NuevoComisionistaComponent @actualizar="getComisionistas()" />
 

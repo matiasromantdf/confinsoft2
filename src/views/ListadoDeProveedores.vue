@@ -8,7 +8,7 @@
                             :loading="cargando" :hover=true loading-text="cargando proveedores...">
                             <template v-slot:top>
                                 <v-toolbar>
-                                    <v-toolbar-title>Listado de Proveedores</v-toolbar-title>
+                                    <v-toolbar-title>Proveedores</v-toolbar-title>
                                     <v-divider class="mx-4" inset vertical></v-divider>
                                     <NuevoProveedorComponent @actualizarProveedores="getProveedores()" />
                                     <v-spacer></v-spacer>

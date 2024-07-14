@@ -6,16 +6,19 @@
                     <v-card>
                         <v-data-table :headers="headers" :items="clientes" item-key="id" class="elevation-5 border"
                             :loading="cargando" :hover=true :loading-text="cargandoText"
-                            :items-per-page-text="textoItems">
+                            :items-per-page-text="textoItems" :search="search">
                             <template v-slot:top>
                                 <v-toolbar>
-                                    <v-toolbar-title>Listado de Clientes</v-toolbar-title>
+                                    <v-toolbar-title>Clientes</v-toolbar-title>
                                     <v-divider class="mx-4" inset vertical></v-divider>
                                     <NuevoClienteComponent @actualizarClientes="getClientes()" />
                                     <v-spacer></v-spacer>
-                                    <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar"
-                                        @keyup="buscar()" single-line hide-details variant="underlined"></v-text-field>
+                                    <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+                                        hide-details variant="underlined"></v-text-field>
                                 </v-toolbar>
+                            </template>
+                            <template v-slot:item.cuenta="{ item }">
+                                {{ item.cuenta ? item.cuenta.saldo : 0 }}
                             </template>
 
                             <template v-slot:item.actions="{ item }">
@@ -28,14 +31,10 @@
                                         <v-btn v-bind="props" variant="flat">Cuenta</v-btn>
                                     </template>
                                     <v-list>
-                                        <v-list-item value="sumar">
-                                            <v-list-item-title>Cargar pago</v-list-item-title>
-                                        </v-list-item>
-                                        <v-list-item value="movimientos">
-                                            <v-list-item-title>Ver movimientos</v-list-item-title>
+                                        <v-list-item value="cuenta" @click="verCuenta(item)">
+                                            <v-list-item-title>Movimientos</v-list-item-title>
                                         </v-list-item>
                                     </v-list>
-
                                 </v-menu>
                             </template>
                         </v-data-table>
@@ -62,6 +61,7 @@ export default {
                 { title: 'DNI/CUIT', value: 'dni' },
                 { title: 'Nombre', value: 'nombre' },
                 { title: 'Teléfono', value: 'telefono' },
+                { title: 'Saldo', value: 'cuenta' },
                 { title: 'Acciones', value: 'actions', sortable: false },
             ],
             clientes: [],
@@ -96,12 +96,12 @@ export default {
                 .finally(() => this.cargando = false);
 
         },
+        verCuenta(cliente) {
+            this.$router.push({ name: 'cuenta-corriente', params: { id: cliente.id } });
+        },
         eliminarCliente(cliente) {
             alert('eliminar cliente' + cliente.nombre)
         },
-        buscar() {
-            console.log('buscando');
-        }
     },
     setup() {
         const usuario = useUserStore();

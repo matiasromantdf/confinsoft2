@@ -95,7 +95,13 @@ const router = createRouter({
       path:'/configuracion',
       name:'configuracion',
       component: () => import('../views/ConfiguracionDelComercioView.vue')
+    },
+    {
+      path:'/cuenta-corriente/:id',
+      name:'cuenta-corriente',
+      component: () => import('../views/CuentaCorrienteClienteView.vue')
     }
+
     
 
   ]
