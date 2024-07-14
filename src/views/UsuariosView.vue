@@ -2,6 +2,16 @@
     <div>
         <v-container>
             <v-row>
+                <v-col>
+                    <v-card title="Usuarios vendedores" :loading="cargando">
+                        <v-card-text>
+                            En esta sección se pueden crear, editar y eliminar usuarios vendedores. Estos usuarios van a
+                            tener restricciones de acceso a ciertas secciones de la aplicación.
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+            </v-row>
+            <!-- <v-row>
                 <v-col class="d-flex algin-items-center">
                     <div>
                         <v-alert v-model="mensaje" border="start" close-label="Close Alert" color="indigo-lighten-2"
@@ -11,8 +21,8 @@
                         </v-alert>
                     </div>
                 </v-col>
-            </v-row>
-            <v-row class="d-flex">
+            </v-row> -->
+            <v-row class="d-flex" v-if="!cargando">
                 <v-col class="d-flex">
                     <v-card class="ml-2" v-for="usuario in usuarios" :key="usuario.id" width="200px" elevation="15">
                         <template v-slot:prepend>

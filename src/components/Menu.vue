@@ -166,6 +166,6 @@ export default {
 
 .v-list-group__items .v-list-item {
     padding-inline-start: 35px !important;
-    background-color: #1a478a8a !important;
+    color: rgb(193, 205, 214)
 }
 </style>

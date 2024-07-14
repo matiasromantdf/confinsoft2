@@ -1,6 +1,18 @@
 <template>
     <v-container>
         <v-row>
+            <v-col class="d-flex algin-items-center">
+                <div>
+                    <v-alert v-model="mensaje" border="start" close-label="Close Alert" color="indigo-lighten-2"
+                        title="Aviso" variant="tonal" closable>
+                        En esta sección se pueden configurar los datos del comercio y el tipo de impresión de los
+                        comprobantes.<br>
+                        Estos datos son utilizados en la facturacion y deben ingresarse correctamente.
+                    </v-alert>
+                </div>
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col>
                 <v-card title="Datos del comercio" :loading="loading">
                     <v-card-text>
@@ -73,7 +85,8 @@ export default {
                 }
             ],
             url: import.meta.env.VITE_URL,
-            loading: false
+            loading: false,
+            mensaje: true
         }
     },
     methods: {
