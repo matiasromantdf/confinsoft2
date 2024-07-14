@@ -24,11 +24,12 @@
         </v-app-bar>
 
 
-        <v-navigation-drawer v-model="drawer" color="indigo-darken-1" v-if="usuario.isLogged" temporary>
+        <v-navigation-drawer v-model="drawer" color="indigo-darken-1" v-if="usuario.isLogged" temporary
+            class="sin-scroll">
 
 
             <v-list v-model:opened="open">
-                <v-list-item prepend-avatar="" :title="usuario.comercio.nombre"
+                <v-list-item :prepend-avatar="usuario.comercio.logo" :title="usuario.comercio.nombre"
                     :subtitle="usuario.username"></v-list-item>
 
                 <v-divider class="mt-6"></v-divider>
@@ -57,6 +58,10 @@
                         :to="{ name: 'reporte-de-comisiones' }"></v-list-item>
                     <v-list-item title="Ventas totales" prepend-icon="mdi-sigma" value="ventas-totales"
                         :to="{ name: 'ventas-totales' }"></v-list-item>
+                    <v-list-item title="Por artículo" prepend-icon="mdi-shopping-outline" value="ventas-articulos"
+                        :to="{ name: 'ventas-por-articulo' }"></v-list-item>
+
+
 
                 </v-list-group>
 
@@ -92,6 +97,9 @@
                     </template>
                     <v-list-item title="Usuarios" prepend-icon="mdi-account-multiple" value="usuarios"
                         @click="$router.push('usuarios')"></v-list-item>
+                    <v-list-item title="Configuración" prepend-icon="mdi-cog" value="configuracion"
+                        @click="$router.push('configuracion')"></v-list-item>
+
 
 
                 </v-list-group>
@@ -130,4 +138,34 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.v-navigation-drawer {
+    scrollbar-width: thin;
+    scrollbar-color: #0a0944 transparent;
+    overflow-y: auto;
+}
+
+.v-navigation-drawer::-webkit-scrollbar {
+    width: 5px !important;
+    height: 5px !important;
+}
+
+.v-navigation-drawer::-webkit-scrollbar-thumb {
+    background-color: #0a0944 !important;
+    border-radius: 5px !important;
+}
+
+.v-navigation-drawer::-webkit-scrollbar-track {
+    background-color: transparent !important;
+    border-radius: 5px !important;
+}
+
+.v-navigation-drawer::-webkit-scrollbar-thumb:hover {
+    background-color: #000 !important;
+}
+
+.v-list-group__items .v-list-item {
+    padding-inline-start: 35px !important;
+    background-color: #1a478a8a !important;
+}
+</style>

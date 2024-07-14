@@ -26,10 +26,10 @@
                                         <v-btn v-bind="props" variant="flat">Cuenta</v-btn>
                                     </template>
                                     <v-list>
-                                        <v-list-item>
-                                            <v-list-item-title>Ver cuenta</v-list-item-title>
+                                        <v-list-item value="sumar">
+                                            <v-list-item-title>Cargar pago</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item>
+                                        <v-list-item value="movimientos">
                                             <v-list-item-title>Ver movimientos</v-list-item-title>
                                         </v-list-item>
                                     </v-list>

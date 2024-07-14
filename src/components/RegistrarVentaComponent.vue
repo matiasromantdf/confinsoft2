@@ -100,7 +100,7 @@
                         <v-col cols="6" v-if="pago.recargo > 0" offset="4" style="height: 50px; margin-top: -40px;">
                             <v-chip class="" color="primary" label>monto a cobrar: {{
                                 formatear(parseFloat(pago.monto) + parseFloat(pago.recargo))
-                            }}</v-chip>
+                                }}</v-chip>
                         </v-col>
 
 
@@ -262,7 +262,7 @@ export default {
             else {
                 console.log('el tipo de comp es :' + this.tipo_cbte);
                 console.log('registrando venta fiscal');
-                // this.registrarVentaEnBD(true);
+                this.registrarVentaEnBD(true);
 
 
             }
