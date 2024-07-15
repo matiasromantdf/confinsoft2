@@ -40,8 +40,8 @@ export default {
         return {
             articulos: [],
             url: import.meta.env.VITE_URL,
-            desde: '2020-01-01',
-            hasta: '2025-01-01',
+            desde: '',
+            hasta: '',
             headers: [
                 { title: 'Código', value: 'codigo', sortable: true },
                 { title: 'Artículo', value: 'descripcion', sortable: true },
@@ -51,6 +51,8 @@ export default {
         }
     },
     mounted() {
+        this.desde = new Date().toISOString().substr(0, 10)
+        this.hasta = new Date().toISOString().substr(0, 10)
     },
     methods: {
         async getArticulos() {
