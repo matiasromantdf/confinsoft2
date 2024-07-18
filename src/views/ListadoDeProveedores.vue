@@ -10,7 +10,9 @@
                                 <v-toolbar>
                                     <v-toolbar-title>Proveedores</v-toolbar-title>
                                     <v-divider class="mx-4" inset vertical></v-divider>
-                                    <NuevoProveedorComponent @actualizarProveedores="getProveedores()" />
+                                    <v-btn @click="modalNuevo = true" color="primary" text>Nuevo</v-btn>
+                                    <NuevoProveedorComponent @actualizarProveedores="getProveedores()"
+                                        @cerrarDialogo="this.modalNuevo = false" v-if="modalNuevo" />
                                     <v-spacer></v-spacer>
                                     <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar"
                                         @keyup="buscar()" single-line hide-details variant="underlined"></v-text-field>
@@ -50,7 +52,8 @@ export default {
             url: import.meta.env.VITE_URL,
             cargando: false,
             proveedorAEditar: {},
-            modalEditar: false
+            modalEditar: false,
+            modalNuevo: false
         }
     },
     methods: {

@@ -100,7 +100,18 @@ const router = createRouter({
       path:'/cuenta-corriente/:id',
       name:'cuenta-corriente',
       component: () => import('../views/CuentaCorrienteClienteView.vue')
+    },
+    {
+      path:'/historial-de-compas',
+      name:'historial-de-compras',
+      component: () => import('../views/HistorialDeComprasView.vue')
+    },
+    {
+      path:'/graficos',
+      name:'graficos',
+      component: () => import('../views/GraficosView.vue')
     }
+
 
     
 

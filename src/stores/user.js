@@ -19,7 +19,7 @@ export const useUserStore = defineStore('usuario', {
     },
     getComercio: (state) => {
       return state.comercio
-    }
+    },
   },
   actions: {
     setUsuario(data) {
@@ -40,7 +40,15 @@ export const useUserStore = defineStore('usuario', {
       this.rol = null
       this.tpv = null
       this.comercio = null
-
+    },
+    comercioTiene(plugin) {
+      if (this.comercio == null) {
+        return false
+      }
+      if (this.comercio.plugins.includes(plugin)) {
+        return true
+      }
+      return false
     }
 
   }

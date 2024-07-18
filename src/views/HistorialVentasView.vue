@@ -1,5 +1,6 @@
 <template>
     <v-container>
+
         <v-row>
             <v-col>
                 <v-card>
@@ -22,7 +23,8 @@
                         </v-row>
                         <v-row>
                             <v-col>
-                                <v-data-table :items="ventas" :headers="cabeceras">
+                                <v-data-table :items="ventas" :headers="cabeceras" no-data-text="sin datos"
+                                    items-per-page-text="filas">
                                     <template v-slot:item.verDetalle="{ item }">
                                         <v-btn @click="mostrarDetalle(item)" variant="flat">Ver detalle</v-btn>
                                     </template>
@@ -96,8 +98,10 @@ export default {
             cabeceras: [
                 { title: 'Numero', key: 'numero', value: 'numero' },
                 { title: 'Fecha', key: 'fecha', value: item => item.created_at.substr(0, 10) },
-                { title: 'Monto', key: 'monto', value: 'monto' },
+                { title: 'Monto', key: 'monto', value: item => item.monto },
+                { title: 'Recargo Financ.', key: 'recargo', value: item => item.recargo },
                 { title: 'Descuento', key: 'descuento', value: 'descuento' },
+                { title: 'Cliente', key: 'cliente', value: item => item.cliente.nombre },
                 { title: 'Acciones', key: 'acciones' }
             ],
             desde: '',

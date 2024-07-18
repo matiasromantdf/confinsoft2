@@ -6,8 +6,10 @@
                     <v-card :title="'Cuenta corriente de ' + cliente.nombre">
                         <v-card-text>
                             <v-container>
-                                <v-row>
+                                <v-row class="elevation-1 rounded-sm border">
                                     <v-col>
+                                        <h4>Añadir un registro a la cuenta</h4>
+                                        <br>
                                         <!-- form para añadir un movimiento a la cuenta-->
                                         <v-form @submit.prevent="saveMovimiento()" v-model="completo"
                                             validate-on="blur">
@@ -30,8 +32,9 @@
                                             </v-row>
                                             <v-row>
                                                 <v-spacer />
-                                                <v-col cols="3">
-                                                    <v-btn type="submit" color="primary">Guardar</v-btn>
+                                                <v-col md="2" sm="6">
+                                                    <v-btn type="submit" color="green" variant="flat"
+                                                        width="100%">Guardar</v-btn>
                                                 </v-col>
                                             </v-row>
                                         </v-form>
@@ -165,6 +168,11 @@ export default {
         const usuario = useUserStore();
         return { usuario };
     },
+    mounted() {
+        if (this.usuario.rol != 1) {
+            this.$router.push('/no-autorizado');
+        }
+    }
 
 }
 </script>

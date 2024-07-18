@@ -38,7 +38,7 @@
                             </v-col>
                             <v-col cols="12" md="6">
                                 <v-text-field v-model="comercio.inicio_actividades" label="Inicio de actividades"
-                                    variant="outlined"></v-text-field>
+                                    variant="outlined" type="date"></v-text-field>
                             </v-col>
                             <v-col cols="12" md="6">
                                 <v-select v-model="comercio.impresion" :items="modosDeImpresion"
@@ -144,6 +144,7 @@ export default {
                             this.getComercioData();
                         })
                         .catch(error => {
+                            this.$swal('Error', 'Ha ocurrido un error al guardar los datos', 'error');
                             console.log(error);
                         })
                         .finally(() => {
@@ -155,6 +156,9 @@ export default {
         },
     },
     mounted() {
+        if (this.usuario.rol != 1) {
+            this.$router.push('/no-autorizado');
+        }
         this.getComercioData();
     },
     setup() {

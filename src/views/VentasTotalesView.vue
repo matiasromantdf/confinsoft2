@@ -1,10 +1,19 @@
 <template>
     <v-container>
         <v-row>
+            <v-col class="d-flex algin-items-center">
+                <v-alert v-model="mensaje" border="start" close-label="Close Alert" color="primary" title="Aviso"
+                    variant="tonal" closable>
+                    Los montos con tarjeta de crédito NO incluyen los recargos por financiación, ya que en esta vista se
+                    muestran los ingresos de dinero.
+                </v-alert>
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col>
                 <v-card>
                     <v-card-title>
-                        <h3>Historial de ventas</h3>
+                        <h3>Ventas totales</h3>
                     </v-card-title>
                     <v-card-text>
                         <v-row class="mt-1">
@@ -87,6 +96,7 @@ export default {
             hasta: '',
             comisionista: '',
             cargando: false,
+            mensaje: true,
         };
     },
     methods: {

@@ -2,7 +2,6 @@
     <div>
         <!-- <v-btn @click="dialogo = true" prepend-icon="mdi-plus" class="mr-4 border" tonal color="primary">Nueva</v-btn>-->
         <v-dialog width="500" class="rounded-xl" v-model="dialogo">
-
             <v-card :title=titulo>
                 <v-form fast-fail @submit.prevent="guardarCategoria" v-model="valid">
                     <v-card-text>

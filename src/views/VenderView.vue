@@ -203,8 +203,8 @@
       <!-- abrir componente con una transicion-->
       <transition>
 
-        <RegistrarVentaComponent :detalle="detalle" :clienteId="cliente.id" :total="total + (variacion * -1)" :costo="costo"
-          :usuario="usuario" v-if="modalRegistroVenta && detalle.length > 0"
+        <RegistrarVentaComponent :detalle="detalle" :clienteId="cliente.id" :total="total + (variacion * -1)"
+          :costo="costo" :usuario="usuario" v-if="modalRegistroVenta && detalle.length > 0"
           @cerrarModalPagos="modalRegistroVenta = false" :variacion="variacion" @venta-registrada="reinicializar()"
           :comprobantes="comprobantes" :comisionistas="comisionistas" />
       </transition>
@@ -522,8 +522,12 @@ export default {
 
   },
   mounted() {
-    this.getComisionistas();
-    this.getTiposDeComprobante();
+    if (this.usuario.comercioTiene('comisiones')) {
+      this.getComisionistas();
+    }
+    if (this.usuario.comercioTiene('facturacion')) {
+      this.getTiposDeComprobante();
+    }
   },
   setup() {
     const usuario = useUserStore();

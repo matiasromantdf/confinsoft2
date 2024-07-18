@@ -181,8 +181,13 @@ export default {
     },
     mounted() {
         this.getArticulos();
-        if (this.usuario.rol == 2) {
-            this.headers.splice(4, 1);
+        if (this.usuario.rol != 1) {
+            let index = this.headers.findIndex(header => header.title == 'Acciones');
+            this.headers.splice(index, 1);
+        }
+        if (!this.usuario.comercioTiene('comisiones')) {
+            let index = this.headers.findIndex(header => header.title == 'Comisión');
+            this.headers.splice(index, 1);
         }
 
     },

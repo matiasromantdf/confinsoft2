@@ -10,14 +10,15 @@
                                 <v-col cols="6">
                                     <v-select append-icon="mdi-plus" v-model="articulo.proveedor_id" label="Proveedor"
                                         variant="outlined" required :items="proveedores" item-title="nombre"
-                                        item-value="id" :rules="proveedorRule">
+                                        item-value="id" :rules="proveedorRule"
+                                        @click:append="this.modalNuevoProveedor = true">
 
                                     </v-select>
                                 </v-col>
                                 <v-col cols="6">
                                     <v-select append-icon="mdi-plus" v-model="articulo.categoria_id" label="Categoría"
                                         variant="outlined" required :items="categorias" item-title="nombre"
-                                        item-value="id">
+                                        item-value="id" @click:append="this.modalNuevaCategoria = true">
                                     </v-select>
                                 </v-col>
                             </v-row>
@@ -62,8 +63,8 @@
                             </v-row>
                             <v-row>
                                 <v-col cols="6">
-                                    <v-text-field v-model="articulo.comision" label="Comisión" required
-                                        variant="outlined" type="number"></v-text-field>
+                                    <v-text-field v-model="articulo.comision" label="Comisión" variant="outlined"
+                                        type="number" v-if="usuario.comercioTiene('comisiones')"></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
                                     <v-checkbox v-model="articulo.es_servicio" label="Es un servicio"></v-checkbox>
@@ -86,6 +87,12 @@
             </v-card>
         </div>
     </div>
+    <NuevoProveedorComponent @actualizarProveedores="getProveedores()" @cerrarDialogo="this.modalNuevoProveedor = false"
+        v-if="modalNuevoProveedor" />
+    <NuevaCategoriaComponent @actualizarCategorias="getCategorias()" @cerrarDialogo="this.modalNuevaCategoria = false"
+        v-if="modalNuevaCategoria" />
+
+
 </template>
 
 <script>
@@ -103,7 +110,7 @@ export default {
                 proveedor_id: '',
                 categoria_id: '',
                 iva: '',
-                comision: '',
+                comision: 0,
                 es_servicio: false,
             },
             proveedores: [],
@@ -137,7 +144,9 @@ export default {
                     }
                     return 'El campo es requerido';
                 }
-            ]
+            ],
+            modalNuevoProveedor: false,
+            modalNuevaCategoria: false
 
         }
     },

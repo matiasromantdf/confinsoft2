@@ -55,7 +55,8 @@
                     <v-list-item title="Historial" prepend-icon="mdi-calendar-month-outline" value="listar-ventas"
                         :to="{ name: 'historial-de-ventas' }"></v-list-item>
                     <v-list-item title="Comisiones" prepend-icon="mdi-chart-pie" value="comisiones"
-                        :to="{ name: 'reporte-de-comisiones' }"></v-list-item>
+                        :to="{ name: 'reporte-de-comisiones' }"
+                        v-if="usuario.comercioTiene('comisiones')"></v-list-item>
                     <v-list-item title="Ventas totales" prepend-icon="mdi-sigma" value="ventas-totales"
                         :to="{ name: 'ventas-totales' }"></v-list-item>
                     <v-list-item title="Por artículo" prepend-icon="mdi-shopping-outline" value="ventas-articulos"
@@ -66,21 +67,20 @@
                 </v-list-group>
 
 
-                <v-list-group value="Proveedores">
+                <v-list-group value="Compras">
                     <template v-slot:activator="{ props }">
-                        <v-list-item v-bind="props" prepend-icon="" title="Proveedores"></v-list-item>
+                        <v-list-item v-bind="props" prepend-icon="" title="Compras"></v-list-item>
                     </template>
                     <v-list-item title="Proveedores" prepend-icon="mdi-truck-outline" value="listadoProveedores"
                         @click="$router.push('listado-de-proveedores')"></v-list-item>
-                    <v-list-item title="Compras" prepend-icon="mdi-package-variant-closed-plus" value="registrar"
+                    <v-list-item title="Registrar" prepend-icon="mdi-package-variant-closed-plus" value="registrar"
                         :to="{ name: 'compras' }"></v-list-item>
+                    <v-list-item title="Historial" prepend-icon="mdi-calendar-month-outline" value="historialCompras"
+                        :to="{ name: 'historial-de-compras' }"></v-list-item>
+
+
 
                 </v-list-group>
-                <v-list-item title="Clientes" prepend-icon="mdi-account-multiple" value="listadoClientes"
-                    @click="$router.push('listado-de-clientes')"></v-list-item>
-                <v-list-item title="Barberos" prepend-icon="mdi-account-group" value="listadoComisionistas"
-                    @click="$router.push('listado-de-comisionistas')"></v-list-item>
-
                 <!--               
                 <v-list-group value="Pagos y Gastos">
                     <template v-slot:activator="{ props }">
@@ -103,6 +103,14 @@
 
 
                 </v-list-group>
+                <v-divider></v-divider>
+                <v-list-item title="Clientes" prepend-icon="mdi-account-multiple" value="listadoClientes"
+                    @click="$router.push('listado-de-clientes')"></v-list-item>
+                <v-list-item title="Barberos" prepend-icon="mdi-account-group" value="listadoComisionistas"
+                    @click="$router.push('listado-de-comisionistas')"
+                    v-if="usuario.comercioTiene('comisiones')"></v-list-item>
+                <v-list-item title="Gráficos" prepend-icon="mdi-chart-areaspline" value="graficos"
+                    @click="$router.push('graficos')"></v-list-item>
 
 
             </v-list>

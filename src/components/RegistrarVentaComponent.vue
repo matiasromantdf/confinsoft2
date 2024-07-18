@@ -56,7 +56,7 @@
                                 @click="console.log(tipo_cbte)">
                             </v-select>
                         </v-col>
-                        <v-col cols="5">
+                        <v-col cols="5" v-if="usuario.comercioTiene('comisiones')">
                             <v-select variant="underlined" v-model="comisionista" :items="comisionistas" label="Barbero"
                                 item-title="nombre" item-value="id">
                                 <template v-slot:item="{ props, item }">
@@ -88,7 +88,7 @@
                             </v-icon>
 
                         </v-col>
-                        <v-col cols="1" offset="" v-if="pago.medio == 3 && !(i < pagos.length - 1)" class="mb-3">
+                        <v-col cols="1" offset="" v-if="pago.medio == 2 && !(i < pagos.length - 1)" class="mb-3">
                             <v-badge dot :color="pago.recargo == 0 ? 'red' : 'green'">
                                 <v-icon @click="abrirModalPagos(i)" id="icono-mas-pago">
                                     <v-tooltip activator="parent" location="top">Establecer recargo
@@ -149,24 +149,17 @@ export default {
                 },
                 {
                     id: 2,
-                    nombre: 'Débito'
+                    nombre: 'Crédito'
                 },
                 {
                     id: 3,
-                    nombre: 'Crédito'
+                    nombre: 'Débito'
                 },
                 {
                     id: 4,
                     nombre: 'Transferencia'
                 },
-                {
-                    id: 5,
-                    nombre: 'Cheque'
-                },
-                {
-                    id: 6,
-                    nombre: 'Cuenta Corriente'
-                }
+
             ],
             modalRecargoPago: false,
             porcentajeRecargo: 0,
@@ -233,7 +226,7 @@ export default {
                 }
 
             }
-            if (this.comisionista == null) {
+            if (this.comisionista == null && this.usuario.comercioTiene('comisiones')) {
                 this.$swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -273,7 +266,7 @@ export default {
             this.registrandoVenta = true;
             let venta = {
                 cliente_id: this.clienteId,
-                total: this.total - this.descuentoPesos,
+                total: this.total - this.descuentoPesos + this.recargoPesos,
                 costo: this.costo,
                 detalle: JSON.stringify(this.detalle),
                 pagos: JSON.stringify(this.pagos),

@@ -45,7 +45,7 @@
                             </v-col>
                         </v-row>
                         <v-row>
-                            <v-col cols="6">
+                            <v-col cols="6" v-if="this.usuario.comercioTiene('comisiones')">
                                 <v-text-field v-model="articulo.comision" label="Comisión"
                                     variant="outlined"></v-text-field>
                             </v-col>

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-btn @click="dialogo = true" prepend-icon="mdi-plus" class="mr-4 border" tonal color="primary">Nuevo</v-btn>
+        <!-- <v-btn @click="dialogo = true" prepend-icon="mdi-plus" class="mr-4 border" tonal color="primary">Nuevo</v-btn> -->
         <v-dialog width="500" class="rounded-xl" v-model="dialogo">
 
             <v-card title="Nuevo Proveedor">
@@ -67,7 +67,6 @@ export default {
             },
             url: import.meta.env.VITE_URL,
             cargando: false,
-            dialogo: false,
             cuitRules: [
                 value => {
                     if (!value) return 'El CUIT es requerido';
@@ -82,7 +81,9 @@ export default {
                     return true;
                 }
             ],
-            valid: false
+            valid: false,
+            dialogo: true
+
 
         }
     },
@@ -115,7 +116,7 @@ export default {
                 });
         },
         cerrarDialogo() {
-            this.dialogo = false;
+            this.$emit('cerrarDialogo');
         }
     },
     setup() {
@@ -124,7 +125,7 @@ export default {
             usuario
         }
     },
-    emits: ['actualizarProveedores'],
+    emits: ['actualizarProveedores', 'cerrarDialogo'],
 
 }
 </script>

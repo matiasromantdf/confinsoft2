@@ -24,8 +24,8 @@
                             <template v-slot:item.actions="{ item }">
                                 <v-icon v-if="item.dni != 0" small class="mr-2" @click="editarCliente(item)"
                                     color="blue">mdi-pencil</v-icon>
-                                <v-icon v-if="item.dni != 0" small @click="eliminarCliente(item)"
-                                    color="red">mdi-delete</v-icon>
+                                <!-- <v-icon v-if="item.dni != 0" small @click="eliminarCliente(item)"
+                                    color="red">mdi-delete</v-icon> -->
                                 <v-menu v-if="item.dni != 0">
                                     <template v-slot:activator="{ props }">
                                         <v-btn v-bind="props" variant="flat">Cuenta</v-btn>
