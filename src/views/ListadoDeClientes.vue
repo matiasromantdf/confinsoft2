@@ -31,8 +31,9 @@
                                         <v-btn v-bind="props" variant="flat">Cuenta</v-btn>
                                     </template>
                                     <v-list>
-                                        <v-list-item value="cuenta" @click="verCuenta(item)">
-                                            <v-list-item-title>Movimientos</v-list-item-title>
+                                        <v-list-item value="cuenta">
+                                            <v-list-item-title
+                                                @click="$router.push('/cuenta-corriente/' + item.id)">Movimientos</v-list-item-title>
                                         </v-list-item>
                                     </v-list>
                                 </v-menu>
@@ -95,9 +96,6 @@ export default {
                 })
                 .finally(() => this.cargando = false);
 
-        },
-        verCuenta(cliente) {
-            this.$router.push({ name: 'cuenta-corriente', params: { id: cliente.id } });
         },
         eliminarCliente(cliente) {
             alert('eliminar cliente' + cliente.nombre)

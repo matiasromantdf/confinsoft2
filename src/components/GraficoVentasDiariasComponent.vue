@@ -9,7 +9,7 @@
                     <v-tooltip text="cambiar tamaño" target="activator">
                         <template v-slot:activator="{ props }">
                             <v-btn size="" variant="flat" icon @click="resizeThis()" v-bind="props">
-                                <v-icon color="success" v-if="width == 300">mdi-resize</v-icon>
+                                <v-icon color="success" v-if="width == 400">mdi-resize</v-icon>
                                 <v-icon color="success" v-else>mdi-image-size-select-small</v-icon>
                             </v-btn>
                         </template>
@@ -19,12 +19,17 @@
 
         </v-card-title>
         <v-card-text class="mt-2">
-            <v-row>
-                <v-col cols="6">
+            <v-row class="border">
+                <v-col cols="5">
                     <input type="date" label="desde" v-model="desde">
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="5">
                     <input type="date" label="hasta" v-model="hasta">
+                </v-col>
+                <v-col cols="2" class="text-center">
+                    <v-btn size="small" @click="getDatos()" variant="flat">
+                        <v-icon size="25">mdi-refresh</v-icon>
+                    </v-btn>
                 </v-col>
             </v-row>
             <v-row>
@@ -47,7 +52,7 @@ export default {
             desde: '',
             hasta: '',
             datos: [],
-            width: 300,
+            width: 400,
             height: 300,
             url: import.meta.env.VITE_URL,
             llave: 0
@@ -110,7 +115,7 @@ export default {
             });
         },
         resizeThis() {
-            this.width = this.width === 300 ? '100%' : 300;
+            this.width = this.width === 400 ? '100%' : 400;
             this.height = this.height === 300 ? 'fit-content' : 300;
             this.dibujarGrafico();
         }

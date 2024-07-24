@@ -3,7 +3,7 @@
         <v-container>
             <v-row>
                 <v-col>
-                    <v-card :title="'Cuenta corriente de ' + cliente.nombre">
+                    <v-card :title="'Cuenta corriente de ' + cliente.nombre" :loading="cargando">
                         <v-card-text>
                             <v-container>
                                 <v-row class="elevation-1 rounded-sm border">
@@ -33,7 +33,11 @@
                                             <v-row>
                                                 <v-spacer />
                                                 <v-col md="2" sm="6">
-                                                    <v-btn type="submit" color="green" variant="flat"
+                                                    <v-btn type="reset" color="" variant="tonal" @click="$router.back()"
+                                                        width="100%">volver</v-btn>
+                                                </v-col>
+                                                <v-col md="2" sm="6">
+                                                    <v-btn type="submit" color="primary" variant="tonal"
                                                         width="100%">Guardar</v-btn>
                                                 </v-col>
                                             </v-row>
@@ -67,7 +71,7 @@ import { useUserStore } from '../stores/user';
 export default {
     data() {
         return {
-            completo: false,
+            completo: true,
             cliente: {},
             url: import.meta.env.VITE_URL,
             cargando: false,
@@ -160,10 +164,6 @@ export default {
             return new Date(fecha).toLocaleDateString();
         }
     },
-    created() {
-        this.cliente = this.$route.params.id;
-        this.getClienteYCuenta();
-    },
     setup() {
         const usuario = useUserStore();
         return { usuario };
@@ -172,6 +172,8 @@ export default {
         if (this.usuario.rol != 1) {
             this.$router.push('/no-autorizado');
         }
+        this.cliente = this.$route.params.id;
+        this.getClienteYCuenta();
     }
 
 }

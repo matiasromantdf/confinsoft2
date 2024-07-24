@@ -45,7 +45,14 @@
                                     label="Modo de impresión" variant="outlined"></v-select>
                             </v-col>
                             <v-col cols="12" md="6">
-                                <v-file-input label="Logo" id="logo"></v-file-input>
+                                <v-file-input label="Logo" id="logo" variant="outlined"></v-file-input>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="8">
+                                <v-file-input label="Credenciales AFIP" id="credenciales" variant="outlined"
+                                    multiple></v-file-input>
+
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -130,6 +137,10 @@ export default {
                     datos.append('inicio_actividades', this.comercio.inicio_actividades);
                     datos.append('impresion', this.comercio.impresion);
                     datos.append('logo', document.getElementById('logo').files[0]);
+                    for (let i = 0; i < document.getElementById('credenciales').files.length; i++) {
+                        datos.append('credenciales[]', document.getElementById('credenciales').files[i]);
+                    }
+
 
                     this.loading = true;
                     axios.post(this.url + '/' + this.usuario.tpv + '/comercio/actualizar', datos,

@@ -26,6 +26,11 @@
                 </v-card>
             </v-col>
         </v-row>
+        <v-row justify="center">
+            <v-col md="6" sm="12" class="text-center">
+                <v-btn color="primary" @click="reg()">Probar GRATIS</v-btn>
+            </v-col>
+        </v-row>
     </v-container>
 </template>
 <script>
@@ -98,6 +103,9 @@ export default {
 
                 })
         },
+        reg() {
+            this.$router.push('/registrarse');
+        }
     },
     setup() {
         const usuario = useUserStore();

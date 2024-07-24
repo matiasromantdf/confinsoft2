@@ -5,7 +5,7 @@
                 <v-col md="6" sm="12">
                     <v-card elevation="10">
                         <v-card-title class="text-center">
-                            Caja del usuario {{ usuario.username }}
+                            Caja del usuario {{ usuario.username }} ({{ usuario.nombre }})
                         </v-card-title>
                         <v-card-text>
                             <v-table>
@@ -35,6 +35,29 @@
                     </v-card>
                 </v-col>
             </v-row>
+            <v-row>
+                <v-col>
+                    <v-card title="últimas cajas">
+                        <v-card-text>
+                            <v-data-table :headers="headers" :items="cajasAnteriores" :items-per-page="5"
+                                class="elevation-1" no-data-text="sin datos...">
+                                <template v-slot:item.fecha_apertura="{ item }">
+                                    {{ fechaConvertida(item.fecha_apertura) }}
+                                </template>
+                                <template v-slot:item.ventas="{ item }">
+                                    {{ item.ventas }}
+                                </template>
+                                <template v-slot:item.total="{ item }">
+                                    {{ item.total }}
+                                </template>
+                                <template v-slot:item.fecha_cierre="{ item }">
+                                    {{ fechaConvertida(item.fecha_cierre) }}
+                                </template>
+                            </v-data-table>
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+            </v-row>
         </v-container>
     </div>
 </template>
@@ -50,7 +73,15 @@ export default {
             hprops: {
                 class: 'bg-grey',
             },
-            cargando: false
+            cargando: false,
+            cajasAnteriores: [],
+            headers: [
+                { title: 'Usuario', value: 'usuario' },
+                { title: 'Apertura', value: 'fecha_apertura' },
+                { title: 'Ventas', value: 'ventas' },
+                { title: 'Total', value: 'total' },
+                { title: 'Cierre', value: 'fecha_cierre' },
+            ]
 
         };
     },
@@ -70,6 +101,14 @@ export default {
 
         },
         cerrarCaja() {
+            if (this.caja.length == 0) {
+                this.$swal(
+                    'Caja vacía',
+                    'No se puede cerrar una caja vacía',
+                    'warning'
+                );
+                return;
+            }
             //pedir confirmacion
             this.$swal({
                 title: '¿Estás seguro?',
@@ -100,6 +139,23 @@ export default {
                     });
                 }
             });
+        },
+        verUltimasCajas() {
+            axios.get(this.url + '/' + this.usuario.tpv + '/cajas/ultimas', {
+                headers: {
+                    Authorization: this.usuario.token
+                }
+            }).then(response => {
+                this.cajasAnteriores = response.data;
+            }).catch(error => {
+                console.log(error);
+            });
+        },
+        fechaConvertida(fecha) {
+            //convertir fecha a formato dd/mm/yyyy con hora
+            let date = new Date(fecha);
+            return date.toLocaleString();
+
         }
     },
     setup() {
@@ -109,7 +165,9 @@ export default {
     },
     mounted() {
         this.getCaja();
-    }
+        this.verUltimasCajas();
+    },
+
 
 }
 </script>

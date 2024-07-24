@@ -3,7 +3,7 @@
 
         <v-row>
             <v-col>
-                <v-card>
+                <v-card :loading="cargando">
                     <v-card-title>
                         <h3>Historial de ventas</h3>
                     </v-card-title>
@@ -18,7 +18,7 @@
                                     variant="outlined"></v-text-field>
                             </v-col>
                             <v-col cols="12" md="4" class="text-center">
-                                <v-btn :loading="cargando" color="primary" @click="getVentas()">Buscar</v-btn>
+                                <v-btn :loading="cargando2" color="primary" @click="getVentas()">Buscar</v-btn>
                             </v-col>
                         </v-row>
                         <v-row>
@@ -108,13 +108,14 @@ export default {
             hasta: '',
             comisionista: '',
             cargando: false,
+            cargando2: false,
             dialogoDetalle: false,
             itemsDelDetalle: []
         };
     },
     methods: {
         getVentas() {
-            this.cargando = true;
+            this.cargando2 = true;
             axios.get(this.url + '/' + this.usuario.tpv + '/ventas/filtradas', {
                 headers: {
                     Authorization: this.usuario.token
@@ -133,7 +134,7 @@ export default {
                 .catch(error => {
                     console.log(error);
                 })
-                .finally(() => this.cargando = false);
+                .finally(() => this.cargando2 = false);
 
 
         },
@@ -167,6 +168,7 @@ export default {
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    this.cargando = true;
                     axios.post(this.url + '/' + this.usuario.tpv + '/ventas/anular', {
                         id: item.id
                     }, {
@@ -182,7 +184,8 @@ export default {
                         this.getVentas();
                     }).catch(error => {
                         console.log(error);
-                    });
+                    }).
+                        finally(() => this.cargando = false);
                 }
             })
         },

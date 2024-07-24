@@ -100,7 +100,7 @@
                         <v-col cols="6" v-if="pago.recargo > 0" offset="4" style="height: 50px; margin-top: -40px;">
                             <v-chip class="" color="primary" label>monto a cobrar: {{
                                 formatear(parseFloat(pago.monto) + parseFloat(pago.recargo))
-                                }}</v-chip>
+                            }}</v-chip>
                         </v-col>
 
 
@@ -284,9 +284,10 @@ export default {
             })
                 .then(response => {
                     if (response.data.id) {
+                        var idVenta = response.data.id;
                         if (fiscal) {
                             let datosFiscal = {
-                                venta_id: response.data.id,
+                                venta_id: idVenta,
                                 tipo_cbte: this.tipo_cbte,
                             };
                             axios.post(this.url + '/' + this.usuario.tpv + '/facturas/facturar', datosFiscal, {
@@ -303,6 +304,8 @@ export default {
                                     this.$emit('venta-registrada');
                                     this.registrandoVenta = false;
                                     this.$emit('cerrar-modal-pagos');
+                                    this.imprimirComprobante(idVenta);
+
                                 })
                                 .catch(error => {
                                     this.$swal.fire({
@@ -326,10 +329,11 @@ export default {
                             this.$emit('venta-registrada');
                             this.registrandoVenta = false;
                             this.$emit('cerrar-modal-pagos');
+                            this.imprimirComprobante(idVenta);
+
 
                         }
 
-                        this.imprimirComprobante(response.data.id);
 
                     }
                 })

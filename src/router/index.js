@@ -102,7 +102,7 @@ const router = createRouter({
       component: () => import('../views/CuentaCorrienteClienteView.vue')
     },
     {
-      path:'/historial-de-compas',
+      path:'/historial-de-compras',
       name:'historial-de-compras',
       component: () => import('../views/HistorialDeComprasView.vue')
     },
@@ -110,6 +110,16 @@ const router = createRouter({
       path:'/graficos',
       name:'graficos',
       component: () => import('../views/GraficosView.vue')
+    },
+    {
+      path:'/suscripcion',
+      name:'suscripcion',
+      component: () => import('../views/SuscripcionView.vue')
+    },
+    {
+      path:'/registrarse',
+      name:'registrarse',
+      component: () => import('../views/RegistrarseView.vue')
     }
 
 
@@ -119,7 +129,9 @@ const router = createRouter({
 })
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
-  if (to.name !== 'login' && !userStore.isLogged) next({ name: 'login' })
+  if(to.name == 'registrarse') next()
+
+  else if ((to.name !== 'login') && !userStore.isLogged) next({ name: 'login' })
   else next()
 
 }

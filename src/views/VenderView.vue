@@ -518,6 +518,20 @@ export default {
         .catch(error => {
           console.log(error);
         })
+    },
+    getDiasDeSuscripcion() {
+      let fechaVencimiento = this.usuario.comercio.vencimiento;
+      //hora de vencimiento es a las 00:00
+      fechaVencimiento = fechaVencimiento;
+      let fechaActual = this.usuario.horaServidor;
+      let fechaVencimientoDate = new Date(fechaVencimiento);
+      let fechaActualDate = new Date(fechaActual);
+      let diferencia = fechaVencimientoDate.getTime() - fechaActualDate.getTime();
+      let dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+
+      return dias;
+
+
     }
 
   },
@@ -527,6 +541,21 @@ export default {
     }
     if (this.usuario.comercioTiene('facturacion')) {
       this.getTiposDeComprobante();
+    }
+    if (this.getDiasDeSuscripcion() < 0) {
+      this.$swal.fire({
+        icon: 'warning',
+        title: 'Atención',
+        text: 'Su suscripción ha vencido, por favor renuevela para seguir utilizando el sistema',
+      })
+      this.$router.push('/suscripcion');
+    }
+    if (this.getDiasDeSuscripcion() <= 7 && this.getDiasDeSuscripcion() > -1) {
+      this.$swal.fire({
+        icon: 'warning',
+        title: 'Atención',
+        text: 'Su suscripción vencerá en ' + this.getDiasDeSuscripcion() + ' días. Luego no podrá registrar ventas',
+      })
     }
   },
   setup() {

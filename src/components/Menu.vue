@@ -18,7 +18,7 @@
 
                 </v-menu>
                 <v-btn icon>
-                    <v-icon>mdi-email-outline</v-icon>
+                    <v-icon @click="msjWhatsapp()">mdi-email-outline</v-icon>
                 </v-btn>
             </template>
         </v-app-bar>
@@ -40,9 +40,9 @@
                         <v-list-item v-bind="props" prepend-icon="" title="Articulos"></v-list-item>
                     </template>
                     <v-list-item title="Articulos" prepend-icon="mdi-view-list" value="listadoArticulos"
-                        @click="$router.push('listado-de-articulos')"></v-list-item>
+                        @click="$router.push('/listado-de-articulos')"></v-list-item>
                     <v-list-item title="Categorias" prepend-icon="mdi-shape-outline" value="listadoCategorias"
-                        @click="$router.push('listado-de-categorias')"></v-list-item>
+                        @click="$router.push('/listado-de-categorias')"></v-list-item>
                 </v-list-group>
 
                 <!-- </v-list-group> -->
@@ -51,16 +51,16 @@
                         <v-list-item v-bind="props" prepend-icon="" title="Ventas"></v-list-item>
                     </template>
                     <v-list-item title="Caja" prepend-icon="mdi-cash-check" value="caja"
-                        :to="{ name: 'caja' }"></v-list-item>
+                        @click="$router.push('/caja')"></v-list-item>
                     <v-list-item title="Historial" prepend-icon="mdi-calendar-month-outline" value="listar-ventas"
-                        :to="{ name: 'historial-de-ventas' }"></v-list-item>
+                        @click="$router.push('/historial-de-ventas')"></v-list-item>
                     <v-list-item title="Comisiones" prepend-icon="mdi-chart-pie" value="comisiones"
-                        :to="{ name: 'reporte-de-comisiones' }"
+                        @click="$router.push('/reporte-de-comisiones')"
                         v-if="usuario.comercioTiene('comisiones')"></v-list-item>
                     <v-list-item title="Ventas totales" prepend-icon="mdi-sigma" value="ventas-totales"
-                        :to="{ name: 'ventas-totales' }"></v-list-item>
+                        @click="$router.push('/ventas-totales')"></v-list-item>
                     <v-list-item title="Por artículo" prepend-icon="mdi-shopping-outline" value="ventas-articulos"
-                        :to="{ name: 'ventas-por-articulo' }"></v-list-item>
+                        @click="$router.push('/ventas-por-articulo')"></v-list-item>
 
 
 
@@ -72,11 +72,11 @@
                         <v-list-item v-bind="props" prepend-icon="" title="Compras"></v-list-item>
                     </template>
                     <v-list-item title="Proveedores" prepend-icon="mdi-truck-outline" value="listadoProveedores"
-                        @click="$router.push('listado-de-proveedores')"></v-list-item>
+                        @click="$router.push('/listado-de-proveedores')"></v-list-item>
                     <v-list-item title="Registrar" prepend-icon="mdi-package-variant-closed-plus" value="registrar"
-                        :to="{ name: 'compras' }"></v-list-item>
+                        @click="$router.push('/compras')"></v-list-item>
                     <v-list-item title="Historial" prepend-icon="mdi-calendar-month-outline" value="historialCompras"
-                        :to="{ name: 'historial-de-compras' }"></v-list-item>
+                        @click="$router.push('/historial-de-compras')"></v-list-item>
 
 
 
@@ -96,21 +96,23 @@
                         <v-list-item v-bind="props" prepend-icon="" title="Configuración"></v-list-item>
                     </template>
                     <v-list-item title="Usuarios" prepend-icon="mdi-account-multiple" value="usuarios"
-                        @click="$router.push('usuarios')"></v-list-item>
+                        @click="$router.push('/usuarios')"></v-list-item>
                     <v-list-item title="Configuración" prepend-icon="mdi-cog" value="configuracion"
-                        @click="$router.push('configuracion')"></v-list-item>
+                        @click="$router.push('/configuracion')"></v-list-item>
+                    <v-list-item title="Suscripción" prepend-icon="mdi-wallet-membership"
+                        @click="$router.push('/suscripcion')" value="suscripcion"></v-list-item>
 
 
 
                 </v-list-group>
                 <v-divider></v-divider>
                 <v-list-item title="Clientes" prepend-icon="mdi-account-multiple" value="listadoClientes"
-                    @click="$router.push('listado-de-clientes')"></v-list-item>
+                    @click="$router.push('/listado-de-clientes')"></v-list-item>
                 <v-list-item title="Barberos" prepend-icon="mdi-account-group" value="listadoComisionistas"
-                    @click="$router.push('listado-de-comisionistas')"
-                    v-if="usuario.comercioTiene('comisiones')"></v-list-item>
+                    @click="$router.push('/listado-de-comisionistas')"
+                    v-if="usuario.comercioTiene('/comisiones')"></v-list-item>
                 <v-list-item title="Gráficos" prepend-icon="mdi-chart-areaspline" value="graficos"
-                    @click="$router.push('graficos')"></v-list-item>
+                    @click="$router.push('/graficos')"></v-list-item>
 
 
             </v-list>
@@ -139,6 +141,9 @@ export default {
         cerrarSesion() {
             this.usuario.logOff();
             this.$router.push({ name: 'login' });
+        },
+        msjWhatsapp() {
+            window.open('https://wa.me/5492901520850?text=Hola%20quiero%20información%20de%20ConFin%20Soft', '_blank');
         }
     }
 
