@@ -1,1 +1,0 @@
-import{_ as o,Y as t,Z as a,a5 as s,a0 as n,b as e,a3 as r,a2 as c,a7 as l}from"./index-Cn-3wDDx.js";const _={},u=l("h1",null,"No autorizado",-1);function d(i,f,p,V,h,x){return n(),t(s,null,{default:a(()=>[e(c,null,{default:a(()=>[e(r,null,{default:a(()=>[u]),_:1})]),_:1})]),_:1})}const $=o(_,[["render",d]]);export{$ as default};
