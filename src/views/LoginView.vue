@@ -2,8 +2,8 @@
     <v-container>
         <v-row>
             <v-col align="center">
-                <v-card class="mt-6 px-6 py-6" max-width="344" title="Ingreso al sistema" subtitle=" "
-                    :loading="loading" elevation="6">
+                <v-card class="mt-6 px-6 py-6" max-width="344" title="Ingreso al TPV" subtitle=" " :loading="loading"
+                    elevation="6">
                     <template v-slot:append>
                         <v-avatar size="32">
                             <v-icon size="x-large">mdi-lock-outline</v-icon>
