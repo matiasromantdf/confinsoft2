@@ -168,8 +168,6 @@ export default {
             registrandoVenta: false,
             comisionista: null,
 
-
-
         }
     },
     methods: {
@@ -343,12 +341,45 @@ export default {
                 })
 
         },
-        imprimirComprobante(id) {
-            let token = this.usuario.token;
-            //abrir nueva ventana con el comprobante pdf, enviando las credenciales del token
-            let url = this.url + '/' + this.usuario.tpv + '/ventas/imprimirCbte/' + id + '/' + token;
+        async imprimirComprobante(id) {
 
-            window.open(url, '_blank');
+            //si es un celular, abrir el pdf en una nueva ventana
+            if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/Windows Phone/i)) {
+                let token = this.usuario.token;
+                let url = this.url + '/' + this.usuario.tpv + '/ventas/imprimirCbte/' + id + '/' + token;
+                window.open(url, '_blank');
+                return;
+            }
+            else {
+
+                let token = this.usuario.token;
+                let url = this.url + '/' + this.usuario.tpv + '/ventas/imprimirCbte/' + id + '/' + token;
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const pdfUrl = URL.createObjectURL(blob);
+
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+
+                iframe.onload = function () {
+                    iframe.contentWindow.print();
+
+                    // Close the print dialog and window after a print
+
+                    iframe.contentWindow.onafterprint = function () {
+                        iframe.contentWindow.close();
+                        URL.revokeObjectURL(pdfUrl);
+                        document.body.removeChild(iframe);
+                    };
+                };
+
+                iframe.src = pdfUrl;
+
+            }
+
+
+
         },
         formatear(valor) {
             return formatoARS.format(valor);

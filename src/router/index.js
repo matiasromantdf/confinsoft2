@@ -120,6 +120,10 @@ const router = createRouter({
       path:'/registrarse',
       name:'registrarse',
       component: () => import('../views/RegistrarseView.vue')
+    },{
+      path:'/reset-pass',
+      name:'reset-pass',
+      component: () => import('../views/ResetPasswordView.vue')
     }
 
 
@@ -129,7 +133,7 @@ const router = createRouter({
 })
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
-  if(to.name == 'registrarse') next()
+  if(to.name == 'registrarse' || to.name == 'reset-pass') next()
 
   else if ((to.name !== 'login') && !userStore.isLogged) next({ name: 'login' })
   else next()

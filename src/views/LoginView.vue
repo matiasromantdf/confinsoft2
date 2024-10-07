@@ -11,10 +11,11 @@
                     </template>
                     <v-form v-model="form" @submit.prevent="login">
                         <v-text-field v-model="username" :readonly="loading" :rules="[required]" class="mb-2" clearable
-                            label="Usuario"></v-text-field>
+                            label="Usuario" name="username"></v-text-field>
 
                         <v-text-field v-model="password" :readonly="loading" :rules="[required]" clearable
-                            label="Contraseña" placeholder="Ingrese su clave" type="password"></v-text-field>
+                            label="Contraseña" placeholder="Ingrese su clave" type="password"
+                            name="password"></v-text-field>
 
                         <br>
 
@@ -23,9 +24,14 @@
                             Ingresar
                         </v-btn>
                     </v-form>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn text @click.prevent="recuperarPass()">Olvide mi contraseña</v-btn>
+                    </v-card-actions>
                 </v-card>
             </v-col>
         </v-row>
+
         <v-row justify="center">
             <v-col md="6" sm="12" class="text-center">
                 <v-btn color="primary" @click="reg()">Probar GRATIS</v-btn>
@@ -105,6 +111,9 @@ export default {
         },
         reg() {
             this.$router.push('/registrarse');
+        },
+        recuperarPass() {
+            this.$router.push('/reset-pass');
         }
     },
     setup() {

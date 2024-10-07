@@ -17,8 +17,8 @@
 
                         <v-row>
                             <v-col cols="4">
-                                <v-text-field v-model="articulo.codigo" label="Codigo"
-                                    variant="outlined"></v-text-field>
+                                <v-text-field v-model="articulo.codigo" label="Codigo" variant="outlined"
+                                    disabled></v-text-field>
                             </v-col>
                             <v-col cols="5">
                                 <v-text-field v-model="articulo.descripcion" label="Descripcion" required

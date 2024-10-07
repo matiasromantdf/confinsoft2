@@ -5,7 +5,12 @@
         <v-col cols="12" md="9">
           <v-row>
             <v-col>
-              <v-card title="Detalle de venta" prepend-icon=" mdi-cash-register" append-icon="">
+              <v-card title="Detalle de venta" prepend-icon="mdi-cash-register" @keydown="esTeclaFuncion()"
+                tabindex="0">
+                <template v-slot:append>
+                  <v-icon @click="mostrarAyuda()" color="red">mdi-help</v-icon>
+
+                </template>
                 <!-- <template v-slot:append>
                   <v-menu>
                     <template v-slot:activator="{ props }">
@@ -52,9 +57,9 @@
                       </v-dialog>
                     </v-col>
                     <v-col cols="4" md="3">
-                      <v-text-field label="Cantidad" outlined v-model="articulo.cantidad" :disabled="buscandoArticulo"
+                      <!-- <v-text-field label="Cantidad" outlined v-model="articulo.cantidad" :disabled="buscandoArticulo"
                         variant="outlined" id="campoCantidad" @keydown="checkEnter2($event)"
-                        @focus="buscarArticulo()"></v-text-field>
+                        @focus="buscarArticulo()"></v-text-field>-->
                     </v-col>
                     <v-col cols="6" md="2">
                       <v-btn class="ml-1 mt-2" color="primary" dark :loading="buscandoArticulo"
@@ -108,7 +113,7 @@
                               <p v-else>{{ item.porc_bonif }}</p>
                             </td>
                             <td>{{ item.iva }}</td>
-                            <td>{{ item.cantidad }}</td>
+                            <td @dblclick="cambiarCantidad(item)">{{ item.cantidad }}</td>
                             <td>{{ formatear(item.subtotal) }}</td>
                             <td>
                               <v-btn icon="mdi-delete-outline" size="small" color="red-lighten-2"
@@ -307,17 +312,11 @@ export default {
       });
       return formatoARS.format(valor);
     },
-    checkEnter(event) {
+    async checkEnter(event) {
       if (event.key === 'Enter') {
-        document.getElementById('campoCantidad').focus();
-
-      }
-    },
-    checkEnter2(event) {
-      if (event.key === 'Enter') {
-        if (this.articulo.codigo != '') {
-          this.agregarAlDetalle();
-        }
+        await this.buscarArticulo();
+        this.articulo.cantidad = 1;
+        this.agregarAlDetalle();
       }
     },
     setCliente(cliente) {
@@ -325,7 +324,7 @@ export default {
       this.cliente = cliente;
       console.log(this.cliente);
     },
-    buscarArticulo() {
+    async buscarArticulo() {
       if (this.articulo.codigo != '') {
         this.buscandoArticulo = true;
         document.getElementById('codigo').disabled = true;
@@ -344,9 +343,9 @@ export default {
               this.articulo.foto = response.data.foto;
 
               let campoCantidad = document.getElementById('campoCantidad');
-              this.$nextTick(() => {
-                campoCantidad.focus();
-              });
+              this.agregarAlDetalle();
+              document.getElementById('codigo').disabled = false;
+              document.getElementById('codigo').focus();
             }
             else {
               this.$swal.fire({
@@ -364,9 +363,9 @@ export default {
                 codigo: '',
               };
 
-              this.$nextTick(() => {
-                document.getElementById('codigo').focus();
-              });
+              // this.$nextTick(() => {
+              //   document.getElementById('codigo').focus();
+              // });
             }
           })
           .catch(error => {
@@ -375,6 +374,18 @@ export default {
               icon: 'error',
               title: 'Error',
               text: 'El artículo no existe!',
+              confirmButtonText: 'Aceptar',
+              didOpen: () => {
+                const swalmodal = this.$swal.getPopup();
+                //hacer foco en el boton de aceptar
+                swalmodal.querySelector('button').focus();
+
+              },
+              didClose: () => {
+                document.getElementById('codigo').disabled = false;
+                document.getElementById('codigo').focus();
+                this.buscandoArticulo = false;
+              }
             })
             this.articulo = {
               id: '',
@@ -384,15 +395,14 @@ export default {
               costo: '',
               cantidad: 1,
             };
-
-
           })
           .finally(() => {
-            this.buscandoArticulo = false;
+            // document.getElementById('codigo').disabled = false;
+            // document.getElementById('codigo').focus();
+            // this.buscandoArticulo = false;
           });
 
       }
-      document.getElementById('codigo').disabled = false;
     },
     agregarAlDetalle() {
       if (isNaN(this.articulo.precio) || this.articulo.cantidad == 0 || isNaN(this.articulo.cantidad)) {
@@ -532,10 +542,82 @@ export default {
       return dias;
 
 
-    }
+    },
+    esTeclaFuncion() {
+      //si es asterisco, y hay al menos un item en el detalle, abrir un modal para cambiar la cantidad
+      if (event.key === '*') {
+        if (this.detalle.length > 0) {
+          this.$swal.fire({
+            title: 'Cambiar cantidad',
+            input: 'number',
+            inputAttributes: {
+              autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',
+            showLoaderOnConfirm: true,
+            preConfirm: (cantidad) => {
+              if (cantidad == 0 || cantidad == '') {
+                this.$swal.fire('Debe ingresar una cantidad válida');
+                return;
+              }
+              //el ultimo item del array es el 0
+              let ultimoIndice = 0;
+              this.detalle[ultimoIndice].cantidad = cantidad;
+              this.detalle[ultimoIndice].subtotal = this.detalle[ultimoIndice].precio * cantidad;
+            },
+            allowOutsideClick: () => !this.$swal.isLoading()
+          })
+        }
+      }
+      //si la tecla es F2, abrir el modal de buscar articulo
+      if (event.key === 'F2') {
+        this.modalBusquedaArticulo = true;
+      }
+      //si la tecla es F4, abrir el modal de registrar venta
+      if (event.key === 'F4') {
+        this.modalRegistroVenta = true;
+      }
 
+
+    },
+    cambiarCantidad(item) {
+      this.$swal.fire({
+        title: 'Cambiar cantidad',
+        input: 'number',
+        inputAttributes: {
+          autocapitalize: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar',
+        showLoaderOnConfirm: true,
+        preConfirm: (cantidad) => {
+          if (cantidad == 0 || cantidad == '') {
+            this.$swal.fire('Debe ingresar una cantidad válida');
+            return;
+          }
+          item.cantidad = cantidad;
+          item.subtotal = item.precio * cantidad;
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      })
+    },
+    mostrarAyuda() {
+      this.$swal.fire({
+        title: 'Ayuda',
+        html: '<p># Para buscar un artículo, presione F2</p><p># Para cambiar la cantidad del ultimo artículo seleccionado, presione "*" o haga doble clic en cantidad</p><p># Para cobrar la venta haga clic en el cuadro "Total" o presiones "F4"</p>',
+        icon: 'info',
+        confirmButtonText: 'Aceptar'
+      })
+    }
   },
   mounted() {
+    //hacer foco en el campo de codigo
+    this.$nextTick(() => {
+      document.getElementById('codigo').focus();
+    });
     if (this.usuario.comercioTiene('comisiones')) {
       this.getComisionistas();
     }

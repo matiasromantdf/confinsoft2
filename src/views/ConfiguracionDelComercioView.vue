@@ -48,12 +48,16 @@
                                 <v-file-input label="Logo" id="logo" variant="outlined"></v-file-input>
                             </v-col>
                         </v-row>
-                        <v-row>
-                            <v-col cols="8">
+                        <v-row v-if="usuario.comercioTiene('facturacion')">
+                            <v-col cols="6">
                                 <v-file-input label="Credenciales AFIP" id="credenciales" variant="outlined"
                                     multiple></v-file-input>
-
                             </v-col>
+                            <v-col cols="3">
+                                <v-text-field v-model="comercio.pto_venta" label="Punto de venta" variant="outlined"
+                                    type="number"></v-text-field>
+                            </v-col>
+
                         </v-row>
                     </v-card-text>
                     <v-card-actions>
@@ -80,6 +84,7 @@ export default {
                 inicio_actividades: '',
                 impresion: '',
                 nombre: '',
+                pto_venta: '',
             },
             modosDeImpresion: [
                 {
@@ -136,9 +141,23 @@ export default {
                     datos.append('iibb', this.comercio.iibb);
                     datos.append('inicio_actividades', this.comercio.inicio_actividades);
                     datos.append('impresion', this.comercio.impresion);
-                    datos.append('logo', document.getElementById('logo').files[0]);
-                    for (let i = 0; i < document.getElementById('credenciales').files.length; i++) {
-                        datos.append('credenciales[]', document.getElementById('credenciales').files[i]);
+
+                    if (this.usuario.comercioTiene('facturacion')) {
+
+                        datos.append('pto_venta', this.comercio.pto_venta);
+                    }
+
+
+                    if (document.getElementById('logo').files.length > 0) {
+
+                        datos.append('logo', document.getElementById('logo').files[0]);
+                    }
+
+                    if (this.usuario.comercioTiene('facturacion') && (document.getElementById('credenciales').files.length > 0)) {
+
+                        for (let i = 0; i < document.getElementById('credenciales').files.length; i++) {
+                            datos.append('credenciales[]', document.getElementById('credenciales').files[i]);
+                        }
                     }
 
 
