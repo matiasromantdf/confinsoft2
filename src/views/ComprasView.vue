@@ -256,7 +256,8 @@ export default {
             proveedores: [],
             url: import.meta.env.VITE_URL,
             articulo: {
-                codigo: ''
+                codigo: '',
+                cantidad: 0,
             },
             modalBusquedaArticulo: false,
             search: '',
