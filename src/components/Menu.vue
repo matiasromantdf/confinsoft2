@@ -18,7 +18,7 @@
 
                 </v-menu>
                 <v-btn icon>
-                    <v-icon @click="msjWhatsapp()">mdi-email-outline</v-icon>
+                    <v-icon @click="msjWhatsapp()">mdi-chat-question-outline</v-icon>
                 </v-btn>
             </template>
         </v-app-bar>

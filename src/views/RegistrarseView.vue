@@ -22,18 +22,31 @@
                         <v-card-title>Registrarse</v-card-title>
                         <v-card-text>
                             <v-form v-model="form" @submit.prevent="registrar()">
-                                <v-text-field v-model="nombre" label="Nombre" :rules="required" outlined></v-text-field>
-                                <v-text-field v-model="username" label="Nombre de usuario" :rules="required"
-                                    outlined></v-text-field>
+                                <v-row>
+                                    <v-col md="6" cols="12">
+                                        <v-text-field v-model="nombre" label="Nombre del usuario" :rules="required"
+                                            variant="outlined"></v-text-field>
+                                    </v-col>
+                                    <v-col md="6" sm="12">
+                                        <v-text-field v-model="username" label="Correo electronico" variant="outlined"
+                                            hint="será el que se utilice para ingresar" persistent-hint
+                                            :rules="esCorreo"></v-text-field>
+                                    </v-col>
+                                </v-row>
+                                <!-- <v-text-field v-model="email" label="Email" :rules="required" outlined></v-text-field> -->
+                                <!-- <v-text-field v-model="telefono" label="Teléfono" :rules="required" outlined
+                                    type="number"></v-text-field> -->
+                                <v-row>
+                                    <v-col cols="12" md="6">
+                                        <v-text-field v-model="password" label="Contraseña" variant="outlined"
+                                            type="password"></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" md="6">
+                                        <v-text-field v-model="password2" label="Repetir contraseña" variant="outlined"
+                                            type="password"></v-text-field>
+                                    </v-col>
+                                </v-row>
 
-                                <v-text-field v-model="email" label="Email" :rules="required" outlined></v-text-field>
-                                <v-text-field v-model="telefono" label="Teléfono" :rules="required" outlined
-                                    type="number"></v-text-field>
-
-                                <v-text-field v-model="password" label="Contraseña" :rules="[required, logintud]"
-                                    outlined type="password"></v-text-field>
-                                <v-text-field v-model="password2" label="Repetir contraseña"
-                                    :rules="[required, logintud]" outlined type="password"></v-text-field>
                                 <v-row>
                                     <v-col class="mt-3">
                                         <p>Al registrarte aceptas los Términos y
@@ -42,7 +55,8 @@
                                 </v-row>
                                 <v-spacer></v-spacer>
 
-                                <v-btn color="primary" class="mt-5" type="submit">Registrarse</v-btn>
+                                <v-btn color="primary" class="mt-5" type="submit"
+                                    :loading="cargando">Registrarse</v-btn>
                             </v-form>
                         </v-card-text>
 
@@ -60,6 +74,7 @@ export default {
         return {
             url: import.meta.env.VITE_URL,
             form: false,
+            cargando: false,
             nombre: '',
             username: '',
             email: '',
@@ -67,8 +82,13 @@ export default {
             password: '',
             password2: '',
             mensaje: true,
-            required: [v => !!v || 'El campo es requerido'],
-            logintud: v => v.length >= 6 || 'El campo debe tener al menos 6 caracteres'
+            required: [value => {
+                if (!value) {
+                    return 'Este campo es requerido';
+                }
+                return true;
+            }],
+            esCorreo: [v => /.+@.+\..+/.test(v) || 'El correo no es válido'],
 
         }
     },

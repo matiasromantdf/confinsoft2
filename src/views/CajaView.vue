@@ -39,8 +39,8 @@
                 <v-col>
                     <v-card title="últimas cajas">
                         <v-card-text>
-                            <v-data-table :headers="headers" :items="cajasAnteriores" :items-per-page="5"
-                                class="elevation-1" no-data-text="sin datos...">
+                            <v-data-table :headers="headers" :items="cajasAnteriores" :items-per-page="5" class=""
+                                no-data-text="sin datos...">
                                 <template v-slot:item.fecha_apertura="{ item }">
                                     {{ fechaConvertida(item.fecha_apertura) }}
                                 </template>

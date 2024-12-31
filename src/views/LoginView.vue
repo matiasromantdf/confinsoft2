@@ -11,7 +11,7 @@
                     </template>
                     <v-form v-model="form" @submit.prevent="login">
                         <v-text-field v-model="username" :readonly="loading" :rules="[required]" class="mb-2" clearable
-                            label="Usuario" name="username"></v-text-field>
+                            label="Email" name="username"></v-text-field>
 
                         <v-text-field v-model="password" :readonly="loading" :rules="[required]" clearable
                             label="Contraseña" placeholder="Ingrese su clave" type="password"
