@@ -42,7 +42,7 @@
                     <v-list-item title="Articulos" prepend-icon="mdi-view-list" value="listadoArticulos"
                         @click="$router.push('/listado-de-articulos')"></v-list-item>
                     <v-list-item title="Categorias" prepend-icon="mdi-shape-outline" value="listadoCategorias"
-                        @click="$router.push('/listado-de-categorias')"></v-list-item>
+                        @click="$router.push('/listado-de-categorias')" v-if="usuario.rol == 1"></v-list-item>
                 </v-list-group>
 
                 <!-- </v-list-group> -->
@@ -53,28 +53,28 @@
                     <v-list-item title="Caja" prepend-icon="mdi-cash-check" value="caja"
                         @click="$router.push('/caja')"></v-list-item>
                     <v-list-item title="Historial" prepend-icon="mdi-calendar-month-outline" value="listar-ventas"
-                        @click="$router.push('/historial-de-ventas')"></v-list-item>
+                        @click="$router.push('/historial-de-ventas')" v-if="usuario.rol == 1"></v-list-item>
                     <v-list-item title="Comisiones" prepend-icon="mdi-chart-pie" value="comisiones"
                         @click="$router.push('/reporte-de-comisiones')"
-                        v-if="usuario.comercioTiene('comisiones')"></v-list-item>
+                        v-if="usuario.comercioTiene('comisiones') && usuario.rol == 1"></v-list-item>
                     <v-list-item title="Ventas totales" prepend-icon="mdi-sigma" value="ventas-totales"
-                        @click="$router.push('/ventas-totales')"></v-list-item>
+                        @click="$router.push('/ventas-totales')" v-if="usuario.rol == 1"></v-list-item>
                     <v-list-item title="Por artículo" prepend-icon="mdi-shopping-outline" value="ventas-articulos"
-                        @click="$router.push('/ventas-por-articulo')"></v-list-item>
+                        @click="$router.push('/ventas-por-articulo')" v-if="usuario.rol == 1"></v-list-item>
 
 
 
                 </v-list-group>
 
 
-                <v-list-group value="Compras">
+                <v-list-group value="Compras" v-if="usuario.rol == 1">
                     <template v-slot:activator="{ props }">
                         <v-list-item v-bind="props" prepend-icon="" title="Compras"></v-list-item>
                     </template>
-                    <v-list-item title="Proveedores" prepend-icon="mdi-truck-outline" value="listadoProveedores"
-                        @click="$router.push('/listado-de-proveedores')"></v-list-item>
                     <v-list-item title="Registrar" prepend-icon="mdi-package-variant-closed-plus" value="registrar"
                         @click="$router.push('/compras')"></v-list-item>
+                    <v-list-item title="Proveedores" prepend-icon="mdi-truck-outline" value="listadoProveedores"
+                        @click="$router.push('/listado-de-proveedores')"></v-list-item>
                     <v-list-item title="Historial" prepend-icon="mdi-calendar-month-outline" value="historialCompras"
                         @click="$router.push('/historial-de-compras')"></v-list-item>
 
@@ -91,7 +91,7 @@
                     </v-list-item>
                 </v-list-group> -->
 
-                <v-list-group value="Configuración">
+                <v-list-group value="Configuración" v-if="usuario.rol == 1">
                     <template v-slot:activator="{ props }">
                         <v-list-item v-bind="props" prepend-icon="" title="Configuración"></v-list-item>
                     </template>
@@ -107,12 +107,12 @@
                 </v-list-group>
                 <v-divider></v-divider>
                 <v-list-item title="Clientes" prepend-icon="mdi-account-multiple" value="listadoClientes"
-                    @click="$router.push('/listado-de-clientes')"></v-list-item>
+                    @click="$router.push('/listado-de-clientes')" v-if="usuario.rol == 1"></v-list-item>
                 <v-list-item title="Barberos" prepend-icon="mdi-account-group" value="listadoComisionistas"
                     @click="$router.push('/listado-de-comisionistas')"
                     v-if="usuario.comercioTiene('/comisiones')"></v-list-item>
                 <v-list-item title="Gráficos" prepend-icon="mdi-chart-areaspline" value="graficos"
-                    @click="$router.push('/graficos')"></v-list-item>
+                    @click="$router.push('/graficos')" v-if="usuario.rol == 1"></v-list-item>
 
 
             </v-list>
@@ -122,63 +122,63 @@
     </div>
 </template>
 <script>
-import { useUserStore } from '../stores/user';
-export default {
-    data() {
-        return {
-            drawer: true,
-            open: [],
-        };
-    },
-    setup() {
-        let usuario = useUserStore();
-        return { usuario };
-    },
-    computed: {
-
-    },
-    methods: {
-        cerrarSesion() {
-            this.usuario.logOff();
-            this.$router.push({ name: 'login' });
+    import { useUserStore } from '../stores/user';
+    export default {
+        data() {
+            return {
+                drawer: true,
+                open: [],
+            };
         },
-        msjWhatsapp() {
-            window.open('https://wa.me/5492901520850?text=Hola%20quiero%20información%20de%20ConFin%20Soft', '_blank');
+        setup() {
+            let usuario = useUserStore();
+            return { usuario };
+        },
+        computed: {
+
+        },
+        methods: {
+            cerrarSesion() {
+                this.usuario.logOff();
+                this.$router.push({ name: 'login' });
+            },
+            msjWhatsapp() {
+                window.open('https://wa.me/5492901520850?text=Hola%20quiero%20información%20de%20ConFin%20Soft', '_blank');
+            }
         }
+
+
     }
-
-
-}
 </script>
 
 <style scoped>
-.v-navigation-drawer {
-    scrollbar-width: thin;
-    scrollbar-color: #0a0944 transparent;
-    overflow-y: auto;
-}
+    .v-navigation-drawer {
+        scrollbar-width: thin;
+        scrollbar-color: #0a0944 transparent;
+        overflow-y: auto;
+    }
 
-.v-navigation-drawer::-webkit-scrollbar {
-    width: 5px !important;
-    height: 5px !important;
-}
+    .v-navigation-drawer::-webkit-scrollbar {
+        width: 5px !important;
+        height: 5px !important;
+    }
 
-.v-navigation-drawer::-webkit-scrollbar-thumb {
-    background-color: #0a0944 !important;
-    border-radius: 5px !important;
-}
+    .v-navigation-drawer::-webkit-scrollbar-thumb {
+        background-color: #0a0944 !important;
+        border-radius: 5px !important;
+    }
 
-.v-navigation-drawer::-webkit-scrollbar-track {
-    background-color: transparent !important;
-    border-radius: 5px !important;
-}
+    .v-navigation-drawer::-webkit-scrollbar-track {
+        background-color: transparent !important;
+        border-radius: 5px !important;
+    }
 
-.v-navigation-drawer::-webkit-scrollbar-thumb:hover {
-    background-color: #000 !important;
-}
+    .v-navigation-drawer::-webkit-scrollbar-thumb:hover {
+        background-color: #000 !important;
+    }
 
-.v-list-group__items .v-list-item {
-    padding-inline-start: 35px !important;
-    color: rgb(193, 205, 214)
-}
+    .v-list-group__items .v-list-item {
+        padding-inline-start: 35px !important;
+        color: rgb(193, 205, 214)
+    }
 </style>

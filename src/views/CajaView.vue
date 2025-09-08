@@ -37,7 +37,7 @@
             </v-row>
             <v-row>
                 <v-col>
-                    <v-card title="últimas cajas">
+                    <v-card title="últimas cajas" v-if="usuario.rol == 1">
                         <v-card-text>
                             <v-data-table :headers="headers" :items="cajasAnteriores" :items-per-page="5" class=""
                                 no-data-text="sin datos...">
@@ -63,113 +63,113 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { useUserStore } from '../stores/user';
-export default {
-    data() {
-        return {
-            url: import.meta.env.VITE_URL,
-            caja: [],
-            hprops: {
-                class: 'bg-grey',
+    import axios from 'axios';
+    import { useUserStore } from '../stores/user';
+    export default {
+        data() {
+            return {
+                url: import.meta.env.VITE_URL,
+                caja: [],
+                hprops: {
+                    class: 'bg-grey',
+                },
+                cargando: false,
+                cajasAnteriores: [],
+                headers: [
+                    { title: 'Usuario', value: 'usuario' },
+                    { title: 'Apertura', value: 'fecha_apertura' },
+                    { title: 'Ventas', value: 'ventas' },
+                    { title: 'Total', value: 'total' },
+                    { title: 'Cierre', value: 'fecha_cierre' },
+                ]
+
+            };
+        },
+        methods: {
+            getCaja() {
+                this.cargando = true;
+                axios.get(this.url + '/' + this.usuario.tpv + '/caja/' + this.usuario.token_caja, {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
+                }).then(response => {
+                    this.caja = response.data;
+                }).catch(error => {
+                    console.log(error);
+                }).finally(() => this.cargando = false);
+
+
             },
-            cargando: false,
-            cajasAnteriores: [],
-            headers: [
-                { title: 'Usuario', value: 'usuario' },
-                { title: 'Apertura', value: 'fecha_apertura' },
-                { title: 'Ventas', value: 'ventas' },
-                { title: 'Total', value: 'total' },
-                { title: 'Cierre', value: 'fecha_cierre' },
-            ]
-
-        };
-    },
-    methods: {
-        getCaja() {
-            this.cargando = true;
-            axios.get(this.url + '/' + this.usuario.tpv + '/caja/' + this.usuario.token_caja, {
-                headers: {
-                    Authorization: this.usuario.token
+            cerrarCaja() {
+                if (this.caja.length == 0) {
+                    this.$swal(
+                        'Caja vacía',
+                        'No se puede cerrar una caja vacía',
+                        'warning'
+                    );
+                    return;
                 }
-            }).then(response => {
-                this.caja = response.data;
-            }).catch(error => {
-                console.log(error);
-            }).finally(() => this.cargando = false);
+                //pedir confirmacion
+                this.$swal({
+                    title: '¿Estás seguro?',
+                    text: "¿Quieres cerrar la caja?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, cerrar caja'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.post(this.url + '/' + this.usuario.tpv + '/caja/cerrar', {
+                            token_caja: this.usuario.token_caja
+                        }, {
+                            headers: {
+                                Authorization: this.usuario.token
+                            }
+                        }).then(response => {
+                            this.$swal(
+                                'Caja cerrada',
+                                'La caja se ha cerrado correctamente',
+                                'success'
+                            );
+                            this.usuario.logOff();
+                            this.$router.push({ name: 'login' });
+                        }).catch(error => {
+                            console.log(error);
+                        });
+                    }
+                });
+            },
+            verUltimasCajas() {
+                axios.get(this.url + '/' + this.usuario.tpv + '/cajas/ultimas', {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
+                }).then(response => {
+                    this.cajasAnteriores = response.data;
+                }).catch(error => {
+                    console.log(error);
+                });
+            },
+            fechaConvertida(fecha) {
+                //convertir fecha a formato dd/mm/yyyy con hora
+                let date = new Date(fecha);
+                return date.toLocaleString();
 
-
-        },
-        cerrarCaja() {
-            if (this.caja.length == 0) {
-                this.$swal(
-                    'Caja vacía',
-                    'No se puede cerrar una caja vacía',
-                    'warning'
-                );
-                return;
             }
-            //pedir confirmacion
-            this.$swal({
-                title: '¿Estás seguro?',
-                text: "¿Quieres cerrar la caja?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, cerrar caja'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.post(this.url + '/' + this.usuario.tpv + '/caja/cerrar', {
-                        token_caja: this.usuario.token_caja
-                    }, {
-                        headers: {
-                            Authorization: this.usuario.token
-                        }
-                    }).then(response => {
-                        this.$swal(
-                            'Caja cerrada',
-                            'La caja se ha cerrado correctamente',
-                            'success'
-                        );
-                        this.usuario.logOff();
-                        this.$router.push({ name: 'login' });
-                    }).catch(error => {
-                        console.log(error);
-                    });
-                }
-            });
         },
-        verUltimasCajas() {
-            axios.get(this.url + '/' + this.usuario.tpv + '/cajas/ultimas', {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            }).then(response => {
-                this.cajasAnteriores = response.data;
-            }).catch(error => {
-                console.log(error);
-            });
+        setup() {
+            const usuario = useUserStore();
+            return { usuario }
+
         },
-        fechaConvertida(fecha) {
-            //convertir fecha a formato dd/mm/yyyy con hora
-            let date = new Date(fecha);
-            return date.toLocaleString();
-
-        }
-    },
-    setup() {
-        const usuario = useUserStore();
-        return { usuario }
-
-    },
-    mounted() {
-        this.getCaja();
-        this.verUltimasCajas();
-    },
+        mounted() {
+            this.getCaja();
+            this.verUltimasCajas();
+        },
 
 
-}
+    }
 </script>
 
 <style scoped></style>

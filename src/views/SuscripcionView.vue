@@ -51,88 +51,83 @@
 </template>
 
 <script>
-const mp = new MercadoPago('APP_USR-542986ce-8be5-49a9-8fb9-99ac00e3be2f');
-const brickBuilder = mp.bricks();
-import { useUserStore } from '../stores/user';
-import axios from 'axios';
-export default {
-    data() {
-        return {
-            url: import.meta.env.VITE_URL,
-            cargando: false,
-            cargandoText: 'cargando suscripción...',
-            suscripcion: {},
-        }
-    },
-    setup() {
-        let usuario = useUserStore();
-        return { usuario };
-    },
-    mounted() {
-    },
-    methods: {
-        test() {
-            this.cargando = true;
-            let data = {
-                tpv: this.usuario.tpv
+    const mp = new MercadoPago('APP_USR-542986ce-8be5-49a9-8fb9-99ac00e3be2f');
+    const brickBuilder = mp.bricks();
+    import { useUserStore } from '../stores/user';
+    import axios from 'axios';
+    export default {
+        data() {
+            return {
+                url: import.meta.env.VITE_URL,
+                cargando: false,
+                cargandoText: 'cargando suscripción...',
+                suscripcion: {},
             }
-            axios.post(this.url + '/' + this.usuario.tpv + '/comercio/pagarSuscripcion', data, {
-                headers: {
-                    Authorization: this.usuario.token
+        },
+        setup() {
+            let usuario = useUserStore();
+            return { usuario };
+        },
+        mounted() {
+        },
+        methods: {
+            test() {
+                this.cargando = true;
+                let data = {
+                    tpv: this.usuario.tpv
                 }
+                axios.post(this.url + '/' + this.usuario.tpv + '/comercio/pagarSuscripcion', data, {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
 
-            })
-                .then(response => {
-                    console.log(response.data);
-                    mp.bricks().create("wallet", "wallet_container", {
-                        initialization: {
-                            preferenceId: response.data
-                        },
-                        customization: {
-                            texts: {
-                                valueProp: 'smart_option'
+                })
+                    .then(response => {
+                        console.log(response.data);
+                        mp.bricks().create("wallet", "wallet_container", {
+                            initialization: {
+                                preferenceId: response.data
+                            },
+                            customization: {
+                                texts: {
+                                    valueProp: 'smart_option'
+                                }
                             }
-                        }
+                        })
+
                     })
+                    .catch(error => {
+                        console.log(error);
+                    })
+                    .finally(() => this.cargando = false);
 
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => this.cargando = false);
+            },
+            adherirseDA() {
+                //redireccionar a la pagina de adherirse a debito automaticohttps://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808490c3cfa40190ccdf376202c5
+                window.location.href = 'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808490c3cfa40190ccdf376202c5';
+
+            },
+            formatearfecha(fecha) {
+                let date = new Date(fecha);
+                return date.toLocaleDateString();
+            },
+            formatearMoneda(valor) {
+                //formatear a moneda con punto de mil y coma decimal
+                let floatNumber = parseFloat(valor);
+                return floatNumber.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            }
 
         },
-        adherirseDA() {
-            //redireccionar a la pagina de adherirse a debito automaticohttps://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808490c3cfa40190ccdf376202c5
-            window.location.href = 'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808490c3cfa40190ccdf376202c5';
-
-        },
-        formatearfecha(fecha) {
-            let date = new Date(fecha);
-            return date.toLocaleDateString();
-        },
-        formatearMoneda(valor) {
-            //formatear a moneda con punto de mil y coma decimal
-            let floatNumber = parseFloat(valor);
-            return floatNumber.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-
-
-
-
-
+        computed: {
+            proximoVencimiento() {
+                let date = new Date(this.usuario.comercio.vencimiento);
+                //sumar 30 dias
+                date.setDate(date.getDate() + 30);
+                return date.toLocaleDateString();
+            }
         }
 
-    },
-    computed: {
-        proximoVencimiento() {
-            let date = new Date(this.usuario.comercio.vencimiento);
-            //sumar 30 dias
-            date.setDate(date.getDate() + 30);
-            return date.toLocaleDateString();
-        }
     }
-
-}
 </script>
 
 <style scoped></style>

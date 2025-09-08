@@ -9,8 +9,7 @@
                             <v-row>
                                 <v-col cols="6">
                                     <v-select append-icon="mdi-plus" v-model="articulo.proveedor_id" label="Proveedor"
-                                        variant="outlined" required :items="proveedores" item-title="nombre"
-                                        item-value="id" :rules="proveedorRule"
+                                        variant="outlined" :items="proveedores" item-title="nombre" item-value="id"
                                         @click:append="this.modalNuevoProveedor = true">
 
                                     </v-select>
@@ -96,171 +95,163 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { useUserStore } from '../stores/user';
-export default {
-    data() {
-        return {
-            articulo: {
-                codigo: '',
-                descripcion: '',
-                precio: '',
-                costo: '',
-                stock: '',
-                proveedor_id: '',
-                categoria_id: '',
-                iva: '',
-                comision: 0,
-                es_servicio: false,
+    import axios from 'axios';
+    import { useUserStore } from '../stores/user';
+    export default {
+        data() {
+            return {
+                articulo: {
+                    codigo: '',
+                    descripcion: '',
+                    precio: '',
+                    costo: '',
+                    stock: '',
+                    proveedor_id: '',
+                    categoria_id: '',
+                    iva: '',
+                    comision: 0,
+                    es_servicio: false,
+                },
+                proveedores: [],
+                categorias: [],
+                url: import.meta.env.VITE_URL,
+                cargando: false,
+                dialogo: false,
+                valido: false,
+                reglasIva: [
+                    // v => !!v || 'El campo es requerido',
+                    // v => (v == 10.5 || v == 21 || v == 0) || '0;10.5;21;27'
+                    value => {
+                        if (value == 10.5 || value == 21 || value == 0) {
+                            return true;
+                        }
+                        return 'El IVA debe ser 0, 10.5 o 21';
+                    }
+                ],
+                codigoRule: [
+                    value => {
+                        if (value) {
+                            return true;
+                        }
+                        return 'El campo es requerido';
+                    }
+                ],
+                modalNuevoProveedor: false,
+                modalNuevaCategoria: false
+
+            }
+        },
+        methods: {
+            guardarArticulo(e) {
+                //verificar que los campos estén completos
+                // if (this.articulo.codigo == '' || this.articulo.descripcion == '' || this.articulo.precio == '' || this.articulo.costo == '' || this.articulo.stock == '' || this.articulo.proveedor_id == '' || this.articulo.iva == '') {
+                //     this.$swal('Error', 'Hay campos obligatorios', 'error');
+                //     return;
+                // }
+
+                if (!this.valido) {
+                    return;
+                }
+
+
+                this.cargando = true;
+                let formData = new FormData();
+                formData.append('codigo', this.articulo.codigo);
+                formData.append('descripcion', this.articulo.descripcion);
+                formData.append('precio', this.articulo.precio);
+                formData.append('costo', this.articulo.costo);
+                formData.append('stock', this.articulo.stock);
+                formData.append('proveedor_id', this.articulo.proveedor_id);
+                formData.append('categoria_id', this.articulo.categoria_id);
+                formData.append('iva', this.articulo.iva);
+                formData.append('comision', this.articulo.comision);
+                formData.append('es_servicio', this.articulo.es_servicio ? 1 : 0);
+                let foto = document.getElementById('foto-articulo').files[0];
+                formData.append('foto', foto);
+
+                axios.post(this.url + '/' + this.usuario.tpv + '/articulos', formData, {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
+                })
+                    .then(response => {
+                        if (response.data.id) {
+                            this.$swal('Artículo guardado', 'El artículo se guardó correctamente', 'success');
+                            this.$emit('actualizarArticulos');
+                            this.$emit('cerrar-modal');
+                            this.cargando = false;
+                            this.vaciarFormulario();
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this.cargando = false;
+                        this.$swal('Error', 'Ocurrió un error al guardar el artículo: ' + error.response.data.error, 'error');
+                    })
             },
-            proveedores: [],
-            categorias: [],
-            url: import.meta.env.VITE_URL,
-            cargando: false,
-            dialogo: false,
-            valido: false,
-            reglasIva: [
-                // v => !!v || 'El campo es requerido',
-                // v => (v == 10.5 || v == 21 || v == 0) || '0;10.5;21;27'
-                value => {
-                    if (value == 10.5 || value == 21 || value == 0) {
-                        return true;
+            getProveedores() {
+                axios.get(this.url + '/' + this.usuario.tpv + '/proveedores', {
+                    headers: {
+                        Authorization: this.usuario.token
                     }
-                    return 'El IVA debe ser 0, 10.5 o 21';
-                }
-            ],
-            proveedorRule: [
-                value => {
-                    if (value) {
-                        return true;
+                })
+                    .then(response => {
+                        console.log(response.data);
+                        this.proveedores = response.data;
+                        console.log(this.proveedores);
+                    })
+            },
+            getCategorias() {
+                axios.get(this.url + '/' + this.usuario.tpv + '/categorias', {
+                    headers: {
+                        Authorization: this.usuario.token
                     }
-                    return 'El campo es requerido';
-                }
-            ],
-            codigoRule: [
-                value => {
-                    if (value) {
-                        return true;
-                    }
-                    return 'El campo es requerido';
-                }
-            ],
-            modalNuevoProveedor: false,
-            modalNuevaCategoria: false
+                })
+                    .then(response => {
+                        console.log(response.data);
+                        this.categorias = response.data;
+                        console.log(this.categorias);
+                    })
 
-        }
-    },
-    methods: {
-        guardarArticulo(e) {
-            //verificar que los campos estén completos
-            // if (this.articulo.codigo == '' || this.articulo.descripcion == '' || this.articulo.precio == '' || this.articulo.costo == '' || this.articulo.stock == '' || this.articulo.proveedor_id == '' || this.articulo.iva == '') {
-            //     this.$swal('Error', 'Hay campos obligatorios', 'error');
-            //     return;
-            // }
-
-            if (!this.valido) {
-                return;
+            },
+            vaciarFormulario() {
+                this.articulo.codigo = '';
+                this.articulo.descripcion = '';
+                this.articulo.precio = '';
+                this.articulo.costo = '';
+                this.articulo.stock = '';
+                this.articulo.proveedor_id = '';
+                this.articulo.categoria_id = '';
+                this.articulo.imagen = '';
             }
 
-
-            this.cargando = true;
-            let formData = new FormData();
-            formData.append('codigo', this.articulo.codigo);
-            formData.append('descripcion', this.articulo.descripcion);
-            formData.append('precio', this.articulo.precio);
-            formData.append('costo', this.articulo.costo);
-            formData.append('stock', this.articulo.stock);
-            formData.append('proveedor_id', this.articulo.proveedor_id);
-            formData.append('categoria_id', this.articulo.categoria_id);
-            formData.append('iva', this.articulo.iva);
-            formData.append('comision', this.articulo.comision);
-            formData.append('es_servicio', this.articulo.es_servicio ? 1 : 0);
-            let foto = document.getElementById('foto-articulo').files[0];
-            formData.append('foto', foto);
-
-            axios.post(this.url + '/' + this.usuario.tpv + '/articulos', formData, {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            })
-                .then(response => {
-                    if (response.data.id) {
-                        this.$swal('Artículo guardado', 'El artículo se guardó correctamente', 'success');
-                        this.$emit('actualizarArticulos');
-                        this.$emit('cerrar-modal');
-                        this.cargando = false;
-                        this.vaciarFormulario();
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                    this.cargando = false;
-                    this.$swal('Error', 'Ocurrió un error al guardar el artículo: ' + error.response.data.error, 'error');
-                })
         },
-        getProveedores() {
-            axios.get(this.url + '/' + this.usuario.tpv + '/proveedores', {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            })
-                .then(response => {
-                    console.log(response.data);
-                    this.proveedores = response.data;
-                    console.log(this.proveedores);
-                })
+        mounted() {
+            this.getProveedores();
+            this.getCategorias();
         },
-        getCategorias() {
-            axios.get(this.url + '/' + this.usuario.tpv + '/categorias', {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            })
-                .then(response => {
-                    console.log(response.data);
-                    this.categorias = response.data;
-                    console.log(this.categorias);
-                })
-
+        setup() {
+            const usuario = useUserStore();
+            return {
+                usuario
+            }
         },
-        vaciarFormulario() {
-            this.articulo.codigo = '';
-            this.articulo.descripcion = '';
-            this.articulo.precio = '';
-            this.articulo.costo = '';
-            this.articulo.stock = '';
-            this.articulo.proveedor_id = '';
-            this.articulo.categoria_id = '';
-            this.articulo.imagen = '';
-        }
+        emits: ['actualizarArticulos', 'cerrar-modal']
 
-    },
-    mounted() {
-        this.getProveedores();
-        this.getCategorias();
-    },
-    setup() {
-        const usuario = useUserStore();
-        return {
-            usuario
-        }
-    },
-    emits: ['actualizarArticulos', 'cerrar-modal']
-
-}
+    }
 </script>
 
 <style scoped>
-.fondo {
-    background-color: rgba(0, 0, 0, 0.5);
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1;
-}
+    .fondo {
+        background-color: rgba(0, 0, 0, 0.5);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+    }
 </style>

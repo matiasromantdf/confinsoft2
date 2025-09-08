@@ -13,7 +13,7 @@
                                     <v-divider class="mx-4" inset vertical></v-divider>
 
                                     <v-btn @click="dialogoNuevo = true" prepend-icon="mdi-plus" class="mr-4 border"
-                                        tonal color="primary">Nuevo</v-btn>
+                                        tonal color="primary" v-if="usuario.rol == 1">Nuevo</v-btn>
                                     <NuevoArticuloComponent v-if="dialogoNuevo" @cerrar-modal="dialogoNuevo = false"
                                         @actualizar-articulos="getArticulos" />
                                     <v-spacer></v-spacer>
@@ -67,143 +67,149 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { useUserStore } from '../stores/user';
-import NuevoArticuloComponent from '../components/NuevoArticuloComponent.vue';
-import EditarArticuloComponent from '@/components/EditarArticuloComponent.vue';
-import swal from 'sweetalert2';
-export default {
-    data() {
-        return {
-            search: '',
-            headers: [
-                { title: 'Cod', value: 'codigo', sortable: true },
-                { title: 'Nombre', value: 'descripcion', sortable: true },
-                { title: 'Precio', value: 'precio' },
-                { title: 'Comisión', value: 'comision' },
-                { title: 'Costo', value: 'costo' },
-                { title: 'Stock', value: 'stock' },
-                { title: 'Tipo', value: 'es_servicio', sortable: true },
-                { title: 'Categoria', value: 'categoria.nombre', sortable: true },
-                { title: 'Foto', value: 'foto', width: '100px', sortable: false },
-                { title: 'Acciones', value: 'actions', sortable: false },
-            ],
-            articulos: [],
-            url: import.meta.env.VITE_URL,
-            cargando: false,
-            dialogoNuevo: false,
-            dialogoEditar: false,
-            articuloParaEditar: {},
-            textoItems: 'Artículos por página',
-            sinDatos: 'No se encontraron artículos'
-        }
-    },
-    methods: {
-        editarArticulo(item) {
-            //crear una copia del objeto para no modificar el original
-            this.articuloParaEditar = Object.assign({}, item);
-            this.dialogoEditar = true;
+    import axios from 'axios';
+    import { useUserStore } from '../stores/user';
+    import NuevoArticuloComponent from '../components/NuevoArticuloComponent.vue';
+    import EditarArticuloComponent from '@/components/EditarArticuloComponent.vue';
+    import swal from 'sweetalert2';
+    export default {
+        data() {
+            return {
+                search: '',
+                headers: [
+                    { title: 'Cod', value: 'codigo', sortable: true },
+                    { title: 'Nombre', value: 'descripcion', sortable: true },
+                    { title: 'Precio', value: 'precio' },
+                    { title: 'Comisión', value: 'comision' },
+                    { title: 'Costo', value: 'costo' },
+                    { title: 'Stock', value: 'stock' },
+                    { title: 'Tipo', value: 'es_servicio', sortable: true },
+                    { title: 'Categoria', value: 'categoria.nombre', sortable: true },
+                    { title: 'Foto', value: 'foto', width: '100px', sortable: false },
+                    { title: 'Acciones', value: 'actions', sortable: false },
+                ],
+                articulos: [],
+                url: import.meta.env.VITE_URL,
+                cargando: false,
+                dialogoNuevo: false,
+                dialogoEditar: false,
+                articuloParaEditar: {},
+                textoItems: 'Artículos por página',
+                sinDatos: 'No se encontraron artículos'
+            }
         },
-        eliminarArticulo(item) {
-            let id = item.id;
-            swal.fire({
-                title: '¿Estás seguro?',
-                text: "No se puede revertir esto!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, borralo!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.delete(this.url + '/' + this.usuario.tpv + '/articulos/' + id, {
-                        headers: {
-                            Authorization: this.usuario.token
-                        }
-                    })
-                        .then(response => {
-                            swal.fire(
-                                'Borrado!',
-                                'El artículo ha sido eliminado.',
-                                'success'
-                            )
-                            this.getArticulos();
+        methods: {
+            editarArticulo(item) {
+                //crear una copia del objeto para no modificar el original
+                this.articuloParaEditar = Object.assign({}, item);
+                this.dialogoEditar = true;
+            },
+            eliminarArticulo(item) {
+                let id = item.id;
+                swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "No se puede revertir esto!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, borralo!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.delete(this.url + '/' + this.usuario.tpv + '/articulos/' + id, {
+                            headers: {
+                                Authorization: this.usuario.token
+                            }
                         })
-                        .catch(error => {
-                            console.log(error);
-                        })
-                }
-            })
-        },
-        getArticulos() {
-            this.cargando = true;
-            this.articulos = [];
-            this.articuloParaEditar = {};
-            axios.get(this.url + '/' + this.usuario.tpv + '/articulos', {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            })
-                .then(response => {
-                    this.articulos = response.data;
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => this.cargando = false);
-        },
-        buscar() {
-            if (this.search.length > 2) {
-                this.cargando = true;
-                let nuevoArray = [];
-                this.articulos.forEach(articulo => {
-                    if (articulo.descripcion.toLowerCase().includes(this.search.toLowerCase()) || articulo.codigo.toLowerCase().includes(this.search.toLowerCase())) {
-                        nuevoArray.push(articulo);
+                            .then(response => {
+                                swal.fire(
+                                    'Borrado!',
+                                    'El artículo ha sido eliminado.',
+                                    'success'
+                                )
+                                this.getArticulos();
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            })
                     }
-                });
-                this.articulos = nuevoArray;
-                this.cargando = false;
-            }
-            else {
-                this.cargando = false;
-            }
-        },
-        recargarBusqueda(event) {
-            if (this.search.length == 0) {
-                this.getArticulos();
-            }
-            else {
-                if (event.key == 'Enter') {
-                    this.buscar();
+                })
+            },
+            getArticulos() {
+                this.cargando = true;
+                this.articulos = [];
+                this.articuloParaEditar = {};
+                axios.get(this.url + '/' + this.usuario.tpv + '/articulos', {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
+                })
+                    .then(response => {
+                        this.articulos = response.data;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+                    .finally(() => this.cargando = false);
+            },
+            buscar() {
+                if (this.search.length > 2) {
+                    this.cargando = true;
+                    let nuevoArray = [];
+                    this.articulos.forEach(articulo => {
+                        if (articulo.descripcion.toLowerCase().includes(this.search.toLowerCase()) || articulo.codigo.toLowerCase().includes(this.search.toLowerCase())) {
+                            nuevoArray.push(articulo);
+                        }
+                    });
+                    this.articulos = nuevoArray;
+                    this.cargando = false;
+                }
+                else {
+                    this.cargando = false;
+                }
+            },
+            recargarBusqueda(event) {
+                if (this.search.length == 0) {
+                    this.getArticulos();
+                }
+                else {
+                    if (event.key == 'Enter') {
+                        this.buscar();
+                    }
                 }
             }
-        }
-    },
-    mounted() {
-        this.getArticulos();
-        if (this.usuario.rol != 1) {
-            let index = this.headers.findIndex(header => header.title == 'Acciones');
-            this.headers.splice(index, 1);
-        }
-        if (!this.usuario.comercioTiene('comisiones')) {
-            let index = this.headers.findIndex(header => header.title == 'Comisión');
-            this.headers.splice(index, 1);
-        }
+        },
+        mounted() {
+            this.getArticulos();
+            if (this.usuario.rol != 1) {
+                let index = this.headers.findIndex(header => header.title == 'Acciones');
+                this.headers.splice(index, 1);
+                //quitar columna costo si no es admin
+                index = this.headers.findIndex(header => header.title == 'Costo');
+                this.headers.splice(index, 1);
+                //quitar columna comision si no tiene comisiones habilitadas
+                index = this.headers.findIndex(header => header.title == 'Comisión');
+                this.headers.splice(index, 1);
+            }
+            if (!this.usuario.comercioTiene('comisiones')) {
+                let index = this.headers.findIndex(header => header.title == 'Comisión');
+                this.headers.splice(index, 1);
+            }
 
-    },
-    setup() {
-        const usuario = useUserStore();
-        return { usuario };
+        },
+        setup() {
+            const usuario = useUserStore();
+            return { usuario };
 
-    },
-    components: {
-        NuevoArticuloComponent,
-        EditarArticuloComponent
-    },
+        },
+        components: {
+            NuevoArticuloComponent,
+            EditarArticuloComponent
+        },
 
 
 
-}
+    }
 </script>
 
 <style scoped></style>

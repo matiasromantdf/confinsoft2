@@ -1,10 +1,10 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+  import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
   <v-app>
-    <Menu />
+    <Menu v-if="this.getDiasDeSusc() > 0" />
     <v-main class="bg-grey-lighten-2">
 
       <router-view v-slot="{ Component }">
@@ -17,24 +17,34 @@ import { RouterLink, RouterView } from 'vue-router'
   </v-app>
 </template>
 <script>
-import Menu from './components/Menu.vue';
+  import Menu from './components/Menu.vue';
+  import { useUserStore } from './stores/user';
 
-export default {
-  components: {
-    Menu
-  },
-};
+  export default {
+    components: {
+      Menu
+    },
+    methods: {
+      getDiasDeSusc() {
+        return this.usuario.diasDeSuscripcion;
+      }
+
+    },
+    setup() {
+      let usuario = useUserStore();
+      return { usuario };
+    }
+  };
 </script>
 <style>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity .5s;
-}
 
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity .5s;
+  }
+
+  .fade-enter,
+  .fade-leave-to {
+    opacity: 0;
+  }
 </style>
-
-

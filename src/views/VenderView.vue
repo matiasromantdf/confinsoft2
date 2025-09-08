@@ -16,13 +16,13 @@
                     <template v-slot:activator="{ props }">
                     <v-btn icon="mdi-dots-vertical" v-bind="props"></v-btn>
                   </template>
-<v-list>
-  <v-list-item>
-    <v-list-item-title>Accion 1</v-list-item-title>
-  </v-list-item>
-</v-list>
-</v-menu>
-</template> -->
+                    <v-list>
+                      <v-list-item>
+                        <v-list-item-title>Accion 1</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                    </v-menu>
+                    </template> -->
                 <v-card-text>
                   <v-row>
 
@@ -39,12 +39,20 @@
                           <v-card-text>
                             <v-text-field label="Buscar" v-model="search" append-icon="mdi-magnify" single-line
                               hide-details variant="outlined" @click:append="buscarArticulos"
-                              @keyup="buscarArticulos($event)"></v-text-field>
+                              @keyup="buscarArticulos($event)" ref="inputBuscarArticulo"></v-text-field>
                             <v-data-table :headers="headers" :items="articulos" item-key="codigo" :loading="cargando"
                               no-data-text="No se encontraron artículos" items-per-page-text="Artículos por página"
                               :hover=true loading-text="cargando artículos...">
-                              <template v-slot:item.actions="{ item }">
-                                <v-icon small @click="seleccionarArticulo(item)" color="blue">mdi-check</v-icon>
+                              <template v-slot:item="{ item, props }">
+                                <tr v-bind="props" @click="seleccionarArticulo(item)" style="cursor:pointer;">
+                                  <td>{{ item.codigo }}</td>
+                                  <td>{{ item.descripcion }}</td>
+                                  <td>{{ formatear(item.precio) }}</td>
+                                  <td>{{ item.stock }}</td>
+                                  <td>
+                                    <v-icon small color="blue">mdi-check</v-icon>
+                                  </td>
+                                </tr>
                               </template>
                             </v-data-table>
                           </v-card-text>
@@ -113,7 +121,11 @@
                               <p v-else>{{ item.porc_bonif }}</p>
                             </td>
                             <td>{{ item.iva }}</td>
-                            <td @dblclick="cambiarCantidad(item)">{{ item.cantidad }}</td>
+                            <td class="cantidad-cell" @dblclick="cambiarCantidad(item)">
+                              <span>{{ item.cantidad }}</span>
+                              <v-icon class="edit-cantidad-icon" size="18"
+                                @click="cambiarCantidad(item)">mdi-pencil</v-icon>
+                            </td>
                             <td>{{ formatear(item.subtotal) }}</td>
                             <td>
                               <v-btn icon="mdi-delete-outline" size="small" color="red-lighten-2"
@@ -134,8 +146,9 @@
                         <v-tooltip activator="parent" location="start">
                           click para Cobrar
                         </v-tooltip>
-                        <v-card-title>
+                        <v-card-title class="text-center d-flex flex-row">
                           <h3>Total</h3>
+                          <p style="margin-left: 8px; color:black; font-size: 0.8em;">click o [F4] para cobrar</p>
                         </v-card-title>
                         <v-card-text>
                           <h2>{{ formatear(total) }}</h2>
@@ -218,140 +231,177 @@
 </template>
 
 <script>
-import axios from 'axios';
+  import axios from 'axios';
 
-import BuscarClienteComponent from '../components/BuscarClienteComponent.vue';
-import RegistrarVentaComponent from '../components/RegistrarVentaComponent.vue';
+  import BuscarClienteComponent from '../components/BuscarClienteComponent.vue';
+  import RegistrarVentaComponent from '../components/RegistrarVentaComponent.vue';
 
-import { useUserStore } from '../stores/user';
-export default {
-  data() {
-    return {
-      menuVentas: false,
-      articulo: {
-        id: '',
-        descripcion: '',
-        cantidad: 1,
-        precio: '',
-        iva: '',
-        subtotal: '',
-        foto: '',
-        codigo: '',
-      },
-      detalle: [],
-      url: import.meta.env.VITE_URL,
-      buscandoArticulo: false,
-      dialogCambiarPrecio: false,
-      dialogoBuscarCliente: false,
-      modalRegistroVenta: false,
-      porcBonif: '',
-      variacion: 0,
-      CodigoParaCambioPrecio: '',
-      cliente: {
-        id: 0,
-        nombre: '',
-        direccion: '',
-        dni: '',
-      },
-      modalBusquedaArticulo: false,
-      search: '',
-      headers: [
-        { title: 'Código', value: 'codigo' },
-        { title: 'Descripción', value: 'descripcion' },
-        { title: 'Precio', value: 'precio' },
-        { title: 'Stock', value: 'stock' },
-        { title: 'Acciones', value: 'actions', sortable: false },
-      ],
-      articulos: [],
-      cargando: false,
-      comprobantes: [],
-      comisionistas: [],
+  import { useUserStore } from '../stores/user';
+  export default {
+    data() {
+      return {
+        menuVentas: false,
+        articulo: {
+          id: '',
+          descripcion: '',
+          cantidad: 1,
+          precio: '',
+          iva: '',
+          subtotal: '',
+          foto: '',
+          codigo: '',
+        },
+        detalle: [],
+        url: import.meta.env.VITE_URL,
+        buscandoArticulo: false,
+        dialogCambiarPrecio: false,
+        dialogoBuscarCliente: false,
+        modalRegistroVenta: false,
+        porcBonif: '',
+        variacion: 0,
+        CodigoParaCambioPrecio: '',
+        cliente: {
+          id: 0,
+          nombre: '',
+          direccion: '',
+          dni: '',
+        },
+        modalBusquedaArticulo: false,
+        search: '',
+        headers: [
+          { title: 'Código', value: 'codigo' },
+          { title: 'Descripción', value: 'descripcion' },
+          { title: 'Precio', value: 'precio' },
+          { title: 'Stock', value: 'stock' },
+          { title: 'Acciones', value: 'actions', sortable: false },
+        ],
+        articulos: [],
+        cargando: false,
+        comprobantes: [],
+        comisionistas: [],
 
 
-    };
-  },
-  methods: {
-    buscarArticulos() {
-      if (this.search.length < 3) {
-        return;
-      }
-      this.cargando = true;
-      axios.get(this.url + '/' + this.usuario.tpv + '/articulos/buscar/' + this.search,
-        { headers: { Authorization: this.usuario.token } })
-        .then(response => {
-          this.articulos = response.data.data;
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => this.cargando = false);
+      };
     },
-    seleccionarArticulo(item) {
-      this.articulo.id = item.id;
-      this.articulo.codigo = item.codigo;
-      this.articulo.descripcion = item.descripcion;
-      this.articulo.precio = item.precio;
-      this.articulo.stock = item.stock;
-      this.articulo.costo = item.costo;
-      this.articulo.iva = item.iva;
-      this.articulo.foto = item.foto;
-      this.modalBusquedaArticulo = false;
-      this.$nextTick(() => {
-        document.getElementById('codigo').focus();
-      });
-    },
-    eliminarDelDetalle(item) {
-      let index = this.detalle.indexOf(item);
-      this.detalle.splice(index, 1);
-      this.calcularVariacion();
-    },
-    formatear(valor) {
-      let formatoARS = new Intl.NumberFormat('es-AR', {
-        style: 'currency',
-        currency: 'ARS'
-      });
-      return formatoARS.format(valor);
-    },
-    async checkEnter(event) {
-      if (event.key === 'Enter') {
-        await this.buscarArticulo();
-        this.articulo.cantidad = 1;
-        this.agregarAlDetalle();
-      }
-    },
-    setCliente(cliente) {
-
-      this.cliente = cliente;
-      console.log(this.cliente);
-    },
-    async buscarArticulo() {
-      if (this.articulo.codigo != '') {
-        this.buscandoArticulo = true;
-        document.getElementById('codigo').disabled = true;
-
-        axios.get(this.url + '/' + this.usuario.tpv + '/articulos/' + this.articulo.codigo, { headers: { Authorization: this.usuario.token } })
+    methods: {
+      buscarArticulos() {
+        if (this.search.length < 3) {
+          return;
+        }
+        this.cargando = true;
+        axios.get(this.url + '/' + this.usuario.tpv + '/articulos/buscar/' + this.search,
+          { headers: { Authorization: this.usuario.token } })
           .then(response => {
-            if (response.data.codigo == this.articulo.codigo) {
-              this.buscandoArticulo = false;
-              this.articulo.id = response.data.id;
-              this.articulo.codigo = response.data.codigo;
-              this.articulo.descripcion = response.data.descripcion;
-              this.articulo.precio = response.data.precio;
-              this.articulo.stock = response.data.stock;
-              this.articulo.costo = response.data.costo;
-              this.articulo.iva = response.data.iva;
-              this.articulo.foto = response.data.foto;
+            this.articulos = response.data.data;
+          })
+          .catch(error => {
+            console.log(error);
+          })
+          .finally(() => this.cargando = false);
+      },
+      seleccionarArticulo(item) {
+        this.articulo.id = item.id;
+        this.articulo.codigo = item.codigo;
+        this.articulo.descripcion = item.descripcion;
+        this.articulo.precio = item.precio;
+        this.articulo.stock = item.stock;
+        this.articulo.costo = item.costo;
+        this.articulo.iva = item.iva;
+        this.articulo.foto = item.foto;
+        this.agregarAlDetalle();
+        this.modalBusquedaArticulo = false;
 
-              let campoCantidad = document.getElementById('campoCantidad');
-              this.agregarAlDetalle();
-              document.getElementById('codigo').disabled = false;
-              document.getElementById('codigo').focus();
-            }
-            else {
+        this.search = '';
+        this.$nextTick(() => {
+          document.getElementById('codigo').focus();
+        });
+      },
+      eliminarDelDetalle(item) {
+        let index = this.detalle.indexOf(item);
+        this.detalle.splice(index, 1);
+        this.calcularVariacion();
+      },
+      formatear(valor) {
+        let formatoARS = new Intl.NumberFormat('es-AR', {
+          style: 'currency',
+          currency: 'ARS'
+        });
+        return formatoARS.format(valor);
+      },
+      async checkEnter(event) {
+        if (event.key === 'Enter') {
+          await this.buscarArticulo();
+          this.articulo.cantidad = 1;
+          this.agregarAlDetalle();
+        }
+      },
+      setCliente(cliente) {
+
+        this.cliente = cliente;
+        console.log(this.cliente);
+      },
+      async buscarArticulo() {
+        if (this.articulo.codigo != '') {
+          this.buscandoArticulo = true;
+          document.getElementById('codigo').disabled = true;
+
+          axios.get(this.url + '/' + this.usuario.tpv + '/articulos/' + this.articulo.codigo, { headers: { Authorization: this.usuario.token } })
+            .then(response => {
+              if (response.data.codigo == this.articulo.codigo) {
+                this.buscandoArticulo = false;
+                this.articulo.id = response.data.id;
+                this.articulo.codigo = response.data.codigo;
+                this.articulo.descripcion = response.data.descripcion;
+                this.articulo.precio = response.data.precio;
+                this.articulo.stock = response.data.stock;
+                this.articulo.costo = response.data.costo;
+                this.articulo.iva = response.data.iva;
+                this.articulo.foto = response.data.foto;
+
+                let campoCantidad = document.getElementById('campoCantidad');
+                this.agregarAlDetalle();
+                document.getElementById('codigo').disabled = false;
+                document.getElementById('codigo').focus();
+              }
+              else {
+                this.$swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'El artículo no existe!',
+                })
+                this.articulo = {
+                  id: '',
+                  descripcion: '',
+                  precio: '',
+                  stock: '',
+                  costo: '',
+                  cantidad: 1,
+                  codigo: '',
+                };
+
+                // this.$nextTick(() => {
+                //   document.getElementById('codigo').focus();
+                // });
+              }
+            })
+            .catch(error => {
+              console.log(error);
               this.$swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: 'El artículo no existe!',
+                confirmButtonText: 'Aceptar',
+                didOpen: () => {
+                  const swalmodal = this.$swal.getPopup();
+                  //hacer foco en el boton de aceptar
+                  swalmodal.querySelector('button').focus();
+
+                },
+                didClose: () => {
+                  document.getElementById('codigo').disabled = false;
+                  document.getElementById('codigo').focus();
+                  this.buscandoArticulo = false;
+                }
               })
               this.articulo = {
                 id: '',
@@ -360,361 +410,348 @@ export default {
                 stock: '',
                 costo: '',
                 cantidad: 1,
-                codigo: '',
               };
-
-              // this.$nextTick(() => {
-              //   document.getElementById('codigo').focus();
-              // });
-            }
-          })
-          .catch(error => {
-            console.log(error);
-            this.$swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'El artículo no existe!',
-              confirmButtonText: 'Aceptar',
-              didOpen: () => {
-                const swalmodal = this.$swal.getPopup();
-                //hacer foco en el boton de aceptar
-                swalmodal.querySelector('button').focus();
-
-              },
-              didClose: () => {
-                document.getElementById('codigo').disabled = false;
-                document.getElementById('codigo').focus();
-                this.buscandoArticulo = false;
-              }
             })
+            .finally(() => {
+              // document.getElementById('codigo').disabled = false;
+              // document.getElementById('codigo').focus();
+              // this.buscandoArticulo = false;
+            });
+
+        }
+      },
+      agregarAlDetalle() {
+        if (isNaN(this.articulo.precio) || this.articulo.cantidad == 0 || isNaN(this.articulo.cantidad)) {
+          this.$swal.fire('Hay un error en la cantidad');
+          return;
+        }
+        if (this.articulo.descripcion == '') {
+          this.$swal.fire('Debe seleccionar un artículo');
+          return;
+        }
+
+        let yaExiste = false;
+        this.detalle.forEach(item => {
+          if (item.codigo == this.articulo.codigo) {
+            yaExiste = true;
+            item.cantidad += this.articulo.cantidad * 1;
+            item.subtotal = (item.cantidad * item.precio);
             this.articulo = {
               id: '',
               descripcion: '',
-              precio: '',
-              stock: '',
-              costo: '',
               cantidad: 1,
-            };
-          })
-          .finally(() => {
-            // document.getElementById('codigo').disabled = false;
-            // document.getElementById('codigo').focus();
-            // this.buscandoArticulo = false;
-          });
-
-      }
-    },
-    agregarAlDetalle() {
-      if (isNaN(this.articulo.precio) || this.articulo.cantidad == 0 || isNaN(this.articulo.cantidad)) {
-        this.$swal.fire('Hay un error en la cantidad');
-        return;
-      }
-      if (this.articulo.descripcion == '') {
-        this.$swal.fire('Debe seleccionar un artículo');
-        return;
-      }
-
-      let yaExiste = false;
-      this.detalle.forEach(item => {
-        if (item.codigo == this.articulo.codigo) {
-          yaExiste = true;
-          item.cantidad += this.articulo.cantidad * 1;
-          item.subtotal = (item.cantidad * item.precio);
-          this.articulo = {
-            id: '',
-            descripcion: '',
-            cantidad: 1,
-            precio: '',
-            iva: '',
-            subtotal: '',
-            foto: '',
-            codigo: '',
+              precio: '',
+              iva: '',
+              subtotal: '',
+              foto: '',
+              codigo: '',
+            }
           }
+
+        });
+        if (yaExiste) {
+          var elemCodigo = document.getElementById('codigo');
+          elemCodigo.focus();
+          return;
         }
 
-      });
-      if (yaExiste) {
+        this.articulo.subtotal = (this.articulo.cantidad * this.articulo.precio);
+        //pequeño hack para que el objeto se guarde en el array sin referencias
+        let articuloAlDetalle = JSON.parse(JSON.stringify(this.articulo));
+
+        this.detalle.unshift(articuloAlDetalle);
+        this.articulo = {
+          id: '',
+          descripcion: '',
+          cantidad: 1,
+          precio: '',
+          iva: '',
+          subtotal: '',
+          foto: '',
+          codigo: '',
+        }
         var elemCodigo = document.getElementById('codigo');
         elemCodigo.focus();
-        return;
-      }
-
-      this.articulo.subtotal = (this.articulo.cantidad * this.articulo.precio);
-      //pequeño hack para que el objeto se guarde en el array sin referencias
-      let articuloAlDetalle = JSON.parse(JSON.stringify(this.articulo));
-
-      this.detalle.unshift(articuloAlDetalle);
-      this.articulo = {
-        id: '',
-        descripcion: '',
-        cantidad: 1,
-        precio: '',
-        iva: '',
-        subtotal: '',
-        foto: '',
-        codigo: '',
-      }
-      var elemCodigo = document.getElementById('codigo');
-      elemCodigo.focus();
 
 
-    },
-    cambiarPrecio() {
-      if (this.porcBonif == '' || isNaN(this.porcBonif) || this.porcBonif == 0 || this.porcBonif == undefined || this.porcBonif == null || this.porcBonif > 100) {
-        this.$swal.fire('Debe ingresar un porcentaje válido');
+      },
+      cambiarPrecio() {
+        if (this.porcBonif == '' || isNaN(this.porcBonif) || this.porcBonif == 0 || this.porcBonif == undefined || this.porcBonif == null || this.porcBonif > 100) {
+          this.$swal.fire('Debe ingresar un porcentaje válido');
+          this.dialogCambiarPrecio = false;
+          return;
+        }
         this.dialogCambiarPrecio = false;
-        return;
-      }
-      this.dialogCambiarPrecio = false;
-      this.detalle.forEach(item => {
-        if (item.codigo == this.CodigoParaCambioPrecio) {
-          let subtotalAnterior = item.subtotal;
-          let nuevoPrecio = item.precio - (item.precio * (this.porcBonif / 100));
-          item.subtotal = (nuevoPrecio * item.cantidad);
-          item.variacion = item.subtotal - subtotalAnterior;
-          item.porc_bonif = this.porcBonif;
-        }
-      });
-      this.porcBonif = '';
-      this.calcularVariacion();
-
-
-    },
-    reinicializar() {
-      this.detalle = [];
-      this.cliente = {
-        id: 0,
-        nombre: '',
-        direccion: '',
-        dni: '',
-      };
-      this.variacion = 0;
-
-    },
-    calcularVariacion() {
-      let varia = 0;
-      this.detalle.forEach(item => {
-        if (item.variacion != undefined) {
-          varia += item.variacion;
-        }
-      });
-      this.variacion = varia;
-    },
-    getComisionistas() {
-      this.cargando = true;
-      axios.get(this.url + '/' + this.usuario.tpv + '/comisionistas', {
-        headers: {
-          Authorization: this.usuario.token
-        }
-      })
-        .then(response => {
-          this.comisionistas = response.data;
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => this.cargando = false);
-    },
-    getTiposDeComprobante() {
-      axios.get(this.url + '/' + this.usuario.tpv + '/facturas/tiposDeComprobantes', {
-        headers: {
-          Authorization: this.usuario.token
-        }
-      })
-        .then(response => {
-          this.comprobantes = response.data;
-          this.comprobantes.unshift({ Id: 0, Desc: 'No fiscal' });
-        })
-        .catch(error => {
-          console.log(error);
-        })
-    },
-    getDiasDeSuscripcion() {
-      let fechaVencimiento = this.usuario.comercio.vencimiento;
-      //hora de vencimiento es a las 00:00
-      fechaVencimiento = fechaVencimiento;
-      let fechaActual = this.usuario.horaServidor;
-      let fechaVencimientoDate = new Date(fechaVencimiento);
-      let fechaActualDate = new Date(fechaActual);
-      let diferencia = fechaVencimientoDate.getTime() - fechaActualDate.getTime();
-      let dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
-
-      return dias;
-
-
-    },
-    esTeclaFuncion() {
-      //si es asterisco, y hay al menos un item en el detalle, abrir un modal para cambiar la cantidad
-      if (event.key === '*') {
-        if (this.detalle.length > 0) {
-          this.$swal.fire({
-            title: 'Cambiar cantidad',
-            input: 'number',
-            inputAttributes: {
-              autocapitalize: 'off'
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            showLoaderOnConfirm: true,
-            preConfirm: (cantidad) => {
-              if (cantidad == 0 || cantidad == '') {
-                this.$swal.fire('Debe ingresar una cantidad válida');
-                return;
-              }
-              //el ultimo item del array es el 0
-              let ultimoIndice = 0;
-              this.detalle[ultimoIndice].cantidad = cantidad;
-              this.detalle[ultimoIndice].subtotal = this.detalle[ultimoIndice].precio * cantidad;
-            },
-            allowOutsideClick: () => !this.$swal.isLoading()
-          })
-        }
-      }
-      //si la tecla es F2, abrir el modal de buscar articulo
-      if (event.key === 'F2') {
-        this.modalBusquedaArticulo = true;
-      }
-      //si la tecla es F4, abrir el modal de registrar venta
-      if (event.key === 'F4') {
-        this.modalRegistroVenta = true;
-      }
-
-
-    },
-    cambiarCantidad(item) {
-      this.$swal.fire({
-        title: 'Cambiar cantidad',
-        input: 'number',
-        inputAttributes: {
-          autocapitalize: 'off'
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar',
-        showLoaderOnConfirm: true,
-        preConfirm: (cantidad) => {
-          if (cantidad == 0 || cantidad == '') {
-            this.$swal.fire('Debe ingresar una cantidad válida');
-            return;
+        this.detalle.forEach(item => {
+          if (item.codigo == this.CodigoParaCambioPrecio) {
+            let subtotalAnterior = item.subtotal;
+            let nuevoPrecio = item.precio - (item.precio * (this.porcBonif / 100));
+            item.subtotal = (nuevoPrecio * item.cantidad);
+            item.variacion = item.subtotal - subtotalAnterior;
+            item.porc_bonif = this.porcBonif;
           }
-          item.cantidad = cantidad;
-          item.subtotal = item.precio * cantidad;
-        },
-        allowOutsideClick: () => !this.$swal.isLoading()
-      })
-    },
-    mostrarAyuda() {
-      this.$swal.fire({
-        title: 'Ayuda',
-        html: '<p># Para buscar un artículo, presione F2</p><p># Para cambiar la cantidad del ultimo artículo seleccionado, presione "*" o haga doble clic en cantidad</p><p># Para cobrar la venta haga clic en el cuadro "Total" o presiones "F4"</p>',
-        icon: 'info',
-        confirmButtonText: 'Aceptar'
-      })
-    }
-  },
-  mounted() {
-    //hacer foco en el campo de codigo
-    this.$nextTick(() => {
-      document.getElementById('codigo').focus();
-    });
-    if (this.usuario.comercioTiene('comisiones')) {
-      this.getComisionistas();
-    }
-    if (this.usuario.comercioTiene('facturacion')) {
-      this.getTiposDeComprobante();
-    }
-    if (this.getDiasDeSuscripcion() < 0) {
-      this.$swal.fire({
-        icon: 'warning',
-        title: 'Atención',
-        text: 'Su suscripción ha vencido, por favor renuevela para seguir utilizando el sistema',
-      })
-      this.$router.push('/suscripcion');
-    }
-    if (this.getDiasDeSuscripcion() <= 7 && this.getDiasDeSuscripcion() > -1) {
-      this.$swal.fire({
-        icon: 'warning',
-        title: 'Atención',
-        text: 'Su suscripción vencerá en ' + this.getDiasDeSuscripcion() + ' días. Luego no podrá registrar ventas',
-      })
-    }
-  },
-  setup() {
-    const usuario = useUserStore();
-    return {
-      usuario
-    }
-  },
-  computed: {
-    total() {
-      let total = 0;
-      this.detalle.forEach(item => {
-        total += item.subtotal;
-      });
-      return total;
-    },
-    costo() {
-      let costo = 0;
-      this.detalle.forEach(item => {
-        costo += item.costo * item.cantidad;
-      });
-      return costo * 1;
-    },
-    contador() {
-      let cont = 0;
-      this.detalle.forEach(item => {
-        cont += parseInt(item.cantidad);
-        console.log(cont);
-      });
-      return parseInt(cont);
-    },
-    fotoUltimoArticulo() {
-      let ultimoIndice = this.detalle.length - 1;
-      if (this.detalle[ultimoIndice] != undefined) {
-        return this.detalle[ultimoIndice].foto;
-      }
-      else {
-        return '';
-      }
-    }
-  },
-  components: {
-    BuscarClienteComponent,
-    RegistrarVentaComponent
-  }
+        });
+        this.porcBonif = '';
+        this.calcularVariacion();
 
-}
+
+      },
+      reinicializar() {
+        this.detalle = [];
+        this.cliente = {
+          id: 0,
+          nombre: '',
+          direccion: '',
+          dni: '',
+        };
+        this.variacion = 0;
+
+      },
+      calcularVariacion() {
+        let varia = 0;
+        this.detalle.forEach(item => {
+          if (item.variacion != undefined) {
+            varia += item.variacion;
+          }
+        });
+        this.variacion = varia;
+      },
+      getComisionistas() {
+        this.cargando = true;
+        axios.get(this.url + '/' + this.usuario.tpv + '/comisionistas', {
+          headers: {
+            Authorization: this.usuario.token
+          }
+        })
+          .then(response => {
+            this.comisionistas = response.data;
+          })
+          .catch(error => {
+            console.log(error);
+          })
+          .finally(() => this.cargando = false);
+      },
+      getTiposDeComprobante() {
+        axios.get(this.url + '/' + this.usuario.tpv + '/facturas/tiposDeComprobantes', {
+          headers: {
+            Authorization: this.usuario.token
+          }
+        })
+          .then(response => {
+            this.comprobantes = response.data;
+            this.comprobantes.unshift({ Id: 0, Desc: 'No fiscal' });
+          })
+          .catch(error => {
+            console.log(error);
+          })
+      },
+
+      esTeclaFuncion() {
+        //si es asterisco, y hay al menos un item en el detalle, abrir un modal para cambiar la cantidad
+        if (event.key === '*') {
+          if (this.detalle.length > 0) {
+            this.$swal.fire({
+              title: 'Cambiar cantidad',
+              input: 'number',
+              inputAttributes: {
+                autocapitalize: 'off',
+                min: 1,
+              },
+              showCancelButton: true,
+              confirmButtonText: 'Aceptar',
+              cancelButtonText: 'Cancelar',
+              showLoaderOnConfirm: true,
+              preConfirm: (cantidad) => {
+                if (cantidad === '' || isNaN(cantidad) || Number(cantidad) < 1) {
+                  this.$swal.fire('Debe ingresar una cantidad válida (mayor o igual a 1)');
+                  return;
+                }
+                let valor = Number(cantidad);
+                let ultimoIndice = 0;
+                this.detalle[ultimoIndice].cantidad = valor;
+                this.detalle[ultimoIndice].subtotal = this.detalle[ultimoIndice].precio * valor;
+              },
+              allowOutsideClick: () => !this.$swal.isLoading()
+            })
+          }
+        }
+        //si la tecla es F2, abrir el modal de buscar articulo
+        if (event.key === 'F2') {
+          this.modalBusquedaArticulo = true;
+        }
+        //si la tecla es F4, abrir el modal de registrar venta
+        if (event.key === 'F4') {
+          this.modalRegistroVenta = true;
+        }
+
+
+      },
+      cambiarCantidad(item) {
+        this.$swal.fire({
+          title: 'Cambiar cantidad',
+          input: 'number',
+          inputAttributes: {
+            autocapitalize: 'off'
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Aceptar',
+          cancelButtonText: 'Cancelar',
+          showLoaderOnConfirm: true,
+          preConfirm: (cantidad) => {
+            if (cantidad == 0 || cantidad == '') {
+              this.$swal.fire('Debe ingresar una cantidad válida');
+              return;
+            }
+            item.cantidad = cantidad;
+            item.subtotal = item.precio * cantidad;
+          },
+          allowOutsideClick: () => !this.$swal.isLoading()
+        })
+      },
+      mostrarAyuda() {
+        this.$swal.fire({
+          title: 'Ayuda',
+          html: '<p># Para buscar un artículo, presione F2</p><p># Para cambiar la cantidad del ultimo artículo seleccionado, presione "*" o haga doble clic en cantidad</p><p># Para cobrar la venta haga clic en el cuadro "Total" o presiones "F4"</p>',
+          icon: 'info',
+          confirmButtonText: 'Aceptar'
+        })
+      }
+    },
+    mounted() {
+      //hacer foco en el campo de codigo
+      this.$nextTick(() => {
+        document.getElementById('codigo').focus();
+      });
+      if (this.usuario.comercioTiene('comisiones')) {
+        this.getComisionistas();
+      }
+      if (this.usuario.comercioTiene('facturacion')) {
+        this.getTiposDeComprobante();
+      }
+      if (this.usuario.diasDeSuscripcion < 0) {
+        this.$swal.fire({
+          icon: 'warning',
+          title: 'Atención',
+          text: 'Su suscripción ha vencido, por favor renuevela para seguir utilizando el sistema',
+        })
+        this.$router.push('/suscripcion');
+      }
+      if (this.usuario.diasDeSuscripcion <= 7 && this.usuario.diasDeSuscripcion > -1) {
+        this.$swal.fire({
+          icon: 'warning',
+          title: 'Atención',
+          text: 'Su suscripción vencerá en ' + this.usuario.diasDeSuscripcion + ' días. Luego no podrá registrar ventas',
+        })
+      }
+    },
+    setup() {
+      const usuario = useUserStore();
+      return {
+        usuario
+      }
+    },
+    computed: {
+      total() {
+        let total = 0;
+        this.detalle.forEach(item => {
+          total += item.subtotal;
+        });
+        return total;
+      },
+      costo() {
+        let costo = 0;
+        this.detalle.forEach(item => {
+          costo += item.costo * item.cantidad;
+        });
+        return costo * 1;
+      },
+      contador() {
+        let cont = 0;
+        this.detalle.forEach(item => {
+          cont += parseInt(item.cantidad);
+          console.log(cont);
+        });
+        return parseInt(cont);
+      },
+      fotoUltimoArticulo() {
+        let ultimoIndice = this.detalle.length - 1;
+        if (this.detalle[ultimoIndice] != undefined) {
+          return this.detalle[ultimoIndice].foto;
+        }
+        else {
+          return '';
+        }
+      }
+    },
+    components: {
+      BuscarClienteComponent,
+      RegistrarVentaComponent
+    },
+    watch: {
+      modalBusquedaArticulo(val) {
+        if (val) {
+          this.$nextTick(() => {
+            // Para Vuetify 2.x y 3.x, el input real está en $refs.inputBuscarArticulo.$el.querySelector('input')
+            let input = this.$refs.inputBuscarArticulo;
+            if (input) {
+              // Si es un componente de Vuetify, buscar el input real
+              let realInput = input.$el ? input.$el.querySelector('input') : input;
+              if (realInput && realInput.focus) {
+                realInput.focus();
+              }
+            }
+          });
+        }
+      }
+    },
+  }
 </script>
 
 <style scoped>
-.total {
-  cursor: pointer;
-}
+  .total {
+    cursor: pointer;
+  }
 
-.total:hover {
-  background-color: rgb(131, 9, 131) !important;
-  color: white;
-}
+  .total:hover {
+    background-color: rgb(131, 9, 131) !important;
+    color: white;
+  }
 
-.fotoArticulo {
-  width: 100%;
-  height: 100%;
-  padding: 10px;
-  border-radius: 10px;
+  .fotoArticulo {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    border-radius: 10px;
 
 
-}
+  }
 
-.v-enter-active,
-.v-leave-active {
-  transition: all 0.5s ease;
-}
+  .v-enter-active,
+  .v-leave-active {
+    transition: all 0.5s ease;
+  }
 
-.v-enter-from,
-.v-leave-to {
-  transform: translateX(40px) !important;
-  opacity: 0;
+  .v-enter-from,
+  .v-leave-to {
+    transform: translateX(40px) !important;
+    opacity: 0;
 
-}
+  }
+
+  .cantidad-cell {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .edit-cantidad-icon {
+    margin-left: 6px;
+    vertical-align: middle;
+    opacity: 0;
+    transition: opacity 0.2s;
+    cursor: pointer;
+  }
+
+  .cantidad-cell:hover .edit-cantidad-icon {
+    opacity: 1;
+  }
 </style>

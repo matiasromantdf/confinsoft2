@@ -6,7 +6,8 @@
                     <v-card title="Usuarios vendedores" :loading="cargando">
                         <v-card-text>
                             En esta sección se pueden crear, editar y eliminar usuarios vendedores. Estos usuarios van a
-                            tener restricciones de acceso a ciertas secciones de la aplicación.
+                            tener restricciones de acceso a funciones sensibles de la aplicación, como la gestión de
+                            productos. Sólo podrán realizar ventas y ver ciertos reportes.
                         </v-card-text>
                     </v-card>
                 </v-col>
@@ -109,8 +110,8 @@
                                                     <v-row>
                                                         <v-col>
                                                             <v-text-field label="Username" variant="outlined"
-                                                                hide-details
-                                                                v-model="nuevoUsuario.username"></v-text-field>
+                                                                hide-details v-model="nuevoUsuario.username"
+                                                                readonly=""></v-text-field>
                                                         </v-col>
                                                     </v-row>
                                                     <v-row>
@@ -149,115 +150,116 @@
 </template>
 
 <script>
-import { useUserStore } from '@/stores/user';
-import axios from 'axios';
-export default {
-    data() {
-        return {
-            url: import.meta.env.VITE_URL,
-            usuarios: [],
-            cargando: false,
-            mensaje: true,
-            dialog: false,
-            dialogEditar: false,
-            nuevoUsuario: {
-                nombre: '',
-                username: '',
-                password: ''
-            },
-            guardandoNuevo: false
-        }
-    },
-    methods: {
-        getUsuarios() {
-            this.cargando = true;
-            axios.get(this.url + '/' + this.usuario.tpv + '/usuarios/vendedores', {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            })
-                .then(response => {
-                    this.usuarios = response.data;
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => this.cargando = false);
+    import { useUserStore } from '@/stores/user';
+    import axios from 'axios';
+    export default {
+        data() {
+            return {
+                url: import.meta.env.VITE_URL,
+                usuarios: [],
+                cargando: false,
+                mensaje: true,
+                dialog: false,
+                dialogEditar: false,
+                nuevoUsuario: {
+                    nombre: '',
+                    username: '',
+                    password: ''
+                },
+                guardandoNuevo: false
+            }
         },
-        guardarNuevoUsuario() {
-            this.guardandoNuevo = true;
-            axios.post(this.url + '/' + this.usuario.tpv + '/usuarios/vendedores', this.nuevoUsuario, {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            })
-                .then(response => {
-                    this.dialog = false;
-                    this.$swal('Usuario creado', 'El usuario ha sido creado', 'success');
-                    this.getUsuarios();
+        methods: {
+            getUsuarios() {
+                this.cargando = true;
+                axios.get(this.url + '/' + this.usuario.tpv + '/usuarios/vendedores', {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
                 })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => this.guardandoNuevo = false);
-        },
-        editarUsuario(usuario) {
-            axios.put(this.url + '/' + this.usuario.tpv + '/usuarios/vendedores/' + usuario.id, usuario, {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            })
-                .then(response => {
-                    this.dialogEditar = false;
-                    this.getUsuarios();
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-        },
-        eliminarUsuario(usuario) {
-            //consultar si se desea eliminar
-            this.$swal({
-                title: 'Eliminar usuario',
-                text: '¿Está seguro que desea eliminar este usuario?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.delete(this.url + '/' + this.usuario.tpv + '/usuarios/vendedores/' + usuario.id, {
-                        headers: {
-                            Authorization: this.usuario.token
-                        }
+                    .then(response => {
+                        this.usuarios = response.data;
+                        this.nuevoUsuario.username = this.usuario.tpv + '-caja-' + (this.usuarios.length + 1);
                     })
-                        .then(response => {
-                            this.$swal('Usuario eliminado', 'El usuario ha sido eliminado', 'success');
-                            this.getUsuarios();
+                    .catch(error => {
+                        console.log(error);
+                    })
+                    .finally(() => this.cargando = false);
+            },
+            guardarNuevoUsuario() {
+                this.guardandoNuevo = true;
+                axios.post(this.url + '/' + this.usuario.tpv + '/usuarios/vendedores', this.nuevoUsuario, {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
+                })
+                    .then(response => {
+                        this.dialog = false;
+                        this.$swal('Usuario creado', 'El usuario ha sido creado', 'success');
+                        this.getUsuarios();
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+                    .finally(() => this.guardandoNuevo = false);
+            },
+            editarUsuario(usuario) {
+                axios.put(this.url + '/' + this.usuario.tpv + '/usuarios/vendedores/' + usuario.id, usuario, {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
+                })
+                    .then(response => {
+                        this.dialogEditar = false;
+                        this.getUsuarios();
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            },
+            eliminarUsuario(usuario) {
+                //consultar si se desea eliminar
+                this.$swal({
+                    title: 'Eliminar usuario',
+                    text: '¿Está seguro que desea eliminar este usuario?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.delete(this.url + '/' + this.usuario.tpv + '/usuarios/vendedores/' + usuario.id, {
+                            headers: {
+                                Authorization: this.usuario.token
+                            }
                         })
-                        .catch(error => {
-                            console.log(error);
-                        })
-                }
-            })
+                            .then(response => {
+                                this.$swal('Usuario eliminado', 'El usuario ha sido eliminado', 'success');
+                                this.getUsuarios();
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            })
+                    }
+                })
 
+            }
+        },
+        created() {
+            if (this.usuario.rol != 1) {
+                this.$router.push({ name: 'no-autorizado' });
+
+            }
+
+            this.getUsuarios();
+        },
+        setup() {
+            const usuario = useUserStore();
+            return { usuario };
         }
-    },
-    created() {
-        if (this.usuario.rol != 1) {
-            this.$router.push({ name: 'no-autorizado' });
 
-        }
 
-        this.getUsuarios();
-    },
-    setup() {
-        const usuario = useUserStore();
-        return { usuario };
     }
-
-
-}
 </script>
 
 <style scoped></style>

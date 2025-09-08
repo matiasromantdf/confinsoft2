@@ -1,9 +1,9 @@
 <template>
     <v-container>
         <v-row>
-            <v-col class="d-flex algin-items-center">
+            <v-col class="d-flex align-items-center">
                 <div>
-                    <v-alert v-model="mensaje" border="start" close-label="Close Alert" color="indigo-lighten-2"
+                    <v-alert v-model="mensaje" border="start" close-label="Close Alert" color="red-lighten-2"
                         title="Aviso" variant="tonal" closable>
                         En esta sección se pueden configurar los datos del comercio y el tipo de impresión de los
                         comprobantes.<br>
@@ -71,135 +71,135 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { useUserStore } from '@/stores/user';
-export default {
-    data() {
-        return {
-            comercio: {
-                cuit: '',
-                direccion: '',
-                telefono: '',
-                iibb: '',
-                inicio_actividades: '',
-                impresion: '',
-                nombre: '',
-                pto_venta: '',
-            },
-            modosDeImpresion: [
-                {
-                    value: "2",
-                    title: 'A4'
+    import axios from 'axios';
+    import { useUserStore } from '@/stores/user';
+    export default {
+        data() {
+            return {
+                comercio: {
+                    cuit: '',
+                    direccion: '',
+                    telefono: '',
+                    iibb: '',
+                    inicio_actividades: '',
+                    impresion: '',
+                    nombre: '',
+                    pto_venta: '',
                 },
-                {
-                    value: "1",
-                    title: 'Ticket 80mm'
-                }
-            ],
-            url: import.meta.env.VITE_URL,
-            loading: false,
-            mensaje: true
-        }
-    },
-    methods: {
-        getComercioData() {
-            this.loading = true;
-            axios.get(this.url + '/' + this.usuario.tpv + '/comercio',
-                {
-                    headers: {
-                        Authorization: this.usuario.token
+                modosDeImpresion: [
+                    {
+                        value: "2",
+                        title: 'A4'
+                    },
+                    {
+                        value: "1",
+                        title: 'Ticket 80mm'
                     }
-                })
-                .then(response => {
-                    this.comercio = response.data;
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.loading = false;
-                });
-
+                ],
+                url: import.meta.env.VITE_URL,
+                loading: false,
+                mensaje: true
+            }
         },
-        saveComercioData() {
-            this.$swal({
-                title: '¿Estás seguro?',
-                text: "Estás a punto de guardar los datos del comercio",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, guardar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    let datos = new FormData();
-                    datos.append('nombre', this.comercio.nombre);
-                    datos.append('cuit', this.comercio.cuit);
-                    datos.append('direccion', this.comercio.direccion);
-                    datos.append('telefono', this.comercio.telefono);
-                    datos.append('iibb', this.comercio.iibb);
-                    datos.append('inicio_actividades', this.comercio.inicio_actividades);
-                    datos.append('impresion', this.comercio.impresion);
-
-                    if (this.usuario.comercioTiene('facturacion')) {
-
-                        datos.append('pto_venta', this.comercio.pto_venta);
-                    }
-
-
-                    if (document.getElementById('logo').files.length > 0) {
-
-                        datos.append('logo', document.getElementById('logo').files[0]);
-                    }
-
-                    if (this.usuario.comercioTiene('facturacion') && (document.getElementById('credenciales').files.length > 0)) {
-
-                        for (let i = 0; i < document.getElementById('credenciales').files.length; i++) {
-                            datos.append('credenciales[]', document.getElementById('credenciales').files[i]);
+        methods: {
+            getComercioData() {
+                this.loading = true;
+                axios.get(this.url + '/' + this.usuario.tpv + '/comercio',
+                    {
+                        headers: {
+                            Authorization: this.usuario.token
                         }
-                    }
+                    })
+                    .then(response => {
+                        this.comercio = response.data;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+                    .finally(() => {
+                        this.loading = false;
+                    });
+
+            },
+            saveComercioData() {
+                this.$swal({
+                    title: '¿Estás seguro?',
+                    text: "Estás a punto de guardar los datos del comercio",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, guardar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let datos = new FormData();
+                        datos.append('nombre', this.comercio.nombre);
+                        datos.append('cuit', this.comercio.cuit);
+                        datos.append('direccion', this.comercio.direccion);
+                        datos.append('telefono', this.comercio.telefono);
+                        datos.append('iibb', this.comercio.iibb);
+                        datos.append('inicio_actividades', this.comercio.inicio_actividades);
+                        datos.append('impresion', this.comercio.impresion);
+
+                        if (this.usuario.comercioTiene('facturacion')) {
+
+                            datos.append('pto_venta', this.comercio.pto_venta);
+                        }
 
 
-                    this.loading = true;
-                    axios.post(this.url + '/' + this.usuario.tpv + '/comercio/actualizar', datos,
-                        {
-                            headers: {
-                                Authorization: this.usuario.token
+                        if (document.getElementById('logo').files.length > 0) {
+
+                            datos.append('logo', document.getElementById('logo').files[0]);
+                        }
+
+                        if (this.usuario.comercioTiene('facturacion') && (document.getElementById('credenciales').files.length > 0)) {
+
+                            for (let i = 0; i < document.getElementById('credenciales').files.length; i++) {
+                                datos.append('credenciales[]', document.getElementById('credenciales').files[i]);
                             }
-                        })
-                        .then(response => {
-                            console.log(response);
-                            this.$swal('Guardado', 'Los datos del comercio han sido guardados', 'success');
-                            this.getComercioData();
-                        })
-                        .catch(error => {
-                            this.$swal('Error', 'Ha ocurrido un error al guardar los datos', 'error');
-                            console.log(error);
-                        })
-                        .finally(() => {
-                            this.loading = false;
-                        });
-                }
-            })
+                        }
 
+
+                        this.loading = true;
+                        axios.post(this.url + '/' + this.usuario.tpv + '/comercio/actualizar', datos,
+                            {
+                                headers: {
+                                    Authorization: this.usuario.token
+                                }
+                            })
+                            .then(response => {
+                                console.log(response);
+                                this.$swal('Guardado', 'Los datos del comercio han sido guardados', 'success');
+                                this.getComercioData();
+                            })
+                            .catch(error => {
+                                this.$swal('Error', 'Ha ocurrido un error al guardar los datos', 'error');
+                                console.log(error);
+                            })
+                            .finally(() => {
+                                this.loading = false;
+                            });
+                    }
+                })
+
+            },
         },
-    },
-    mounted() {
-        if (this.usuario.rol != 1) {
-            this.$router.push('/no-autorizado');
+        mounted() {
+            if (this.usuario.rol != 1) {
+                this.$router.push('/no-autorizado');
+            }
+            this.getComercioData();
+        },
+        setup() {
+            const usuario = useUserStore();
+            return {
+                usuario
+            }
         }
-        this.getComercioData();
-    },
-    setup() {
-        const usuario = useUserStore();
-        return {
-            usuario
-        }
+
+
     }
-
-
-}
 </script>
 
 <style scoped></style>
