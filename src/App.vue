@@ -26,7 +26,9 @@
     },
     methods: {
       getDiasDeSusc() {
-        return this.usuario.diasDeSuscripcion;
+        if (this.usuario) {
+          return this.usuario.diasDeSuscripcion;
+        }
       }
 
     },

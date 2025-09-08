@@ -120,10 +120,13 @@
         },
         computed: {
             proximoVencimiento() {
-                let date = new Date(this.usuario.comercio.vencimiento);
-                //sumar 30 dias
-                date.setDate(date.getDate() + 30);
-                return date.toLocaleDateString();
+                // let date = new Date(this.usuario.comercio.vencimiento);
+                // //sumar 30 dias
+                // date.setDate(date.getDate() + 30);
+                // return date.toLocaleDateString();
+                let fechaVencimiento = new Date(this.usuario.horaServidor);
+                fechaVencimiento.setDate(fechaVencimiento.getDate() + 30);
+                return fechaVencimiento.toLocaleDateString();
             }
         }
 
