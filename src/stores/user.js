@@ -23,16 +23,20 @@ export const useUserStore = defineStore("usuario", {
       return state.comercio;
     },
     diasDeSuscripcion: (state) => {
+      if (
+        !state.comercio ||
+        !state.comercio.vencimiento ||
+        !state.horaServidor
+      ) {
+        return 0;
+      }
       let fechaVencimiento = state.comercio.vencimiento;
-      //hora de vencimiento es a las 00:00
-      fechaVencimiento = fechaVencimiento;
       let fechaActual = state.horaServidor;
       let fechaVencimientoDate = new Date(fechaVencimiento);
       let fechaActualDate = new Date(fechaActual);
       let diferencia =
         fechaVencimientoDate.getTime() - fechaActualDate.getTime();
       let dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
-
       return dias;
     },
   },

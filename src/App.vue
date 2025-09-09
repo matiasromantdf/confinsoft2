@@ -1,10 +1,15 @@
 <script setup>
-  import { RouterLink, RouterView } from 'vue-router'
+  import Menu from './components/Menu.vue'
+  import { useUserStore } from './stores/user'
+  import { computed } from 'vue'
+
+  const usuario = useUserStore()
+  const diasDeSuscripcion = computed(() => usuario.diasDeSuscripcion)
 </script>
 
 <template>
   <v-app>
-    <Menu v-if="this.getDiasDeSusc() > 0" />
+    <Menu v-if="diasDeSuscripcion > 0" />
     <v-main class="bg-grey-lighten-2">
 
       <router-view v-slot="{ Component }">
@@ -16,28 +21,7 @@
 
   </v-app>
 </template>
-<script>
-  import Menu from './components/Menu.vue';
-  import { useUserStore } from './stores/user';
 
-  export default {
-    components: {
-      Menu
-    },
-    methods: {
-      getDiasDeSusc() {
-        if (this.usuario) {
-          return this.usuario.diasDeSuscripcion;
-        }
-      }
-
-    },
-    setup() {
-      let usuario = useUserStore();
-      return { usuario };
-    }
-  };
-</script>
 <style>
 
   .fade-enter-active,
