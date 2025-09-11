@@ -25,10 +25,11 @@
                                 <v-row>
                                     <v-col md="6" cols="12">
                                         <v-text-field v-model="nombre" label="Nombre del usuario" :rules="required"
-                                            variant="outlined"></v-text-field>
+                                            variant="outlined"
+                                            hint="Ingrese su nombre completo o nombre del comercio"></v-text-field>
                                     </v-col>
                                     <v-col md="6" sm="12">
-                                        <v-text-field v-model="username" label="Correo electronico" variant="outlined"
+                                        <v-text-field v-model="email" label="Correo electronico" variant="outlined"
                                             hint="será el que se utilice para ingresar" persistent-hint
                                             :rules="esCorreo"></v-text-field>
                                     </v-col>
@@ -68,62 +69,61 @@
 </template>
 
 <script>
-import axios from 'axios';
-export default {
-    data() {
-        return {
-            url: import.meta.env.VITE_URL,
-            form: false,
-            cargando: false,
-            nombre: '',
-            username: '',
-            email: '',
-            telefono: '',
-            password: '',
-            password2: '',
-            mensaje: true,
-            required: [value => {
-                if (!value) {
-                    return 'Este campo es requerido';
-                }
-                return true;
-            }],
-            esCorreo: [v => /.+@.+\..+/.test(v) || 'El correo no es válido'],
-
-        }
-    },
-    methods: {
-        registrar() {
-            if (this.password != this.password2) {
-                this.$swal('Error', 'Las contraseñas no coinciden', 'error');
-                return;
-            }
-            if (!this.form) {
-                return;
-            }
-            let datos = new FormData();
-            datos.append('nombre', this.nombre);
-            datos.append('username', this.username);
-            datos.append('email', this.email);
-            datos.append('telefono', this.telefono);
-            datos.append('password', this.password);
-            datos.append('password2', this.password2);
-
-            axios.post(this.url + '/registrar', datos, { timeout: 15000 })
-                .then(response => {
-                    if (response.status == '200') {
-                        this.$swal('Registro exitoso', 'Podes disfrutar de nuestro sistema por 30 días', 'success');
-
-                        this.$router.push('/login');
+    import axios from 'axios';
+    export default {
+        data() {
+            return {
+                url: import.meta.env.VITE_URL,
+                form: false,
+                cargando: false,
+                nombre: '',
+                username: '',
+                email: '',
+                telefono: '',
+                password: '',
+                password2: '',
+                mensaje: true,
+                required: [value => {
+                    if (!value) {
+                        return 'Este campo es requerido';
                     }
-                })
-                .catch(error => {
-                    this.$swal('Error', 'Ocurrió un error al registrar, probablemente el nombre de usuario ya está en uso', 'error');
-                });
-        },
-    }
+                    return true;
+                }],
+                esCorreo: [v => /.+@.+\..+/.test(v) || 'El correo no es válido'],
 
-}
+            }
+        },
+        methods: {
+            registrar() {
+                if (this.password != this.password2) {
+                    this.$swal('Error', 'Las contraseñas no coinciden', 'error');
+                    return;
+                }
+                if (!this.form) {
+                    return;
+                }
+                let datos = new FormData();
+                datos.append('nombre', this.nombre);
+                datos.append('email', this.email);
+                datos.append('telefono', this.telefono);
+                datos.append('password', this.password);
+                datos.append('password2', this.password2);
+
+                axios.post(this.url + '/registrar', datos, { timeout: 15000 })
+                    .then(response => {
+                        if (response.status == '200') {
+                            this.$swal('Registro exitoso', 'Podes disfrutar de nuestro sistema por 30 días', 'success');
+
+                            this.$router.push('/login');
+                        }
+                    })
+                    .catch(error => {
+                        this.$swal('Error', 'Ocurrió un error al registrar, probablemente el nombre de usuario ya está en uso', 'error');
+                    });
+            },
+        }
+
+    }
 </script>
 
 <style scoped></style>
