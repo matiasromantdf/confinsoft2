@@ -11,7 +11,7 @@
                     </template>
                     <v-form v-model="form" @submit.prevent="login">
                         <v-text-field v-model="username" :readonly="loading" :rules="[required]" class="mb-2" clearable
-                            label="Email" name="username"></v-text-field>
+                            label="Email o Usuario" name="username"></v-text-field>
 
                         <v-text-field v-model="password" :readonly="loading" :rules="[required]" clearable
                             label="Contraseña" placeholder="Ingrese su clave" type="password"
@@ -40,93 +40,93 @@
     </v-container>
 </template>
 <script>
-import axios from 'axios';
-import { useUserStore } from '../stores/user';
+    import axios from 'axios';
+    import { useUserStore } from '../stores/user';
 
-export default {
-    data: () => ({
-        form: false,
-        loading: false,
-        username: '',
-        password: '',
-        url: import.meta.env.VITE_URL,
-    }),
+    export default {
+        data: () => ({
+            form: false,
+            loading: false,
+            username: '',
+            password: '',
+            url: import.meta.env.VITE_URL,
+        }),
 
-    methods: {
-        required(v) {
-            return !!v || 'El campo es requerido'
-        },
-        async login() {
-            if (!this.form) return;
-            this.loading = true;
-            let datos = new FormData();
-            datos.append('username', this.username);
-            datos.append('pass', this.password);
+        methods: {
+            required(v) {
+                return !!v || 'El campo es requerido'
+            },
+            async login() {
+                if (!this.form) return;
+                this.loading = true;
+                let datos = new FormData();
+                datos.append('username', this.username);
+                datos.append('pass', this.password);
 
-            await axios.post(this.url + '/login', datos, { timeout: 15000 })
-                .then(response => {
-                    this.loading = false;
-                    if (response.status == '200') {
-                        // console.log(response.data);
-                        let tpv = response.data.tpv;
-                        let token = response.data.token;
-                        let datosUsuario = response.data;
+                await axios.post(this.url + '/login', datos, { timeout: 15000 })
+                    .then(response => {
+                        this.loading = false;
+                        if (response.status == '200') {
+                            // console.log(response.data);
+                            let tpv = response.data.tpv;
+                            let token = response.data.token;
+                            let datosUsuario = response.data;
 
-                        axios.get(this.url + '/' + tpv + '/comercio', {
-                            headers: {
-                                Authorization: token
-                            }
-                        })
-                            .then(response => {
-                                datosUsuario.comercio = response.data;
-                                this.usuario.setUsuario(datosUsuario);
-                                this.$router.push('/');
-
-
+                            axios.get(this.url + '/' + tpv + '/comercio', {
+                                headers: {
+                                    Authorization: token
+                                }
                             })
+                                .then(response => {
+                                    datosUsuario.comercio = response.data;
+                                    this.usuario.setUsuario(datosUsuario);
+                                    this.$router.push('/');
 
 
-                        // let usuario = response.data;
-                        // let fecha = new Date(usuario.vence);
-                        // alert('Bienvenido ' + usuario.username + ' tu suscripción vence el ' + fecha.getDate() + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear());
-                    }
+                                })
 
-                })
-                .catch(error => {
-                    this.loading = false;
-                    if (error.status) {
-                        if (error.response.status == '401') {
-                            alert('Usuario o contraseña incorrectos');
-                        } else {
+
+                            // let usuario = response.data;
+                            // let fecha = new Date(usuario.vence);
+                            // alert('Bienvenido ' + usuario.username + ' tu suscripción vence el ' + fecha.getDate() + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear());
+                        }
+
+                    })
+                    .catch(error => {
+                        this.loading = false;
+                        if (error.status) {
+                            if (error.response.status == '401') {
+                                alert('Usuario o contraseña incorrectos');
+                            } else {
+                                this.$swal('Error', 'Error al iniciar sesión. No hay conexión con el servidor', 'error');
+                                console.log(error);
+                            }
+                        }
+                        else {
                             this.$swal('Error', 'Error al iniciar sesión. No hay conexión con el servidor', 'error');
                             console.log(error);
                         }
-                    }
-                    else {
-                        this.$swal('Error', 'Error al iniciar sesión. No hay conexión con el servidor', 'error');
-                        console.log(error);
-                    }
 
-                })
+                    })
+            },
+            reg() {
+                this.$router.push('/registrarse');
+            },
+            recuperarPass() {
+                this.$router.push('/reset-pass');
+            }
         },
-        reg() {
-            this.$router.push('/registrarse');
+        setup() {
+            const usuario = useUserStore();
+            return { usuario };
         },
-        recuperarPass() {
-            this.$router.push('/reset-pass');
-        }
-    },
-    setup() {
-        const usuario = useUserStore();
-        return { usuario };
-    },
-    mounted() {
-        if (import.meta.env.MODE == 'development') {
-            this.username = 'prueba';
-            this.password = 'prueba';
+        mounted() {
+            if (import.meta.env.MODE == 'development') {
+                this.username = 'prueba';
+                this.password = 'prueba';
+            }
         }
     }
-}
 </script>
 
 

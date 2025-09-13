@@ -4,17 +4,20 @@
         <v-dialog width="500" class="rounded-xl" v-model="dialogo">
 
             <v-card title="Nuevo Proveedor">
+                <v-card-subtitle>
+                    El nombre es obligatorio, lo demás es opcional.
+                </v-card-subtitle>
                 <v-card-text>
                     <v-form v-model="valid">
                         <v-container>
                             <v-row>
                                 <v-col cols="5">
-                                    <v-text-field v-model="proveedor.cuit" label="CUIT" variant="outlined"
-                                        :rules="cuitRules" required></v-text-field>
+                                    <v-text-field v-model="proveedor.cuit" label="CUIT"
+                                        variant="outlined"></v-text-field>
                                 </v-col>
                                 <v-col cols="7">
-                                    <v-text-field v-model="proveedor.nombre" :rules="nombreRules" label="Nombre"
-                                        variant="outlined" required></v-text-field>
+                                    <v-text-field v-model="proveedor.nombre" :rules="nombreRules"
+                                        label="Nombre (obligatorio)" variant="outlined" required></v-text-field>
                                 </v-col>
                             </v-row>
 
@@ -52,82 +55,75 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { useUserStore } from '../stores/user';
-import Swal from 'sweetalert2';
-export default {
-    data() {
-        return {
-            proveedor: {
-                cuit: '',
-                nombre: '',
-                telefono: '',
-                direccion: '',
-                comentarios: ''
-            },
-            url: import.meta.env.VITE_URL,
-            cargando: false,
-            cuitRules: [
-                value => {
-                    if (!value) return 'El CUIT es requerido';
-                    if (value.length != 11) return 'El CUIT debe tener 11 dígitos';
-                    return true;
-                }
-            ],
-            nombreRules: [
-                value => {
-                    if (!value) return 'El nombre es requerido';
-                    if (value.length < 3) return 'El nombre debe tener al menos 3 caracteres';
-                    return true;
-                }
-            ],
-            valid: false,
-            dialogo: true
-
-
-        }
-    },
-    methods: {
-        guardarProveedor() {
-            if (!this.valid) return;
-            this.cargando = true;
-            axios.post(this.url + '/' + this.usuario.tpv + '/proveedores', this.proveedor, {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            })
-                .then(response => {
-                    console.log(response.data);
-                    if (response.data.id) {
-                        this.$swal('Proveedor guardado', 'El proveedor se guardó correctamente', 'success');
+    import axios from 'axios';
+    import { useUserStore } from '../stores/user';
+    import Swal from 'sweetalert2';
+    export default {
+        data() {
+            return {
+                proveedor: {
+                    cuit: '',
+                    nombre: '',
+                    telefono: '',
+                    direccion: '',
+                    comentarios: ''
+                },
+                url: import.meta.env.VITE_URL,
+                cargando: false,
+                nombreRules: [
+                    value => {
+                        if (!value) return 'El nombre es requerido';
+                        if (value.length < 3) return 'El nombre debe tener al menos 3 caracteres';
+                        return true;
                     }
-                    //cerrar el dialog
-                    this.dialogo = false;
-                    this.$emit('actualizarProveedores');
+                ],
+                valid: false,
+                dialogo: true
 
-                })
-                .catch(error => {
-                    console.log(error);
-                    this.dialogo = false;
-                    this.$swal('Error', 'Ocurrió un error al guardar el proveedor, verifique que el CUIT no este repetido', 'error');
-                })
-                .finally(() => {
-                    this.cargando = false;
-                });
+
+            }
         },
-        cerrarDialogo() {
-            this.$emit('cerrarDialogo');
-        }
-    },
-    setup() {
-        const usuario = useUserStore();
-        return {
-            usuario
-        }
-    },
-    emits: ['actualizarProveedores', 'cerrarDialogo'],
+        methods: {
+            guardarProveedor() {
+                if (!this.valid) return;
+                this.cargando = true;
+                axios.post(this.url + '/' + this.usuario.tpv + '/proveedores', this.proveedor, {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
+                })
+                    .then(response => {
+                        console.log(response.data);
+                        if (response.data.id) {
+                            this.$swal('Proveedor guardado', 'El proveedor se guardó correctamente', 'success');
+                        }
+                        //cerrar el dialog
+                        this.dialogo = false;
+                        this.$emit('actualizarProveedores');
 
-}
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this.dialogo = false;
+                        this.$swal('Error', 'Ocurrió un error al guardar el proveedor, verifique que el CUIT no este repetido', 'error');
+                    })
+                    .finally(() => {
+                        this.cargando = false;
+                    });
+            },
+            cerrarDialogo() {
+                this.$emit('cerrarDialogo');
+            }
+        },
+        setup() {
+            const usuario = useUserStore();
+            return {
+                usuario
+            }
+        },
+        emits: ['actualizarProveedores', 'cerrarDialogo'],
+
+    }
 </script>
 
 <style scoped></style>

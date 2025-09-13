@@ -23,7 +23,7 @@
                             </v-row>
 
                             <v-row>
-                                <v-col cols="3">
+                                <v-col cols="4">
                                     <v-text-field v-model="articulo.codigo" label="Código" required variant="outlined"
                                         :rules="codigoRule"></v-text-field>
                                 </v-col>
@@ -31,7 +31,7 @@
                                     <v-text-field v-model="articulo.descripcion" label="Descripción" required
                                         variant="outlined"></v-text-field>
                                 </v-col>
-                                <v-col cols="3">
+                                <v-col cols="2">
                                     <v-text-field v-model="articulo.iva" label="IVA" required variant="outlined"
                                         suffix="%" :rules="reglasIva"></v-text-field>
                                 </v-col>
