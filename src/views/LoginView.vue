@@ -11,11 +11,11 @@
                     </template>
                     <v-form v-model="form" @submit.prevent="login">
                         <v-text-field v-model="username" :readonly="loading" :rules="[required]" class="mb-2" clearable
-                            label="Email o Usuario" name="username"></v-text-field>
+                            label="Email o Usuario" name="username" autocomplete="username"></v-text-field>
 
                         <v-text-field v-model="password" :readonly="loading" :rules="[required]" clearable
-                            label="Contraseña" placeholder="Ingrese su clave" type="password"
-                            name="password"></v-text-field>
+                            label="Contraseña" placeholder="Ingrese su clave" type="password" name="password"
+                            autocomplete="current-password"></v-text-field>
 
                         <br>
 
