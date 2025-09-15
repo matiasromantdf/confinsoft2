@@ -34,7 +34,7 @@
 
         <v-row justify="center">
             <v-col md="6" sm="12" class="text-center">
-                <v-btn color="primary" @click="reg()">Probar GRATIS</v-btn>
+                <v-btn color="primary" @click="reg()">Crear cuenta</v-btn>
             </v-col>
         </v-row>
     </v-container>
