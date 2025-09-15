@@ -11,7 +11,7 @@
                                     <v-checkbox v-model="articulo.es_producto" label="Es un producto"></v-checkbox>
                                 </v-col>
                                 <v-col cols="8">
-                                    <p>Si es un producto (elaboración), no se gestionará el stock</p>
+                                    <p>Si es un producto (elaboración propia), no se gestionará el stock</p>
                                 </v-col>
                             </div>
                             <v-row>
@@ -278,9 +278,9 @@
 
     #fila-check p {
         margin-bottom: 16px;
-        background-color: #e2db7793;
+        background-color: #f0e33760;
         padding: 10px;
         border-radius: 8px;
-        border-left: 6px solid #8b8640;
+        border-left: 6px solid #eee242;
     }
 </style>
