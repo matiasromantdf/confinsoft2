@@ -47,9 +47,9 @@
                                     </template>
                                 </v-dialog>
                             </template>
-                            <template v-slot:item.es_servicio="{ item }">
-                                <v-chip color="primary" v-if="item.es_servicio == 1">Servicio</v-chip>
-                                <v-chip color="success" v-else>Producto</v-chip>
+                            <template v-slot:item.es_producto="{ item }">
+                                <v-chip color="primary" v-if="item.es_producto == 1">Producto</v-chip>
+                                <v-chip color="success" v-else>Artículo</v-chip>
                             </template>
                             <template v-slot:item.actions="{ item }" v-if="this.usuario.rol == 1">
                                 <v-icon small class="mr-2" @click="editarArticulo(item)"
@@ -83,7 +83,7 @@
                     { title: 'Comisión', value: 'comision' },
                     { title: 'Costo', value: 'costo' },
                     { title: 'Stock', value: 'stock' },
-                    { title: 'Tipo', value: 'es_servicio', sortable: true },
+                    { title: 'Tipo', value: 'es_producto', sortable: true },
                     { title: 'Categoria', value: 'categoria.nombre', sortable: true },
                     { title: 'Foto', value: 'foto', width: '100px', sortable: false },
                     { title: 'Acciones', value: 'actions', sortable: false },

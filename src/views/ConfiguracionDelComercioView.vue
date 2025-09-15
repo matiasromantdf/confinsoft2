@@ -2,14 +2,12 @@
     <v-container>
         <v-row>
             <v-col class="d-flex align-items-center">
-                <div>
-                    <v-alert v-model="mensaje" border="start" close-label="Close Alert" color="red-lighten-2"
-                        title="Aviso" variant="tonal" closable>
-                        En esta sección se pueden configurar los datos del comercio y el tipo de impresión de los
-                        comprobantes.<br>
-                        Estos datos son utilizados en la facturacion y deben ingresarse correctamente.
-                    </v-alert>
-                </div>
+                <v-alert v-model="mensaje" border="start" close-label="Close Alert" color="red-lighten-2"
+                    title=" ⚠️  Atención " closable>
+                    Los datos ingresandos en esta sección se utilizan para la facturación electrónica, especialmente
+                    <b>condicion IVA</b>, <b>N° CUIT</b> y si reside en <b>Tierra del Fuego</b><br>
+                    Verificar que sean correctos a fin de evitar inconvenientes.
+                </v-alert>
             </v-col>
         </v-row>
         <v-row>
@@ -22,23 +20,36 @@
                                     variant="outlined"></v-text-field>
                             </v-col>
                             <v-col cols="12" md="6">
-                                <v-text-field v-model="comercio.cuit" label="CUIT" variant="outlined"></v-text-field>
+                                <v-text-field v-model="comercio.cuit" label="CUIT sólo numeros" variant="outlined"
+                                    type="number"></v-text-field>
                             </v-col>
-                            <v-col cols="12" md="6">
+                            <v-col cols="12" md="4">
                                 <v-text-field v-model="comercio.direccion" label="Dirección"
                                     variant="outlined"></v-text-field>
                             </v-col>
-                            <v-col cols="12" md="6">
+                            <v-col cols="12" md="4">
                                 <v-text-field v-model="comercio.telefono" label="Teléfono"
                                     variant="outlined"></v-text-field>
                             </v-col>
-                            <v-col cols="12" md="6">
+                            <v-col cols="12" md="4">
+                                <v-select v-model="comercio.condicion_iva"
+                                    :items="['Responsable Inscripto', 'Monotributista']" label="Condición frente al IVA"
+                                    variant="outlined"></v-select>
+
+                            </v-col>
+                            <v-col cols="12" md="4">
                                 <v-text-field v-model="comercio.iibb" label="Ingresos Brutos"
                                     variant="outlined"></v-text-field>
                             </v-col>
-                            <v-col cols="12" md="6">
+                            <v-col cols="12" md="4">
                                 <v-text-field v-model="comercio.inicio_actividades" label="Inicio de actividades"
                                     variant="outlined" type="date"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="4">
+                                <v-select v-model="comercio.tdf"
+                                    :items="[{ title: 'Sí', value: 1 }, { title: 'No', value: 0 }]"
+                                    label="Tierra del Fuego" item-title="title" item-value="value"
+                                    variant="outlined"></v-select>
                             </v-col>
                             <v-col cols="12" md="6">
                                 <v-select v-model="comercio.impresion" :items="modosDeImpresion"
@@ -48,8 +59,21 @@
                                 <v-file-input label="Logo" id="logo" variant="outlined"></v-file-input>
                             </v-col>
                         </v-row>
-                        <v-row v-if="usuario.comercioTiene('facturacion')">
-                            <v-col cols="6">
+                        <!-- <v-row>
+                            <v-col cols="12">
+                                <h3>Datos para Facturación electrónica (AFIP)</h3>
+                                <p>Mirá el tutorial de los pasos acá:</p>
+                                <a href="https://www.youtube.com/watch?v=Zk1eX4YIu1A"
+                                    target="_blank">https://www.youtube.com/watch?v=Zk1eX4YIu1A</a>
+                            </v-col>
+                        </v-row>
+                        <v-row class="border">
+                            <v-col cols="4">
+                                <v-btn color="primary" @click="">
+                                    Obtener credenciales AFIP</v-btn>
+
+                            </v-col>
+                            <v-col cols="4">
                                 <v-file-input label="Credenciales AFIP" id="credenciales" variant="outlined"
                                     multiple></v-file-input>
                             </v-col>
@@ -58,7 +82,7 @@
                                     type="number"></v-text-field>
                             </v-col>
 
-                        </v-row>
+                        </v-row> -->
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
@@ -84,7 +108,6 @@
                     inicio_actividades: '',
                     impresion: '',
                     nombre: '',
-                    pto_venta: '',
                 },
                 modosDeImpresion: [
                     {
@@ -141,23 +164,13 @@
                         datos.append('iibb', this.comercio.iibb);
                         datos.append('inicio_actividades', this.comercio.inicio_actividades);
                         datos.append('impresion', this.comercio.impresion);
-
-                        if (this.usuario.comercioTiene('facturacion')) {
-
-                            datos.append('pto_venta', this.comercio.pto_venta);
-                        }
+                        datos.append('condicion_iva', this.comercio.condicion_iva);
+                        datos.append('tdf', this.comercio.tdf);
 
 
                         if (document.getElementById('logo').files.length > 0) {
 
                             datos.append('logo', document.getElementById('logo').files[0]);
-                        }
-
-                        if (this.usuario.comercioTiene('facturacion') && (document.getElementById('credenciales').files.length > 0)) {
-
-                            for (let i = 0; i < document.getElementById('credenciales').files.length; i++) {
-                                datos.append('credenciales[]', document.getElementById('credenciales').files[i]);
-                            }
                         }
 
 

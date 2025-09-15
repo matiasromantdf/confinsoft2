@@ -6,13 +6,23 @@
                 <v-form v-model="valido" @submit.prevent="guardarArticulo">
                     <v-card-text>
                         <v-container>
+                            <div id="fila-check">
+                                <v-col cols="4">
+                                    <v-checkbox v-model="articulo.es_producto" label="Es un producto"></v-checkbox>
+                                </v-col>
+                                <v-col cols="8">
+                                    <p>Si es un producto (elaboración), no se gestionará el stock</p>
+                                </v-col>
+                            </div>
                             <v-row>
                                 <v-col cols="6">
-                                    <v-select append-icon="mdi-plus" v-model="articulo.proveedor_id" label="Proveedor"
-                                        variant="outlined" :items="proveedores" item-title="nombre" item-value="id"
+                                    <v-select v-if="!articulo.es_producto" append-icon="mdi-plus"
+                                        v-model="articulo.proveedor_id" label="Proveedor" variant="outlined"
+                                        :items="proveedores" item-title="nombre" item-value="id"
                                         @click:append="this.modalNuevoProveedor = true">
-
                                     </v-select>
+                                    <v-text-field v-else disabled label="Proveedor" variant="outlined"
+                                        value="No aplica"></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
                                     <v-select append-icon="mdi-plus" v-model="articulo.categoria_id" label="Categoría"
@@ -37,6 +47,7 @@
                                 </v-col>
                             </v-row>
 
+
                             <v-row>
                                 <v-col cols="4">
                                     <v-text-field v-model="articulo.precio" label="Precio" required
@@ -47,8 +58,8 @@
                                         variant="outlined"></v-text-field>
                                 </v-col>
                                 <v-col cols="4">
-                                    <v-text-field v-model="articulo.stock" label="Stock" required
-                                        variant="outlined"></v-text-field>
+                                    <v-text-field v-model="articulo.stock" label="Stock" required variant="outlined"
+                                        :disabled="articulo.es_producto"></v-text-field>
                                 </v-col>
 
                                 <v-row>
@@ -65,9 +76,7 @@
                                     <v-text-field v-model="articulo.comision" label="Comisión" variant="outlined"
                                         type="number" v-if="usuario.comercioTiene('comisiones')"></v-text-field>
                                 </v-col>
-                                <v-col cols="6">
-                                    <v-checkbox v-model="articulo.es_servicio" label="Es un servicio"></v-checkbox>
-                                </v-col>
+
                             </v-row>
 
 
@@ -105,12 +114,12 @@
                     descripcion: '',
                     precio: '',
                     costo: '',
-                    stock: '',
+                    stock: 1,
                     proveedor_id: '',
                     categoria_id: '',
                     iva: '',
                     comision: 0,
-                    es_servicio: false,
+                    es_producto: false,
                 },
                 proveedores: [],
                 categorias: [],
@@ -165,7 +174,7 @@
                 formData.append('categoria_id', this.articulo.categoria_id);
                 formData.append('iva', this.articulo.iva);
                 formData.append('comision', this.articulo.comision);
-                formData.append('es_servicio', this.articulo.es_servicio ? 1 : 0);
+                formData.append('es_producto', this.articulo.es_producto ? 1 : 0);
                 let foto = document.getElementById('foto-articulo').files[0];
                 formData.append('foto', foto);
 
@@ -196,9 +205,11 @@
                     }
                 })
                     .then(response => {
-                        console.log(response.data);
                         this.proveedores = response.data;
-                        console.log(this.proveedores);
+                        //asignar el primer proveedor si no hay ninguno seleccionado
+                        if (this.proveedores.length > 0 && !this.articulo.proveedor_id) {
+                            this.articulo.proveedor_id = this.proveedores[0].id;
+                        }
                     })
             },
             getCategorias() {
@@ -208,9 +219,11 @@
                     }
                 })
                     .then(response => {
-                        console.log(response.data);
                         this.categorias = response.data;
-                        console.log(this.categorias);
+                        //asignar la primera categoria si no hay ninguna seleccionada
+                        if (this.categorias.length > 0 && !this.articulo.categoria_id) {
+                            this.articulo.categoria_id = this.categorias[0].id;
+                        }
                     })
 
             },
@@ -253,5 +266,21 @@
         justify-content: center;
         align-items: center;
         z-index: 1;
+    }
+
+    #fila-check {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 50px;
+        margin-bottom: 16px;
+    }
+
+    #fila-check p {
+        margin-bottom: 16px;
+        background-color: #e2db7793;
+        padding: 10px;
+        border-radius: 8px;
+        border-left: 6px solid #8b8640;
     }
 </style>

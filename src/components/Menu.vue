@@ -97,10 +97,14 @@
                     </template>
                     <v-list-item title="Usuarios" prepend-icon="mdi-account-multiple" value="usuarios"
                         @click="$router.push('/usuarios')"></v-list-item>
-                    <v-list-item title="Configuración" prepend-icon="mdi-cog" value="configuracion"
+                    <v-list-item title="Datos del comercio" prepend-icon="mdi-cog" value="Datos del comercio"
                         @click="$router.push('/configuracion')"></v-list-item>
                     <v-list-item title="Suscripción" prepend-icon="mdi-wallet-membership"
                         @click="$router.push('/suscripcion')" value="suscripcion"></v-list-item>
+                    <v-list-item
+                        style="white-space: normal; overflow:visible !important; text-overflow: unset !important; height: auto;"
+                        title="ARCA (AFIP)" prepend-icon="mdi-bank" value="afip"
+                        @click="$router.push('/arca')"></v-list-item>
 
 
 
@@ -181,4 +185,6 @@
         padding-inline-start: 35px !important;
         color: rgb(193, 205, 214)
     }
+
+
 </style>
