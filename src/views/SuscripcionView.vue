@@ -30,8 +30,8 @@
                                         }}</v-btn>
                                 </v-col>
                                 <v-col justify="center" align="center">
-                                    <v-btn color="green" variant="outlined" @click="adherirseDA()">Adherirse a débito
-                                        automático</v-btn>
+                                    <!-- <v-btn color="green" variant="outlined" @click="adherirseDA()">Adherirse a débito
+                                        automático</v-btn> -->
                                 </v-col>
 
 
@@ -124,8 +124,8 @@
                 // //sumar 30 dias
                 // date.setDate(date.getDate() + 30);
                 // return date.toLocaleDateString();
-                let fechaVencimiento = new Date(this.usuario.horaServidor);
-                fechaVencimiento.setDate(fechaVencimiento.getDate() + 30);
+                let fechaVencimiento = new Date(this.usuario.comercio.vencimiento);
+                fechaVencimiento.setMonth(fechaVencimiento.getMonth() + 1);
                 return fechaVencimiento.toLocaleDateString();
             }
         }
