@@ -1,6 +1,5 @@
 <template>
     <v-container>
-
         <v-row>
             <v-col>
                 <v-card :loading="cargando">
@@ -39,8 +38,9 @@
                                                 <v-list-item @click="mostrarDetalle(item)">
                                                     <v-list-item-title>Ver detalle</v-list-item-title>
                                                 </v-list-item>
-                                                <v-list-item @click="eliminar(item)">
-                                                    <v-list-item-title>Anular</v-list-item-title>
+                                                <v-list-item @click="eliminar(item)"
+                                                    v-if="item.factura && !item.factura.nota_de_credito">
+                                                    <v-list-item-title>Anular Fact.</v-list-item-title>
                                                 </v-list-item>
                                                 <v-list-item @click="reimprimir(item)">
                                                     <v-list-item-title>Reimprimir</v-list-item-title>
@@ -88,146 +88,147 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { useUserStore } from '../stores/user';
-export default {
-    data() {
-        return {
-            url: import.meta.env.VITE_URL,
-            ventas: [],
-            cabeceras: [
-                { title: 'Numero', key: 'numero', value: 'numero' },
-                { title: 'Fecha', key: 'fecha', value: item => item.created_at.substr(0, 10) },
-                { title: 'Monto', key: 'monto', value: item => item.monto },
-                { title: 'Recargo Financ.', key: 'recargo', value: item => item.recargo },
-                { title: 'Descuento', key: 'descuento', value: 'descuento' },
-                { title: 'Cliente', key: 'cliente', value: item => item.cliente.nombre },
-                { title: 'Acciones', key: 'acciones' }
-            ],
-            desde: '',
-            hasta: '',
-            comisionista: '',
-            cargando: false,
-            cargando2: false,
-            dialogoDetalle: false,
-            itemsDelDetalle: []
-        };
-    },
-    methods: {
-        getVentas() {
-            this.cargando2 = true;
-            axios.get(this.url + '/' + this.usuario.tpv + '/ventas/filtradas', {
-                headers: {
-                    Authorization: this.usuario.token
-                },
-                params: {
-                    desde: this.desde,
-                    hasta: this.hasta,
-                    param: 'porventa'
-                }
-            })
-                .then(response => {
-                    this.ventas = response.data;
-                    console.log(this.ventas);
-                    console.log(this.cabeceras)
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => this.cargando2 = false);
-
-
+    import axios from 'axios';
+    import { useUserStore } from '../stores/user';
+    export default {
+        data() {
+            return {
+                url: import.meta.env.VITE_URL,
+                ventas: [],
+                cabeceras: [
+                    { title: 'Numero', key: 'numero', value: 'numero' },
+                    { title: 'Fecha', key: 'fecha', value: item => item.created_at.substr(0, 10) },
+                    { title: 'Monto', key: 'monto', value: item => item.monto },
+                    { title: 'Recargo Financ.', key: 'recargo', value: item => item.recargo },
+                    { title: 'Descuento', key: 'descuento', value: 'descuento' },
+                    { title: 'Cliente', key: 'cliente', value: item => item.cliente.nombre },
+                    { title: 'Factura', key: 'factura', value: item => item.factura ? item.factura.pto_venta + '-' + String(item.factura.numero_factura).padStart(8, '0') : '' },
+                    { title: 'Acciones', key: 'acciones' }
+                ],
+                desde: '',
+                hasta: '',
+                comisionista: '',
+                cargando: false,
+                cargando2: false,
+                dialogoDetalle: false,
+                itemsDelDetalle: []
+            };
         },
-        mostrarDetalle(item) {
-            this.itemsDelDetalle = item.detalle;
-            this.itemsDelDetalle.numero = item.numero;
-            //eliminar columnas que no se quieren mostrar
-            this.itemsDelDetalle.forEach(element => {
-                delete element.id;
-                delete element.venta_id;
-                delete element.tpv;
-                delete element.articulo_id;
-                delete element.created_at;
-                delete element.updated_at;
-                element.porc_bonif == '' || element.porc_bonif == null ? element.porc_bonif = 0 : element.porc_bonif;
-                element.porcentaje_de_descuento = element.porc_bonif;
-                delete element.porc_bonif;
-            });
-            //cambiar nombre de las columnas
-            this.dialogoDetalle = true;
-        },
-        eliminar(item) {
-            this.$swal({
-                title: '¿Estás seguro?',
-                text: "No podrás revertir esto! Si existe una factura asociada, se generará una nota de crédito",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, eliminar!',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.cargando = true;
-                    axios.post(this.url + '/' + this.usuario.tpv + '/ventas/anular', {
-                        id: item.id
-                    }, {
-                        headers: {
-                            Authorization: this.usuario.token
-                        }
-                    }).then(response => {
-                        this.$swal(
-                            'Venta anulada',
-                            'La venta se ha anulado correctamente',
-                            'success'
-                        );
-                        this.getVentas();
-                    }).catch(error => {
+        methods: {
+            getVentas() {
+                this.cargando2 = true;
+                axios.get(this.url + '/' + this.usuario.tpv + '/ventas/filtradas', {
+                    headers: {
+                        Authorization: this.usuario.token
+                    },
+                    params: {
+                        desde: this.desde,
+                        hasta: this.hasta,
+                        param: 'porventa'
+                    }
+                })
+                    .then(response => {
+                        this.ventas = response.data;
+                        console.log(this.ventas);
+                        console.log(this.cabeceras)
+                    })
+                    .catch(error => {
                         console.log(error);
-                    }).
-                        finally(() => this.cargando = false);
-                }
-            })
+                    })
+                    .finally(() => this.cargando2 = false);
+
+
+            },
+            mostrarDetalle(item) {
+                this.itemsDelDetalle = item.detalle;
+                this.itemsDelDetalle.numero = item.numero;
+                //eliminar columnas que no se quieren mostrar
+                this.itemsDelDetalle.forEach(element => {
+                    delete element.id;
+                    delete element.venta_id;
+                    delete element.tpv;
+                    delete element.articulo_id;
+                    delete element.created_at;
+                    delete element.updated_at;
+                    element.porc_bonif == '' || element.porc_bonif == null ? element.porc_bonif = 0 : element.porc_bonif;
+                    element.porcentaje_de_descuento = element.porc_bonif;
+                    delete element.porc_bonif;
+                });
+                //cambiar nombre de las columnas
+                this.dialogoDetalle = true;
+            },
+            eliminar(item) {
+                this.$swal({
+                    title: '¿Estás seguro?',
+                    text: "No podrás revertir esto! Si existe una factura asociada, se generará una nota de crédito",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, eliminar!',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.cargando = true;
+                        axios.post(this.url + '/' + this.usuario.tpv + '/notasCredito/generar', {
+                            venta_id: item.id
+                        }, {
+                            headers: {
+                                Authorization: this.usuario.token
+                            }
+                        }).then(response => {
+                            this.$swal(
+                                'Venta anulada',
+                                'La venta se ha anulado correctamente y se creó la nota de crédito',
+                                'success'
+                            );
+                            this.getVentas();
+                        }).catch(error => {
+                            console.log(error);
+                        }).
+                            finally(() => this.cargando = false);
+                    }
+                })
+            },
+            reimprimir(item) {
+                this.$swal({
+                    title: '¿Estás seguro?',
+                    text: "Se reimprimirá el comprobante de la venta " + item.numero,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, reimprimir!',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        let id = item.id;
+                        let token = this.usuario.token;
+                        //abrir nueva ventana con el comprobante pdf, enviando las credenciales del token
+                        let url = this.url + '/' + this.usuario.tpv + '/ventas/imprimirCbte/' + id + '/' + token;
+
+                        window.open(url, '_blank');
+                        console.log('reimprimir');
+                    }
+                })
+            }
+
         },
-        reimprimir(item) {
-            this.$swal({
-                title: '¿Estás seguro?',
-                text: "Se reimprimirá el comprobante de la venta " + item.numero,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, reimprimir!',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
+        mounted() {
+            if (this.usuario.rol != 1) {
+                this.$router.push('/no-autorizado');
+            }
+            let hoy = new Date();
+            this.desde = hoy.toISOString().substr(0, 10);
+            this.hasta = hoy.toISOString().substr(0, 10);
+        },
+        setup() {
+            const usuario = useUserStore();
+            return { usuario };
+        },
 
-                    let id = item.id;
-                    let token = this.usuario.token;
-                    //abrir nueva ventana con el comprobante pdf, enviando las credenciales del token
-                    let url = this.url + '/' + this.usuario.tpv + '/ventas/imprimirCbte/' + id + '/' + token;
-
-                    window.open(url, '_blank');
-                    console.log('reimprimir');
-                }
-            })
-        }
-
-    },
-    mounted() {
-        if (this.usuario.rol != 1) {
-            this.$router.push('/no-autorizado');
-        }
-        let hoy = new Date();
-        this.desde = hoy.toISOString().substr(0, 10);
-        this.hasta = hoy.toISOString().substr(0, 10);
-    },
-    setup() {
-        const usuario = useUserStore();
-        return { usuario };
-    },
-
-}
+    }
 
 </script>
 

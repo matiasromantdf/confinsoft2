@@ -9,14 +9,14 @@
                         <v-container>
                             <v-row>
                                 <v-col cols="5">
-                                    <v-text-field v-model="cliente.dni" :rules="dniRules" label="DNI"
+                                    <v-text-field v-model="cliente.dni" :rules="dniRules" label="DNI o CUIT"
                                         variant="outlined" required></v-text-field>
-                                        
-                                    
+
+
                                 </v-col>
                                 <v-col cols="7">
-                                    <v-text-field v-model="cliente.nombre" label="Nombre"
-                                        variant="outlined" required></v-text-field>                                    
+                                    <v-text-field v-model="cliente.nombre" label="Nombre" variant="outlined"
+                                        required></v-text-field>
                                 </v-col>
                             </v-row>
 
@@ -58,90 +58,90 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { useUserStore } from '../stores/user';
-import Swal from 'sweetalert2';
-export default {
-    data() {
-        return {
-            cliente: {
-                dni: '',
-                nombre: '',
-                telefono: '',
-                direccion: '',
-                email: '',
-                comentarios: '',
-                fiscal: ''
-            },
-            url: import.meta.env.VITE_URL,
-            cargando: false,
-            dialogo: false,
-            dniRules: [
-                value => {
-                    if (!value) return 'El DNI es requerido';
-                    if (value.length != 8 && value.length !=11) return 'El CUIT debe tener 11 dígitos y DNI 8 dígitos';
-                    if(isNaN(value)) return 'El DNI debe ser numérico';
-                    if(value < 0) return 'El DNI no puede ser negativo';                   
-                    return true;
-                }
-            ],
-            nombreRules: [
-                value => {
-                    if (!value) return 'El nombre es requerido';
-                    if (value.length < 3) return 'El nombre debe tener al menos 3 caracteres';
-                    return true;
-                }
-            ],
-            valid: false
-
-        }
-    },
-    methods: {
-        guardarCliente() {
-            if (this.valid) {
-                this.cliente.dni.length == 8 ? this.cliente.fiscal = 1 : this.cliente.fiscal = 2;
-                this.cargando = true;
-                axios.post(this.url + '/' + this.usuario.tpv + '/clientes', this.cliente, {
-                    headers: {
-                        Authorization: this.usuario.token
+    import axios from 'axios';
+    import { useUserStore } from '../stores/user';
+    import Swal from 'sweetalert2';
+    export default {
+        data() {
+            return {
+                cliente: {
+                    dni: '',
+                    nombre: '',
+                    telefono: '',
+                    direccion: '',
+                    email: '',
+                    comentarios: '',
+                    fiscal: ''
+                },
+                url: import.meta.env.VITE_URL,
+                cargando: false,
+                dialogo: false,
+                dniRules: [
+                    value => {
+                        if (!value) return 'El DNI es requerido';
+                        if (value.length != 8 && value.length != 11) return 'El CUIT debe tener 11 dígitos y DNI 8 dígitos';
+                        if (isNaN(value)) return 'El DNI debe ser numérico';
+                        if (value < 0) return 'El DNI no puede ser negativo';
+                        return true;
                     }
-                })
-                    .then(response => {
-                        console.log(response.data);
-                        this.$emit('actualizarClientes');
-                        this.cargando = false;
-                        this.dialogo = false;
-                        Swal.fire(
-                            'Cliente guardado',
-                            'El cliente se guardó correctamente',
-                            'success'
-                        )
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        this.cargando = false;
-                        Swal.fire(
-                            'Error',
-                            'Ocurrió un error al guardar el cliente',
-                            'error'
-                        )
-                    })
+                ],
+                nombreRules: [
+                    value => {
+                        if (!value) return 'El nombre es requerido';
+                        if (value.length < 3) return 'El nombre debe tener al menos 3 caracteres';
+                        return true;
+                    }
+                ],
+                valid: false
+
             }
         },
-    
-        cerrarDialogo() {
-            this.dialogo = false;
-        }
-    },
-    setup() {
-        const usuario = useUserStore();
-        return {
-            usuario
-        }
-    },
-    emits: ['actualizarClientes'],
+        methods: {
+            guardarCliente() {
+                if (this.valid) {
+                    this.cliente.dni.length == 8 ? this.cliente.fiscal = 1 : this.cliente.fiscal = 2;
+                    this.cargando = true;
+                    axios.post(this.url + '/' + this.usuario.tpv + '/clientes', this.cliente, {
+                        headers: {
+                            Authorization: this.usuario.token
+                        }
+                    })
+                        .then(response => {
+                            console.log(response.data);
+                            this.$emit('actualizarClientes');
+                            this.cargando = false;
+                            this.dialogo = false;
+                            Swal.fire(
+                                'Cliente guardado',
+                                'El cliente se guardó correctamente',
+                                'success'
+                            )
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            this.cargando = false;
+                            Swal.fire(
+                                'Error',
+                                'Ocurrió un error al guardar el cliente',
+                                'error'
+                            )
+                        })
+                }
+            },
 
-}
+            cerrarDialogo() {
+                this.dialogo = false;
+            }
+        },
+        setup() {
+            const usuario = useUserStore();
+            return {
+                usuario
+            }
+        },
+        emits: ['actualizarClientes'],
+
+    }
 </script>
 
 <style scoped></style>
