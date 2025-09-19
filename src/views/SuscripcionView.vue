@@ -24,7 +24,8 @@
                         <v-card-actions>
                             <v-row>
                                 <v-col justify="center" align="center">
-                                    <v-btn color="primary" variant="outlined" @click="test">Pagar suscripción hasta el
+                                    <v-btn color="primary" variant="outlined" :loading="cargandoPago"
+                                        :disabled="cargandoPago" @click="test">Pagar suscripción hasta el
                                         {{
                                             proximoVencimiento
                                         }}</v-btn>
@@ -60,6 +61,7 @@
             return {
                 url: import.meta.env.VITE_URL,
                 cargando: false,
+                cargandoPago: false,
                 cargandoText: 'cargando suscripción...',
                 suscripcion: {},
             }
@@ -72,7 +74,7 @@
         },
         methods: {
             test() {
-                this.cargando = true;
+                this.cargandoPago = true;
                 let data = {
                     tpv: this.usuario.tpv
                 }
@@ -99,7 +101,7 @@
                     .catch(error => {
                         console.log(error);
                     })
-                    .finally(() => this.cargando = false);
+                    .finally(() => this.cargandoPago = false);
 
             },
             adherirseDA() {
