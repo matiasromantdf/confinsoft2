@@ -128,6 +128,11 @@ const router = createRouter({
       component: () => import("../views/ResetPasswordView.vue"),
     },
     {
+      path: "/update-password",
+      name: "update-password",
+      component: () => import("../views/UpdatePasswordView.vue"),
+    },
+    {
       path: "/arca",
       name: "arca",
       component: Arca,
@@ -136,7 +141,12 @@ const router = createRouter({
 });
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
-  if (to.name == "registrarse" || to.name == "reset-pass") next();
+  if (
+    to.name == "registrarse" ||
+    to.name == "reset-pass" ||
+    to.name == "update-password"
+  )
+    next();
   else if (to.name !== "login" && !userStore.isLogged) next({ name: "login" });
   else next();
 });
