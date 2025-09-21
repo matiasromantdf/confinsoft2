@@ -109,7 +109,7 @@
 
 
                 </v-list-group>
-                <v-divider style="margin: 12px 0;"></v-divider>
+                <v-divider style="margin: 12px 0;" thickness="3" color="grey"></v-divider>
                 <v-list-item title="Clientes" value="listadoClientes" @click="$router.push('/listado-de-clientes')"
                     v-if="usuario.rol == 1"></v-list-item>
                 <v-list-item title="Barberos" value="listadoComisionistas"
