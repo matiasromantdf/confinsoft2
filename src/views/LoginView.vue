@@ -9,7 +9,7 @@
                             <v-icon size="x-large">mdi-lock-outline</v-icon>
                         </v-avatar>
                     </template>
-                    <form @submit.prevent="login" autocomplete="on">
+                    <form @submit.prevent="login" autocomplete="on" action="/login" method="post">
                         <div class="mb-4">
                             <label class="input-label">Email o Usuario</label>
                             <input v-model="username" :readonly="loading" name="username" autocomplete="username"
