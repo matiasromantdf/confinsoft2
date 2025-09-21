@@ -174,7 +174,6 @@
                     </v-col>
                     <v-col cols="12" md="4">
                       <v-btn color="primary" dark @click="dialogoBuscarCliente = true" variant="tonal">Cambiar</v-btn>
-                      <v-btn color="primary" dark @click="buscarCodigoIVA()" variant="tonal">validar</v-btn>
 
                     </v-col>
                   </v-row>

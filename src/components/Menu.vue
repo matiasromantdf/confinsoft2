@@ -48,7 +48,7 @@
                 <!-- </v-list-group> -->
                 <v-list-group value="Ventas">
                     <template v-slot:activator="{ props }">
-                        <v-list-item v-bind="props" prepend-icon="" title="Ventas"></v-list-item>
+                        <v-list-item v-bind="props" prepend-icon="" title="Informes de Ventas"></v-list-item>
                     </template>
                     <v-list-item title="Caja" prepend-icon="mdi-cash-check" value="caja"
                         @click="$router.push('/caja')"></v-list-item>
@@ -93,7 +93,7 @@
 
                 <v-list-group value="Configuración" v-if="usuario.rol == 1">
                     <template v-slot:activator="{ props }">
-                        <v-list-item v-bind="props" prepend-icon="" title="Configuración"></v-list-item>
+                        <v-list-item v-bind="props" prepend-icon="" title="Sistema"></v-list-item>
                     </template>
                     <v-list-item title="Usuarios" prepend-icon="mdi-account-multiple" value="usuarios"
                         @click="$router.push('/usuarios')"></v-list-item>
@@ -109,14 +109,14 @@
 
 
                 </v-list-group>
-                <v-divider></v-divider>
-                <v-list-item title="Clientes" prepend-icon="mdi-account-multiple" value="listadoClientes"
-                    @click="$router.push('/listado-de-clientes')" v-if="usuario.rol == 1"></v-list-item>
-                <v-list-item title="Barberos" prepend-icon="mdi-account-group" value="listadoComisionistas"
+                <v-divider style="margin: 12px 0;"></v-divider>
+                <v-list-item title="Clientes" value="listadoClientes" @click="$router.push('/listado-de-clientes')"
+                    v-if="usuario.rol == 1"></v-list-item>
+                <v-list-item title="Barberos" value="listadoComisionistas"
                     @click="$router.push('/listado-de-comisionistas')"
                     v-if="usuario.comercioTiene('/comisiones')"></v-list-item>
-                <v-list-item title="Gráficos" prepend-icon="mdi-chart-areaspline" value="graficos"
-                    @click="$router.push('/graficos')" v-if="usuario.rol == 1"></v-list-item>
+                <v-list-item title="Gráficos" value="graficos" @click="$router.push('/graficos')"
+                    v-if="usuario.rol == 1"></v-list-item>
 
 
             </v-list>
