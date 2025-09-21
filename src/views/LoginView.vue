@@ -106,7 +106,7 @@
 
                                     setTimeout(() => {
                                         this.$router.push('/');
-                                    }, 100);
+                                    }, 2000);
                                 })
                                 .catch(error => {
                                     this.loading = false;
