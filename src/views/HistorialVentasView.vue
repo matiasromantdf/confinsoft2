@@ -24,6 +24,15 @@
                             <v-col>
                                 <v-data-table :items="ventas" :headers="cabeceras" no-data-text="sin datos"
                                     items-per-page-text="filas">
+                                    <template v-slot:item.factura="{ item }">
+                                        <span>
+                                            {{ item.factura ? item.factura.pto_venta + '-' + String(item.factura.numero_factura).padStart(8, '0') : '' }}
+                                            <v-icon v-if="item.factura && item.factura.nota_de_credito" color="red"
+                                                :title="'Nota de crédito N° ' + item.factura.nota_de_credito.numero_nota"
+                                                small
+                                                style="vertical-align: middle; margin-left: 4px;">mdi-file-cancel-outline</v-icon>
+                                        </span>
+                                    </template>
                                     <template v-slot:item.verDetalle="{ item }">
                                         <v-btn @click="mostrarDetalle(item)" variant="flat">Ver detalle</v-btn>
                                     </template>

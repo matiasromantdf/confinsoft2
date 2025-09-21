@@ -50,73 +50,74 @@
 </template>
 
 <script>
-import NuevoClienteComponent from '@/components/NuevoClienteComponent.vue';
-import EditarClienteComponent from '@/components/EditarClienteComponent.vue';
-import axios from 'axios';
-import { useUserStore } from '../stores/user';
-export default {
-    data() {
-        return {
-            search: '',
-            headers: [
-                { title: 'DNI/CUIT', value: 'dni' },
-                { title: 'Nombre', value: 'nombre' },
-                { title: 'Teléfono', value: 'telefono' },
-                { title: 'Saldo', value: 'cuenta' },
-                { title: 'Acciones', value: 'actions', sortable: false },
-            ],
-            clientes: [],
-            url: import.meta.env.VITE_URL,
-            cargando: false,
-            clienteAEditar: {},
-            modalEditar: false,
-            textoItems: 'Clientes por página',
-            cargandoText: 'cargando clientes...'
+    import NuevoClienteComponent from '@/components/NuevoClienteComponent.vue';
+    import EditarClienteComponent from '@/components/EditarClienteComponent.vue';
+    import axios from 'axios';
+    import { useUserStore } from '../stores/user';
+    export default {
+        data() {
+            return {
+                search: '',
+                headers: [
+                    { title: 'DNI/CUIT', value: 'dni' },
+                    { title: 'Condición IVA', value: 'tipo_condicion_iva.texto' },
+                    { title: 'Nombre', value: 'nombre' },
+                    { title: 'Teléfono', value: 'telefono' },
+                    { title: 'Saldo', value: 'cuenta' },
+                    { title: 'Acciones', value: 'actions', sortable: false },
+                ],
+                clientes: [],
+                url: import.meta.env.VITE_URL,
+                cargando: false,
+                clienteAEditar: {},
+                modalEditar: false,
+                textoItems: 'Clientes por página',
+                cargandoText: 'cargando clientes...'
+
+            }
+        },
+        methods: {
+            editarCliente(cliente) {
+                //pasar una copia
+                this.clienteAEditar = Object.assign({}, cliente);
+                this.modalEditar = true;
+            },
+            getClientes() {
+                this.cargando = true;
+                axios.get(this.url + '/' + this.usuario.tpv + '/clientes', {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
+                })
+                    .then(response => {
+                        this.clientes = response.data;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+                    .finally(() => this.cargando = false);
+
+            },
+            eliminarCliente(cliente) {
+                alert('eliminar cliente' + cliente.nombre)
+            },
+        },
+        setup() {
+            const usuario = useUserStore();
+            return {
+                usuario
+            }
+        },
+        mounted() {
+            this.getClientes();
+        },
+        components: {
+            NuevoClienteComponent
 
         }
-    },
-    methods: {
-        editarCliente(cliente) {
-            //pasar una copia
-            this.clienteAEditar = Object.assign({}, cliente);
-            this.modalEditar = true;
-        },
-        getClientes() {
-            this.cargando = true;
-            axios.get(this.url + '/' + this.usuario.tpv + '/clientes', {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            })
-                .then(response => {
-                    this.clientes = response.data;
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => this.cargando = false);
 
-        },
-        eliminarCliente(cliente) {
-            alert('eliminar cliente' + cliente.nombre)
-        },
-    },
-    setup() {
-        const usuario = useUserStore();
-        return {
-            usuario
-        }
-    },
-    mounted() {
-        this.getClientes();
-    },
-    components: {
-        NuevoClienteComponent
 
     }
-
-
-}
 </script>
 
 <style scoped></style>

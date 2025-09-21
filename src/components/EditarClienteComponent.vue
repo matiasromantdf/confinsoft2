@@ -8,9 +8,14 @@
                             <v-col cols="5">
                                 <v-text-field v-model="cliente.dni" :rules="dniRules" label="DNI" variant="outlined"
                                     required></v-text-field>
-
-
                             </v-col>
+                            <v-col cols="7">
+                                <v-select v-model="cliente.condicion_iva" :items="condicionesIva" item-title="texto"
+                                    item-value="codigo" label="Condición frente al IVA" variant="outlined"
+                                    required></v-select>
+                            </v-col>
+                        </v-row>
+                        <v-row>
                             <v-col cols="7">
                                 <v-text-field v-model="cliente.nombre" label="Nombre" variant="outlined"
                                     required></v-text-field>
@@ -53,79 +58,95 @@
 </template>
 
 <script>
-import axios from 'axios';
-import swal from 'sweetalert2';
+    import axios from 'axios';
+    import swal from 'sweetalert2';
 
-export default {
-    props: {
-        cliente: {
-            type: Object
+    export default {
+        props: {
+            cliente: {
+                type: Object
+            },
+            user: {
+                type: Object
+            }
         },
-        user: {
-            type: Object
-        }
-    },
-    data() {
-        return {
-            valid: true,
-            dniRules: [
-                v => !!v || 'El DNI es requerido',
-                v => (v && v.length >= 7) || 'El DNI debe tener al menos 7 caracteres',
-            ],
-            url: import.meta.env.VITE_URL,
-        }
-    },
-    methods: {
-        cerrarDialogo() {
-            this.$emit('cerrar-dialogo');
+        data() {
+            return {
+                valid: true,
+                dniRules: [
+                    v => !!v || 'El DNI es requerido',
+                    v => (v && v.length >= 7) || 'El DNI debe tener al menos 7 caracteres',
+                ],
+                url: import.meta.env.VITE_URL,
+                condicionesIva: [],
+            }
         },
-        guardar() {
-            axios.post(this.url + '/' + this.user.tpv + '/clientes/' + this.cliente.id, this.cliente, {
-                headers: {
-                    Authorization: this.user.token
-                }
-            })
-                .then(response => {
-                    if (response.data.id) {
-
-                        swal.fire({
-                            title: 'Cliente actualizado',
-                            icon: 'success',
-                        });
-
-                        this.$emit('actualizarClientes');
-                        this.$emit('cerrar-dialogo');
-
-
+        methods: {
+            cerrarDialogo() {
+                this.$emit('cerrar-dialogo');
+            },
+            guardar() {
+                axios.post(this.url + '/' + this.user.tpv + '/clientes/' + this.cliente.id, this.cliente, {
+                    headers: {
+                        Authorization: this.user.token
                     }
                 })
-                .catch(error => {
-                    console.log(error);
+                    .then(response => {
+                        if (response.data.id) {
+
+                            swal.fire({
+                                title: 'Cliente actualizado',
+                                icon: 'success',
+                            });
+
+                            this.$emit('actualizarClientes');
+                            this.$emit('cerrar-dialogo');
+
+
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+
+            },
+            getCondicionesIva() {
+                axios.get(this.url + '/' + this.user.tpv + '/condicionesIva', {
+                    headers: {
+                        Authorization: this.user.token
+                    }
                 })
+                    .then(response => {
+                        this.condicionesIva = response.data;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            }
+        },
+        mounted() {
+            this.getCondicionesIva();
+        },
+        emits: ['actualizarClientes', 'cerrar-dialogo'],
 
-        }
-
-    },
-    emits: ['actualizarClientes', 'cerrar-dialogo'],
-
-}
+    }
 </script>
 
 <style scoped>
-#tarjeta {
-    width: 35%;
-    min-width: 450px;
-    margin: 0 auto;
-    margin-top: 5%;
-}
+    #tarjeta {
+        width: 35%;
+        min-width: 450px;
+        margin: 0 auto;
+        margin-top: 5%;
+    }
 
-.fondo {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    .fondo {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.5);
 
-}
+    }
 </style>

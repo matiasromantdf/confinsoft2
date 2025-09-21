@@ -174,6 +174,8 @@
                     </v-col>
                     <v-col cols="12" md="4">
                       <v-btn color="primary" dark @click="dialogoBuscarCliente = true" variant="tonal">Cambiar</v-btn>
+                      <v-btn color="primary" dark @click="buscarCodigoIVA()" variant="tonal">validar</v-btn>
+
                     </v-col>
                   </v-row>
                   <v-row>
@@ -615,6 +617,37 @@
           icon: 'info',
           confirmButtonText: 'Aceptar'
         })
+      },
+      buscarCodigoIVA() {
+        let url = this.url + '/' + this.usuario.tpv + '/facturas/consultarCondicionIvaReceptor';
+        let data = {
+          cuit_cuil: 20292131500,
+          ambiente: 'produccion'
+        }
+        axios.post(url, data, { headers: { Authorization: this.usuario.token } })
+          .then(response => {
+            if (response.data.error) {
+              this.$swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: response.data.error,
+              })
+            }
+            else {
+              this.$swal.fire({
+                icon: 'success',
+                title: 'Condición IVA',
+                text: 'La condición frente al IVA es: ' + response.data,
+              })
+            }
+          }).catch(error => {
+            console.log(error);
+            this.$swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Error al consultar condición IVA',
+            })
+          });
       }
     },
     mounted() {

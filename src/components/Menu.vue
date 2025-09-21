@@ -2,7 +2,7 @@
     <div>
         <v-app-bar color="indigo-lighten-1">
             <v-app-bar-nav-icon @click="drawer = !drawer" />
-            <v-toolbar-title>ConFin Soft</v-toolbar-title>
+            <v-toolbar-title>CajaPro</v-toolbar-title>
             <template v-slot:append>
                 <v-menu v-if="this.usuario.token != ''">
                     <template v-slot:activator="{ props }">
@@ -18,7 +18,7 @@
 
                 </v-menu>
                 <v-btn icon>
-                    <v-icon @click="msjWhatsapp()">mdi-chat-question-outline</v-icon>
+                    <v-icon @click="sendMail()">mdi-chat-question-outline</v-icon>
                 </v-btn>
             </template>
         </v-app-bar>
@@ -146,8 +146,11 @@
                 this.usuario.logOff();
                 this.$router.push({ name: 'login' });
             },
-            msjWhatsapp() {
-                window.open('https://wa.me/5492901520850?text=Hola%20quiero%20información%20de%20ConFin%20Soft', '_blank');
+            // msjWhatsapp() {
+            //     window.open('https://wa.me/5492901520850?text=Hola%20quiero%20información%20de%20ConFin%20Soft', '_blank');
+            // }
+            sendMail() {
+                window.location.href = 'mailto:confinsoft@gmail.com';
             }
         }
 

@@ -15,11 +15,18 @@
 
                                 </v-col>
                                 <v-col cols="7">
+                                    <v-select v-model="cliente.condicion_iva" :items="condicionesIva" item-title="texto"
+                                        item-value="codigo" label="Condición frente al IVA" variant="outlined" required>
+                                    </v-select>
+                                </v-col>
+
+                            </v-row>
+                            <v-row>
+                                <v-col cols="7">
                                     <v-text-field v-model="cliente.nombre" label="Nombre" variant="outlined"
                                         required></v-text-field>
                                 </v-col>
                             </v-row>
-
                             <v-row>
                                 <v-col cols="4">
                                     <v-text-field v-model="cliente.telefono" label="Telefono"
@@ -71,8 +78,10 @@
                     direccion: '',
                     email: '',
                     comentarios: '',
-                    fiscal: ''
+                    fiscal: '',
+                    condicion_iva: '', // consumidor final
                 },
+                condicionesIva: [],
                 url: import.meta.env.VITE_URL,
                 cargando: false,
                 dialogo: false,
@@ -131,6 +140,21 @@
 
             cerrarDialogo() {
                 this.dialogo = false;
+            },
+            getCondicionesIva() {
+                axios.get(this.url + '/' + this.usuario.tpv + '/condicionesIva',
+                    {
+                        headers: {
+                            Authorization: this.usuario.token
+                        }
+                    }
+                )
+                    .then(response => {
+                        this.condicionesIva = response.data;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
             }
         },
         setup() {
@@ -138,6 +162,9 @@
             return {
                 usuario
             }
+        },
+        mounted() {
+            this.getCondicionesIva();
         },
         emits: ['actualizarClientes'],
 
