@@ -186,7 +186,8 @@
 
     .v-list-group__items .v-list-item {
         padding-inline-start: 35px !important;
-        color: rgb(193, 205, 214)
+        color: rgb(193, 205, 214);
+        background-color: #363672b2 !important;
     }
 
 
