@@ -9,21 +9,25 @@
                             <v-icon size="x-large">mdi-lock-outline</v-icon>
                         </v-avatar>
                     </template>
-                    <v-form v-model="form" @submit.prevent="login">
-                        <v-text-field v-model="username" :readonly="loading" :rules="[required]" class="mb-2" clearable
-                            label="Email o Usuario" name="username" autocomplete="username"></v-text-field>
+                    <form @submit.prevent="login" autocomplete="on">
+                        <div class="mb-4">
+                            <label class="input-label">Email o Usuario</label>
+                            <input v-model="username" :readonly="loading" name="username" autocomplete="username"
+                                class="custom-input" required />
+                        </div>
 
-                        <v-text-field v-model="password" :readonly="loading" :rules="[required]" clearable
-                            label="Contraseña" placeholder="Ingrese su clave" type="password" name="password"
-                            autocomplete="current-password"></v-text-field>
+                        <div class="mb-4">
+                            <label class="input-label">Contraseña</label>
+                            <input v-model="password" :readonly="loading" type="password" name="password"
+                                autocomplete="current-password" placeholder="Ingrese su clave" class="custom-input"
+                                required />
+                        </div>
 
-                        <br>
-
-                        <v-btn :disabled="!form" :loading="loading" block color="success" size="large" type="submit"
-                            variant="elevated">
+                        <v-btn :disabled="!username || !password || loading" :loading="loading" block color="success"
+                            size="large" type="submit" variant="elevated">
                             Ingresar
                         </v-btn>
-                    </v-form>
+                    </form>
                     <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn text @click.prevent="recuperarPass()">Olvide mi contraseña</v-btn>
@@ -39,6 +43,7 @@
         </v-row>
     </v-container>
 </template>
+
 <script>
     import axios from 'axios';
     import { useUserStore } from '../stores/user';
@@ -57,7 +62,6 @@
                 return !!v || 'El campo es requerido'
             },
             async login() {
-                if (!this.form) return;
                 this.loading = true;
                 let datos = new FormData();
                 datos.append('username', this.username);
@@ -80,15 +84,26 @@
                                 .then(response => {
                                     datosUsuario.comercio = response.data;
                                     this.usuario.setUsuario(datosUsuario);
-                                    this.$router.push('/');
-
+                                    setTimeout(() => {
+                                        this.$router.push('/');
+                                    }, 100);
+                                })
+                                .catch(error => {
+                                    this.loading = false;
+                                    if (error.status) {
+                                        if (error.response.status == '401') {
+                                            alert('Usuario o contraseña incorrectos');
+                                        } else {
+                                            this.$swal('Error', 'Error al iniciar sesión. No hay conexión con el servidor', 'error');
+                                            console.log(error);
+                                        }
+                                    }
+                                    else {
+                                        this.$swal('Error', 'Error al iniciar sesión. No hay conexión con el servidor', 'error');
+                                        console.log(error);
+                                    }
 
                                 })
-
-
-                            // let usuario = response.data;
-                            // let fecha = new Date(usuario.vence);
-                            // alert('Bienvenido ' + usuario.username + ' tu suscripción vence el ' + fecha.getDate() + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear());
                         }
 
                     })
@@ -130,4 +145,39 @@
 </script>
 
 
-<style scoped></style>
+<style scoped>
+    .input-label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.87);
+    }
+
+    .custom-input {
+        width: 100%;
+        padding: 16px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 16px;
+        background-color: #fafafa;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .custom-input:focus {
+        outline: none;
+        border-color: #4caf50;
+        background-color: white;
+        box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+    }
+
+    .custom-input:hover {
+        border-color: #bdbdbd;
+    }
+
+    .custom-input[readonly] {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+    }
+</style>
