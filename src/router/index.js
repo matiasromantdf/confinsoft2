@@ -137,6 +137,11 @@ const router = createRouter({
       name: "arca",
       component: Arca,
     },
+    {
+      path: "/facturas",
+      name: "facturas",
+      component: () => import("../views/FacturasView.vue"),
+    },
   ],
 });
 router.beforeEach((to, from, next) => {
