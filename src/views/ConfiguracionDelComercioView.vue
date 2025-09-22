@@ -42,6 +42,10 @@
                                     variant="outlined"></v-text-field>
                             </v-col>
                             <v-col cols="12" md="4">
+                                <v-text-field v-model="comercio.pto_venta" label="Punto de venta" variant="outlined"
+                                    type="number" hint="Número de punto de venta para facturación"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="4">
                                 <v-text-field v-model="comercio.inicio_actividades" label="Inicio de actividades"
                                     variant="outlined" type="date"></v-text-field>
                             </v-col>
@@ -105,6 +109,7 @@
                     direccion: '',
                     telefono: '',
                     iibb: '',
+                    pto_venta: '',
                     inicio_actividades: '',
                     impresion: '',
                     nombre: '',
@@ -162,6 +167,7 @@
                         datos.append('direccion', this.comercio.direccion);
                         datos.append('telefono', this.comercio.telefono);
                         datos.append('iibb', this.comercio.iibb);
+                        datos.append('pto_venta', this.comercio.pto_venta);
                         datos.append('inicio_actividades', this.comercio.inicio_actividades);
                         datos.append('impresion', this.comercio.impresion);
                         datos.append('condicion_iva', this.comercio.condicion_iva);
