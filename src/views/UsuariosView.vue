@@ -32,13 +32,11 @@
                             </v-avatar>
                         </template>
                         <template v-slot:append>
-                            {{ usuario.nombre }}
+                            Usuario
                         </template>
 
                         <v-card-text>
-                            username: {{ usuario.username }}
                             {{ usuario.email }}
-
                         </v-card-text>
                         <v-card-actions>
                             <v-dialog v-model="dialogEditar" max-width="290">
@@ -48,16 +46,16 @@
                                 <v-card>
                                     <v-card-title class="headline">Editar usuario</v-card-title>
                                     <v-card-text>
-                                        <v-row>
+                                        <!-- <v-row>
                                             <v-col>
                                                 <v-text-field label="Nombre" variant="outlined" hide-details
                                                     v-model="usuario.nombre"></v-text-field>
                                             </v-col>
-                                        </v-row>
+                                        </v-row> -->
                                         <v-row>
                                             <v-col>
-                                                <v-text-field label="Username" variant="outlined" hide-details
-                                                    v-model="usuario.username"></v-text-field>
+                                                <v-text-field label="Usuario" variant="outlined" hide-details
+                                                    v-model="usuario.email"></v-text-field>
                                             </v-col>
                                         </v-row>
                                         <v-row>
@@ -109,9 +107,9 @@
                                                     </v-row>
                                                     <v-row>
                                                         <v-col>
-                                                            <v-text-field label="Username" variant="outlined"
-                                                                hide-details v-model="nuevoUsuario.username"
-                                                                readonly=""></v-text-field>
+                                                            <v-text-field label="Usuario" variant="outlined"
+                                                                hide-details v-model="nuevoUsuarioEmail"
+                                                                readonly></v-text-field>
                                                         </v-col>
                                                     </v-row>
                                                     <v-row>
@@ -179,7 +177,6 @@
                 })
                     .then(response => {
                         this.usuarios = response.data;
-                        this.nuevoUsuario.username = this.usuario.tpv + '-caja-' + (this.usuarios.length + 1);
                     })
                     .catch(error => {
                         console.log(error);
@@ -188,7 +185,12 @@
             },
             guardarNuevoUsuario() {
                 this.guardandoNuevo = true;
-                axios.post(this.url + '/' + this.usuario.tpv + '/usuarios/vendedores', this.nuevoUsuario, {
+                let datos = {
+                    nombre: this.nuevoUsuario.nombre,
+                    email: this.nuevoUsuarioEmail,
+                    password: this.nuevoUsuario.password
+                }
+                axios.post(this.url + '/' + this.usuario.tpv + '/usuarios/vendedores', datos, {
                     headers: {
                         Authorization: this.usuario.token
                     }
@@ -256,6 +258,12 @@
         setup() {
             const usuario = useUserStore();
             return { usuario };
+        },
+        computed: {
+            nuevoUsuarioEmail() {
+                let tpvNumber = this.usuario.tpv;
+                return this.nuevoUsuario.nombre.toLowerCase().replace(/\s+/g, '') + '@tpv' + tpvNumber + '.com';
+            }
         }
 
 

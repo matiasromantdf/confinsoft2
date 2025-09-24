@@ -5,7 +5,7 @@
                 <v-col md="6" sm="12">
                     <v-card elevation="10">
                         <v-card-title class="text-center">
-                            Caja del usuario {{ usuario.username }} ({{ usuario.nombre }})
+                            Caja del usuario {{ usuario.email }} ({{ usuario.nombre }})
                         </v-card-title>
                         <v-card-text>
                             <v-table>

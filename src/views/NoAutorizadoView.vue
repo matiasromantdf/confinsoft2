@@ -3,7 +3,7 @@
         <v-row align="center" justify="center" class="h-100">
             <v-col cols="12" md="6" class="text-center">
                 <v-icon color="red" size="80">mdi-lock-alert</v-icon>
-                <h1 class="titulo">Acceso no autorizado</h1>
+                <h1 class="titulo">Funcionalidad no autorizada</h1>
                 <p class="mensaje">No tienes permisos para ver esta página.<br>Si crees que es un error, contacta al
                     administrador.</p>
                 <v-btn color="primary" class="mt-4" @click="$router.push('/')">Volver al inicio</v-btn>

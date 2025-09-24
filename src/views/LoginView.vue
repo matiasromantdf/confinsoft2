@@ -67,7 +67,7 @@
                 datos.append('username', this.username);
                 datos.append('pass', this.password);
 
-                await axios.post(this.url + '/login', datos, { timeout: 15000 })
+                await axios.post(this.url + '/login', datos)
                     .then(response => {
                         this.loading = false;
                         if (response.status == '200') {
@@ -84,25 +84,6 @@
                                 .then(response => {
                                     datosUsuario.comercio = response.data;
                                     this.usuario.setUsuario(datosUsuario);
-
-                                    // Intentar guardar credenciales usando Credential Management API
-                                    try {
-                                        if (navigator.credentials && navigator.credentials.store) {
-                                            try {
-                                                const cred = new PasswordCredential({
-                                                    id: this.username,
-                                                    password: this.password,
-                                                    name: this.username
-                                                });
-                                                navigator.credentials.store(cred);
-                                                console.log('Intentó guardar credencial con navigator.credentials.store');
-                                            } catch (err) {
-                                                console.warn('PasswordCredential no disponible o falló:', err);
-                                            }
-                                        }
-                                    } catch (e) {
-                                        console.log('Credential Management API no disponible o falló', e);
-                                    }
 
                                     setTimeout(() => {
                                         this.$router.push('/');

@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 export const useUserStore = defineStore("usuario", {
   state: () => ({
-    username: null,
+    email: null,
     id: null,
     token: "",
     token_caja: "",
@@ -14,7 +14,7 @@ export const useUserStore = defineStore("usuario", {
   }),
   getters: {
     isLogged: (state) => {
-      if (state.username == null) {
+      if (state.email == null) {
         return false;
       }
       return true;
@@ -42,8 +42,7 @@ export const useUserStore = defineStore("usuario", {
   },
   actions: {
     setUsuario(data) {
-      this.username = data.username;
-      this.nombre = data.nombre;
+      this.email = data.email;
       this.id = data.id;
       this.token = data.token;
       this.token_caja = data.token_caja;
@@ -53,7 +52,7 @@ export const useUserStore = defineStore("usuario", {
       this.horaServidor = data.horaServidor;
     },
     logOff() {
-      this.username = null;
+      this.email = null;
       this.id = null;
       this.token = null;
       this.token_caja = null;

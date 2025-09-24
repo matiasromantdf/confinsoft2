@@ -222,6 +222,10 @@
             },
         },
         mounted() {
+            if (!this.usuario.comercioTiene('facturacion')) {
+                this.$router.push('/no-autorizado');
+                return;
+            }
             this.getComercioData();
         },
         setup() {

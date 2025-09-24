@@ -30,7 +30,7 @@
 
             <v-list v-model:opened="open">
                 <v-list-item :prepend-avatar="usuario.comercio.logo" :title="usuario.comercio.nombre"
-                    :subtitle="usuario.username"></v-list-item>
+                    :subtitle="usuario.email"></v-list-item>
 
                 <v-divider class="mt-6"></v-divider>
                 <v-list-item title="Vender" prepend-icon="mdi-cash-register" value="inicio"
