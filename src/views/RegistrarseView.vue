@@ -23,11 +23,11 @@
                         <v-card-text>
                             <v-form v-model="form" @submit.prevent="registrar()">
                                 <v-row>
-                                    <v-col md="6" cols="12">
+                                    <!-- <v-col md="6" cols="12">
                                         <v-text-field v-model="nombre" label="Nombre del usuario" :rules="required"
                                             variant="outlined"
                                             hint="Ingrese su nombre completo o nombre del comercio"></v-text-field>
-                                    </v-col>
+                                    </v-col> -->
                                     <v-col md="6" sm="12">
                                         <v-text-field v-model="email" label="Correo electronico" variant="outlined"
                                             hint="será el que se utilice para ingresar" persistent-hint
@@ -103,11 +103,8 @@
                     return;
                 }
                 let datos = new FormData();
-                datos.append('nombre', this.nombre);
                 datos.append('email', this.email);
-                datos.append('telefono', this.telefono);
                 datos.append('password', this.password);
-                datos.append('password2', this.password2);
 
                 axios.post(this.url + '/registrar', datos, { timeout: 15000 })
                     .then(response => {
