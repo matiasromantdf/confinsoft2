@@ -32,11 +32,11 @@
                             </v-avatar>
                         </template>
                         <template v-slot:append>
-                            Usuario
                         </template>
 
                         <v-card-text>
-                            {{ usuario.email }}
+                            <p><strong>Usuario:</strong> {{ usuario.email }}</p>
+                            <p><strong>Nombre:</strong> {{ usuario.nombre }}</p>
                         </v-card-text>
                         <v-card-actions>
                             <v-dialog v-model="dialogEditar" max-width="290">
@@ -46,12 +46,12 @@
                                 <v-card>
                                     <v-card-title class="headline">Editar usuario</v-card-title>
                                     <v-card-text>
-                                        <!-- <v-row>
+                                        <v-row>
                                             <v-col>
                                                 <v-text-field label="Nombre" variant="outlined" hide-details
                                                     v-model="usuario.nombre"></v-text-field>
                                             </v-col>
-                                        </v-row> -->
+                                        </v-row>
                                         <v-row>
                                             <v-col>
                                                 <v-text-field label="Usuario" variant="outlined" hide-details
@@ -252,6 +252,9 @@
                 this.$router.push({ name: 'no-autorizado' });
 
             }
+            if (!this.usuario.comercioTiene('facturacion')) {
+                this.$router.push({ name: 'no-autorizado' });
+            }
 
             this.getUsuarios();
         },
@@ -262,9 +265,9 @@
         computed: {
             nuevoUsuarioEmail() {
                 let tpvNumber = this.usuario.tpv;
-                return this.nuevoUsuario.nombre.toLowerCase().replace(/\s+/g, '') + '@tpv' + tpvNumber + '.com';
+                return this.nuevoUsuario.nombre.toLowerCase().replace(/\s+/g, '') + '-tpv_' + tpvNumber;
             }
-        }
+        },
 
 
     }

@@ -23,11 +23,11 @@
                         <v-card-text>
                             <v-form v-model="form" @submit.prevent="registrar()">
                                 <v-row>
-                                    <!-- <v-col md="6" cols="12">
-                                        <v-text-field v-model="nombre" label="Nombre del usuario" :rules="required"
+                                    <v-col md="6" cols="12">
+                                        <v-text-field v-model="nombre" label="Tu nombre" :rules="required"
                                             variant="outlined"
                                             hint="Ingrese su nombre completo o nombre del comercio"></v-text-field>
-                                    </v-col> -->
+                                    </v-col>
                                     <v-col md="6" sm="12">
                                         <v-text-field v-model="email" label="Correo electronico" variant="outlined"
                                             hint="será el que se utilice para ingresar" persistent-hint
@@ -56,8 +56,8 @@
                                 </v-row>
                                 <v-spacer></v-spacer>
 
-                                <v-btn color="primary" class="mt-5" type="submit"
-                                    :loading="cargando">Registrarse</v-btn>
+                                <v-btn color="primary" class="mt-5" type="submit" :loading="cargando"
+                                    :disabled="cargando">Registrarse</v-btn>
                             </v-form>
                         </v-card-text>
 
@@ -95,6 +95,7 @@
         },
         methods: {
             registrar() {
+                this.cargando = true;
                 if (this.password != this.password2) {
                     this.$swal('Error', 'Las contraseñas no coinciden', 'error');
                     return;
@@ -105,6 +106,7 @@
                 let datos = new FormData();
                 datos.append('email', this.email);
                 datos.append('password', this.password);
+                datos.append('nombre', this.nombre);
 
                 axios.post(this.url + '/registrar', datos, { timeout: 15000 })
                     .then(response => {
@@ -116,7 +118,11 @@
                     })
                     .catch(error => {
                         this.$swal('Error', 'Ocurrió un error al registrar, probablemente el nombre de usuario ya está en uso', 'error');
+                    })
+                    .finally(() => {
+                        this.cargando = false;
                     });
+
             },
         }
 

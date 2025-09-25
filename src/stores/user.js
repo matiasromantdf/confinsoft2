@@ -42,6 +42,7 @@ export const useUserStore = defineStore("usuario", {
   },
   actions: {
     setUsuario(data) {
+      this.nombre = data.nombre;
       this.email = data.email;
       this.id = data.id;
       this.token = data.token;
