@@ -10,7 +10,7 @@
                         <v-card-text>
                             <v-container>
                                 <!-- Información principal de la suscripción -->
-                                <v-row class="mb-4">
+                                <v-row>
                                     <v-col>
                                         <v-alert type="info" variant="tonal" class="mb-4"
                                             icon="mdi-information-outline">
@@ -28,7 +28,7 @@
                                 </v-row>
 
                                 <!-- Información sobre el procesamiento -->
-                                <v-row class="mb-4">
+                                <v-row>
                                     <v-col>
                                         <v-card variant="outlined" class="pa-4">
                                             <div class="d-flex align-center mb-3">
@@ -61,9 +61,8 @@
                                                     <template v-slot:prepend>
                                                         <v-icon color="success" size="small">mdi-check-circle</v-icon>
                                                     </template>
-                                                    <v-list-item-title>Métodos de pago: Tarjeta de crédito/débito,
-                                                        transferencia, efectivo
-                                                        (RapiPago/PagoFácil)</v-list-item-title>
+                                                    <v-list-item-title>Métodos de pago: Tarjeta de
+                                                        crédito/débito dinero en cuenta MP</v-list-item-title>
                                                 </v-list-item>
                                             </v-list>
                                         </v-card>
@@ -71,17 +70,17 @@
                                 </v-row>
 
                                 <!-- Powered by MercadoPago -->
-                                <v-row>
+                                <!-- <v-row>
                                     <v-col class="text-center">
                                         <v-chip color="primary" variant="outlined" prepend-icon="mdi-shield-lock"
                                             size="small">
                                             Pagos seguros con MercadoPago
                                         </v-chip>
                                     </v-col>
-                                </v-row>
+                                </v-row> -->
                             </v-container>
                         </v-card-text>
-                        <v-card-actions class="pa-4">
+                        <v-card-actions>
                             <v-container>
                                 <v-row justify="center">
                                     <v-col cols="12" md="8" class="text-center">
