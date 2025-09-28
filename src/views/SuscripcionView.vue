@@ -121,19 +121,43 @@
                     </v-card>
                 </v-col>
             </v-row>
-            <v-row justify="center" v-if="!cargandoPago">
+            <!-- Indicación visual para dirigir la atención hacia el brick -->
+            <v-row v-if="walletCreated && !cargandoPago" justify="center" class="my-4">
+                <v-col cols="12" class="text-center">
+                    <v-icon color="primary" size="x-large" style="animation: bounce 2s infinite;">
+                        mdi-arrow-down-circle
+                    </v-icon>
+                    <div class="text-body-2 font-weight-medium text-primary mt-2">
+                        Completa tu pago aquí abajo
+                    </div>
+                </v-col>
+            </v-row>
+
+            <v-row justify="center">
                 <v-col md="8" sm="12">
-                    <div id="wallet_container"></div>
-                    <v-card v-if="walletCreated" variant="outlined" class="mt-4 pa-3" color="success">
-                        <div class="d-flex align-center">
-                            <v-icon color="success" class="mr-2">mdi-information</v-icon>
+                    <!-- El contenedor siempre debe estar presente para que MercadoPago pueda encontrarlo -->
+                    <div id="wallet_container" :style="{ display: cargandoPago ? 'none' : 'block' }"
+                        :class="{ 'wallet-highlight': walletCreated && !cargandoPago }"></div>
+
+                    <!-- Mensaje de carga mientras se prepara el wallet -->
+                    <v-card v-if="cargandoPago" variant="outlined" class="pa-4 text-center">
+                        <v-progress-circular indeterminate color="primary" class="mb-3"></v-progress-circular>
+                        <div class="text-body-2 font-weight-medium mb-2">Preparando pasarela de pago</div>
+                        <div class="text-caption text-medium-emphasis">Conectando con MercadoPago...</div>
+                    </v-card>
+
+                    <!-- Mensaje de confirmación cuando el wallet está listo -->
+                    <v-card v-if="walletCreated && !cargandoPago" variant="outlined" class="mt-4 pa-4" color="success"
+                        style="animation: slideIn 0.5s ease-out;">
+                        <div class="d-flex align-center mb-3">
+                            <v-icon color="success" class="mr-2" size="large">mdi-check-circle</v-icon>
                             <div>
-                                <div class="text-body-2 font-weight-medium">Pasarela de pago lista</div>
-                                <div class="text-caption">Una vez completado el pago, tu suscripción se renovará
-                                    automáticamente.
-                                </div>
+                                <div class="text-h6 font-weight-bold text-success">¡Pasarela de pago lista!</div>
                             </div>
                         </div>
+                        <v-alert type="info" variant="tonal" density="compact" icon="mdi-information-outline">
+                            Una vez completado el pago, tu suscripción se renovará automáticamente.
+                        </v-alert>
                     </v-card>
                 </v-col>
             </v-row>
@@ -191,6 +215,19 @@
                             // El wallet se creó exitosamente
                             this.walletCreated = true;
                             this.cargandoPago = false;
+
+                            // Hacer scroll automático hacia el brick después de un breve delay
+                            this.$nextTick(() => {
+                                setTimeout(() => {
+                                    const walletContainer = document.getElementById('wallet_container');
+                                    if (walletContainer) {
+                                        walletContainer.scrollIntoView({
+                                            behavior: 'smooth',
+                                            block: 'center'
+                                        });
+                                    }
+                                }, 500); // Delay para asegurar que el brick esté completamente renderizado
+                            });
                         }).catch((error) => {
                             // Error al crear el wallet
                             console.error('Error creando wallet:', error);
@@ -236,4 +273,68 @@
     }
 </script>
 
-<style scoped></style>
+<style scoped>
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes bounce {
+
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+            transform: translateY(0);
+        }
+
+        40% {
+            transform: translateY(-10px);
+        }
+
+        60% {
+            transform: translateY(-5px);
+        }
+    }
+
+    .wallet-highlight {
+        border: 2px solid #1976d2;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(25, 118, 210, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    /* Animación de pulso para llamar más la atención */
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(25, 118, 210, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(25, 118, 210, 0);
+        }
+    }
+
+    .wallet-highlight::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border-radius: 8px;
+        animation: pulse 2s infinite;
+    }
+</style>
