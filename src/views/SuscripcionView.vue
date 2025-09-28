@@ -9,41 +9,132 @@
                         </v-card-title>
                         <v-card-text>
                             <v-container>
-                                <v-row>
+                                <!-- Información principal de la suscripción -->
+                                <v-row class="mb-4">
                                     <v-col>
+                                        <v-alert type="info" variant="tonal" class="mb-4"
+                                            icon="mdi-information-outline">
+                                            <div class="text-h6 mb-2">Estado de tu Suscripción</div>
+                                            <p class="mb-2">
+                                                <strong>Vencimiento actual:</strong>
+                                                {{ formatearfecha(usuario.comercio.vencimiento) }}
+                                            </p>
+                                            <p class="mb-0">
+                                                <strong>Costo de renovación:</strong> ARS${{
+                                                    formatearMoneda(usuario.comercio.precio) }}
+                                            </p>
+                                        </v-alert>
+                                    </v-col>
+                                </v-row>
 
-                                        <br>
-                                        <p class="text-h6">El vencimiento de tu suscripción es el {{
-                                            formatearfecha(usuario.comercio.vencimiento) }} y el costo de renovación de
-                                            ARS${{
-                                                formatearMoneda(usuario.comercio.precio) }} </p>
+                                <!-- Información sobre el procesamiento -->
+                                <v-row class="mb-4">
+                                    <v-col>
+                                        <v-card variant="outlined" class="pa-4">
+                                            <div class="d-flex align-center mb-3">
+                                                <v-icon color="primary" class="mr-2">mdi-shield-check</v-icon>
+                                                <h6 class="text-h6">Procesamiento Seguro</h6>
+                                            </div>
+                                            <v-list density="compact" class="bg-transparent">
+                                                <v-list-item>
+                                                    <template v-slot:prepend>
+                                                        <v-icon color="success" size="small">mdi-check-circle</v-icon>
+                                                    </template>
+                                                    <v-list-item-title>El pago se procesa automáticamente a través de
+                                                        <strong>MercadoPago</strong></v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item>
+                                                    <template v-slot:prepend>
+                                                        <v-icon color="success" size="small">mdi-check-circle</v-icon>
+                                                    </template>
+                                                    <v-list-item-title>Tu suscripción se renueva inmediatamente después
+                                                        del pago</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item>
+                                                    <template v-slot:prepend>
+                                                        <v-icon color="success" size="small">mdi-check-circle</v-icon>
+                                                    </template>
+                                                    <v-list-item-title>Recibirás confirmación por email una vez
+                                                        completado el proceso</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item>
+                                                    <template v-slot:prepend>
+                                                        <v-icon color="success" size="small">mdi-check-circle</v-icon>
+                                                    </template>
+                                                    <v-list-item-title>Métodos de pago: Tarjeta de crédito/débito,
+                                                        transferencia, efectivo
+                                                        (RapiPago/PagoFácil)</v-list-item-title>
+                                                </v-list-item>
+                                            </v-list>
+                                        </v-card>
+                                    </v-col>
+                                </v-row>
+
+                                <!-- Powered by MercadoPago -->
+                                <v-row>
+                                    <v-col class="text-center">
+                                        <v-chip color="primary" variant="outlined" prepend-icon="mdi-shield-lock"
+                                            size="small">
+                                            Pagos seguros con MercadoPago
+                                        </v-chip>
                                     </v-col>
                                 </v-row>
                             </v-container>
                         </v-card-text>
-                        <v-card-actions>
-                            <v-row>
-                                <v-col justify="center" align="center">
-                                    <v-btn color="primary" variant="outlined" :loading="cargandoPago"
-                                        :disabled="cargandoPago" @click="test">Pagar suscripción hasta el
-                                        {{
-                                            proximoVencimiento
-                                        }}</v-btn>
-                                </v-col>
-                                <v-col justify="center" align="center">
-                                    <!-- <v-btn color="green" variant="outlined" @click="adherirseDA()">Adherirse a débito
-                                        automático</v-btn> -->
-                                </v-col>
+                        <v-card-actions class="pa-4">
+                            <v-container>
+                                <v-row justify="center">
+                                    <v-col cols="12" md="8" class="text-center">
+                                        <v-btn color="primary" size="large" variant="elevated" :loading="cargandoPago"
+                                            :disabled="cargandoPago" @click="test" prepend-icon="mdi-credit-card"
+                                            class="mb-3">
+                                            <template v-if="cargandoPago">
+                                                Preparando pago...
+                                            </template>
+                                            <template v-else>
+                                                Renovar suscripción hasta el {{ proximoVencimiento }}
+                                            </template>
+                                        </v-btn>
 
+                                        <div v-if="cargandoPago" class="text-caption text-medium-emphasis">
+                                            <v-icon size="small" class="mr-1">mdi-loading mdi-spin</v-icon>
+                                            Conectando con MercadoPago, por favor espera...
+                                        </div>
 
-                            </v-row>
+                                        <div v-else class="text-caption text-medium-emphasis">
+                                            Al hacer clic se abrirá la pasarela de pago de MercadoPago
+                                        </div>
+                                    </v-col>
+                                </v-row>
+
+                                <!-- Comentado - Débito automático -->
+                                <!-- <v-row justify="center" class="mt-2">
+                                    <v-col cols="12" md="6" class="text-center">
+                                        <v-btn color="green" variant="outlined" @click="adherirseDA()">
+                                            <v-icon left>mdi-calendar-sync</v-icon>
+                                            Adherirse a débito automático
+                                        </v-btn>
+                                    </v-col>
+                                </v-row> -->
+                            </v-container>
                         </v-card-actions>
                     </v-card>
                 </v-col>
             </v-row>
-            <v-row justify="center">
-                <v-col md="6" sm="12">
+            <v-row justify="center" v-if="!cargandoPago">
+                <v-col md="8" sm="12">
                     <div id="wallet_container"></div>
+                    <v-card v-if="walletCreated" variant="outlined" class="mt-4 pa-3" color="success">
+                        <div class="d-flex align-center">
+                            <v-icon color="success" class="mr-2">mdi-information</v-icon>
+                            <div>
+                                <div class="text-body-2 font-weight-medium">Pasarela de pago lista</div>
+                                <div class="text-caption">Una vez completado el pago, tu suscripción se renovará
+                                    automáticamente.
+                                </div>
+                            </div>
+                        </div>
+                    </v-card>
                 </v-col>
             </v-row>
 
@@ -64,6 +155,7 @@
                 cargandoPago: false,
                 cargandoText: 'cargando suscripción...',
                 suscripcion: {},
+                walletCreated: false,
             }
         },
         setup() {
@@ -95,13 +187,22 @@
                                     valueProp: 'smart_option'
                                 }
                             }
-                        })
+                        }).then(() => {
+                            // El wallet se creó exitosamente
+                            this.walletCreated = true;
+                            this.cargandoPago = false;
+                        }).catch((error) => {
+                            // Error al crear el wallet
+                            console.error('Error creando wallet:', error);
+                            this.cargandoPago = false;
+                            this.$swal('Error', 'Hubo un problema al cargar la pasarela de pago. Por favor, intenta nuevamente.', 'error');
+                        });
 
                     })
                     .catch(error => {
                         console.log(error);
-                    })
-                    .finally(() => this.cargandoPago = false);
+                        this.cargandoPago = false;
+                    });
 
             },
             adherirseDA() {
