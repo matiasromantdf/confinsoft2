@@ -46,12 +46,11 @@
                                     {{ fechaConvertida(item.fecha_apertura) }}
                                 </template>
                                 <template v-slot:item.ventas="{ item }">
-                                    <span class="font-weight-medium text-info">${{ formatearMoneda(item.ventas)
-                                        }}</span>
+                                    <span class="font-weight-medium text-info">{{ item.ventas }}</span>
                                 </template>
                                 <template v-slot:item.total="{ item }">
                                     <span class="font-weight-bold text-success">${{ formatearMoneda(item.total)
-                                        }}</span>
+                                    }}</span>
                                 </template>
                                 <template v-slot:item.fecha_cierre="{ item }">
                                     {{ fechaConvertida(item.fecha_cierre) }}
