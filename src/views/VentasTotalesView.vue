@@ -55,12 +55,14 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td>{{ ventas.total }}</td>
-                                                <td>{{ ventas.ganancia }}</td>
+                                                <td class="font-weight-bold text-success">${{
+                                                    formatearMoneda(ventas.total) }}</td>
+                                                <td class="font-weight-bold text-primary">${{
+                                                    formatearMoneda(ventas.ganancia) }}</td>
                                                 <td>
-                                            <tr v-for="medio in ventas.medios">
-                                                <td>{{ medio.medio }} :</td>
-                                                <td>{{ medio.monto }}</td>
+                                            <tr v-for="medio in ventas.medios" :key="medio.medio">
+                                                <td class="text-medium-emphasis">{{ medio.medio }} :</td>
+                                                <td class="font-weight-medium">${{ formatearMoneda(medio.monto) }}</td>
                                             </tr>
                                             </td>
 
@@ -84,74 +86,82 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { useUserStore } from '../stores/user';
-export default {
-    data() {
-        return {
-            url: import.meta.env.VITE_URL,
-            ventas: [],
-            comisionistas: [],
-            desde: '',
-            hasta: '',
-            comisionista: '',
-            cargando: false,
-            mensaje: true,
-        };
-    },
-    methods: {
-        getComisionistas() {
-            axios.get(this.url + '/' + this.usuario.tpv + '/comisionistas', {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            })
-                .then(response => {
-                    this.comisionistas = response.data;
-                })
-                .catch(error => {
-                    console.log(error);
-                })
+    import axios from 'axios';
+    import { useUserStore } from '../stores/user';
+    export default {
+        data() {
+            return {
+                url: import.meta.env.VITE_URL,
+                ventas: [],
+                comisionistas: [],
+                desde: '',
+                hasta: '',
+                comisionista: '',
+                cargando: false,
+                mensaje: true,
+            };
         },
-        getVentas() {
-            this.cargando = true;
-            axios.get(this.url + '/' + this.usuario.tpv + '/ventas/filtradas', {
-                headers: {
-                    Authorization: this.usuario.token
-                },
-                params: {
-                    desde: this.desde,
-                    hasta: this.hasta,
-                    param: 'periodo'
-                }
-            })
-                .then(response => {
-                    console.log(response.data);
-                    this.ventas = response.data;
+        methods: {
+            formatearMoneda(valor) {
+                if (!valor || isNaN(valor)) return '0,00';
+                const numero = parseFloat(valor);
+                return numero.toLocaleString('es-AR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            },
+            getComisionistas() {
+                axios.get(this.url + '/' + this.usuario.tpv + '/comisionistas', {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
                 })
-                .catch(error => {
-                    console.log(error);
+                    .then(response => {
+                        this.comisionistas = response.data;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            },
+            getVentas() {
+                this.cargando = true;
+                axios.get(this.url + '/' + this.usuario.tpv + '/ventas/filtradas', {
+                    headers: {
+                        Authorization: this.usuario.token
+                    },
+                    params: {
+                        desde: this.desde,
+                        hasta: this.hasta,
+                        param: 'periodo'
+                    }
                 })
-                .finally(() => this.cargando = false);
+                    .then(response => {
+                        console.log(response.data);
+                        this.ventas = response.data;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+                    .finally(() => this.cargando = false);
 
 
+            }
+
+        },
+        mounted() {
+            if (this.usuario.rol != 1) {
+                this.$router.push('/no-autorizado');
+            }
+            this.getComisionistas();
+            let hoy = new Date();
+            this.desde = hoy.toISOString().substr(0, 10);
+            this.hasta = hoy.toISOString().substr(0, 10);
+        },
+        setup() {
+            const usuario = useUserStore();
+            return { usuario };
         }
-
-    },
-    mounted() {
-        if (this.usuario.rol != 1) {
-            this.$router.push('/no-autorizado');
-        }
-        this.getComisionistas();
-        let hoy = new Date();
-        this.desde = hoy.toISOString().substr(0, 10);
-        this.hasta = hoy.toISOString().substr(0, 10);
-    },
-    setup() {
-        const usuario = useUserStore();
-        return { usuario };
     }
-}
 
 </script>
 
