@@ -18,8 +18,9 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="item in caja" :key="item.id">
-                                            <td>{{ item.nombre }}</td>
-                                            <td>{{ item.monto }}</td>
+                                            <td class="font-weight-medium">{{ item.nombre }}</td>
+                                            <td class="font-weight-bold text-success">${{ formatearMoneda(item.monto) }}
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </template>
@@ -45,10 +46,12 @@
                                     {{ fechaConvertida(item.fecha_apertura) }}
                                 </template>
                                 <template v-slot:item.ventas="{ item }">
-                                    {{ item.ventas }}
+                                    <span class="font-weight-medium text-info">${{ formatearMoneda(item.ventas)
+                                        }}</span>
                                 </template>
                                 <template v-slot:item.total="{ item }">
-                                    {{ item.total }}
+                                    <span class="font-weight-bold text-success">${{ formatearMoneda(item.total)
+                                        }}</span>
                                 </template>
                                 <template v-slot:item.fecha_cierre="{ item }">
                                     {{ fechaConvertida(item.fecha_cierre) }}
@@ -86,6 +89,14 @@
             };
         },
         methods: {
+            formatearMoneda(valor) {
+                if (!valor || isNaN(valor)) return '0,00';
+                const numero = parseFloat(valor);
+                return numero.toLocaleString('es-AR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            },
             getCaja() {
                 this.cargando = true;
                 axios.get(this.url + '/' + this.usuario.tpv + '/caja/' + this.usuario.token_caja, {
