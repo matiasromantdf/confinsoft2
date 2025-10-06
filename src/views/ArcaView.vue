@@ -396,7 +396,7 @@
                 altTextoModal: '',
                 // Probar conexión
                 probandoConexion: false,
-                credencialesGuardadas: false
+                credencialesGuardadas: true
             }
         },
         methods: {
