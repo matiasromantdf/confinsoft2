@@ -2,7 +2,7 @@
     <v-card class="bg-grey-lighten-2 pl-5 pr-5 mt-1" elevation="0">
         <v-tabs v-model="tab" class="bg-white">
             <v-tab value="one">Ingreso de mercadería</v-tab>
-            <v-tab value="two">Pagos a proveedores</v-tab>
+            <!-- <v-tab value="two">Pagos a proveedores</v-tab> -->
         </v-tabs>
 
         <v-card-text class="pt-0">
@@ -71,8 +71,7 @@
                                             </v-col>
                                             <v-col md="4" cols="6">
                                                 <v-text-field label="Descripción" outlined
-                                                    v-model="articulo.descripcion" readonly
-                                                    variant="underlined"></v-text-field>
+                                                    v-model="articulo.descripcion" variant="underlined"></v-text-field>
                                             </v-col>
                                             <v-col md="4" cols="6">
                                                 <v-text-field label="Stock" outlined v-model="articulo.stock"
@@ -81,16 +80,19 @@
                                         </v-row>
                                         <v-row>
                                             <v-col md="4" cols="6">
-                                                <v-text-field label="Precio" outlined v-model="articulo.precio"
-                                                    variant="outlined" id="precioArticulo"></v-text-field>
-                                            </v-col>
-                                            <v-col md="4" cols="6">
                                                 <v-text-field label="Costo" outlined v-model="articulo.costo"
                                                     variant="outlined"></v-text-field>
                                             </v-col>
                                             <v-col md="4" cols="6">
-                                                <v-text-field label="Cantidad" outlined v-model="articulo.cantidad"
-                                                    variant="outlined"></v-text-field>
+                                                <v-text-field label="Cantidad comprada" outlined
+                                                    v-model="articulo.cantidad" variant="outlined"></v-text-field>
+                                            </v-col>
+                                            <v-col md="4" cols="6">
+                                                <v-text-field label="Precio de venta" outlined v-model="articulo.precio"
+                                                    variant="outlined" id="precioArticulo"
+                                                    hint="Puede actualizar precio de venta desde aquí"
+                                                    persistent-hint></v-text-field>
+
                                             </v-col>
                                         </v-row>
                                         <v-row justify="end">
@@ -192,7 +194,7 @@
 
                 </v-tabs-window-item>
 
-                <v-tabs-window-item value="two">
+                <!-- <v-tabs-window-item value="two">
                     <v-row class="mt-2 justify-center">
                         <v-col cols="8">
                             <v-card>
@@ -241,266 +243,266 @@
                             </v-card>
                         </v-col>
                     </v-row>
-                </v-tabs-window-item>
+                </v-tabs-window-item> -->
 
             </v-tabs-window>
         </v-card-text>
     </v-card>
 </template>
 <script>
-import axios from 'axios';
-import { useUserStore } from '@/stores/user';
-export default {
-    data() {
-        return {
-            proveedores: [],
-            url: import.meta.env.VITE_URL,
-            articulo: {
-                codigo: '',
-                cantidad: 0,
-            },
-            modalBusquedaArticulo: false,
-            search: '',
-            headers: [
-                { text: 'Código', value: 'codigo' },
-                { text: 'Descripción', value: 'descripcion' },
-                { text: 'Precio', value: 'precio' },
-                { text: 'Stock', value: 'stock' },
-                { text: 'Acciones', value: 'actions', sortable: false }
-            ],
-            articulos: [],
-            cargando: false,
-            detalle: [],
-            fecha: new Date().toISOString().substr(0, 10),
-            proveedor: '',
-            abonado: 0,
-            comprobante: '',
-            tab: 'one',
-
-
-        }
-    },
-    mounted() {
-        this.getProveedores();
-    },
-    methods: {
-        getProveedores() {
-            axios.get(this.url + '/' + this.usuario.tpv + '/proveedores',
-                {
-                    headers: {
-                        Authorization: this.usuario.token
-                    }
-                }
-            )
-                .then(response => {
-                    this.proveedores = response.data;
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-
-        },
-        checkEnter(event) {
-            if (event.key === 'Enter' || event.keyCode === '13' || event.key === 'Tab') {
-                this.getArticulo();
-            }
-        },
-        buscarArticulos() {
-            if (this.search.length < 3) {
-                return;
-            }
-            this.cargando = true;
-            axios.get(this.url + '/' + this.usuario.tpv + '/articulos/buscar/' + this.search,
-                { headers: { Authorization: this.usuario.token } })
-                .then(response => {
-                    this.articulos = response.data.data;
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => this.cargando = false);
-        },
-        seleccionarArticulo(item) {
-            this.articulo.id = item.id;
-            this.articulo.codigo = item.codigo;
-            this.articulo.descripcion = item.descripcion;
-            this.articulo.precio = item.precio;
-            this.articulo.stock = item.stock;
-            this.articulo.costo = item.costo;
-            this.articulo.iva = item.iva;
-            this.articulo.foto = item.foto;
-            this.modalBusquedaArticulo = false;
-            this.$nextTick(() => {
-                document.getElementById('codigo').focus();
-            });
-        },
-        agregarArticulo() {
-            if (this.articulo.cantidad === 0) {
-                return;
-            }
-            this.articulo.subtotal = this.articulo.costo * this.articulo.cantidad;
-            this.detalle.push({ ...this.articulo });
-            this.articulo = {
-                codigo: ''
-            };
-            this.$nextTick(() => {
-                document.getElementById('codigo').focus();
-            });
-        },
-        getArticulo() {
-            axios.get(this.url + '/' + this.usuario.tpv + '/articulos/' + this.articulo.codigo,
-                { headers: { Authorization: this.usuario.token } })
-                .then(response => {
-                    if (!response.data.id) {
-                        this.$swal('Artículo no encontrado', 'El artículo no se encuentra registrado', 'error');
-                        return;
-                    }
-                    this.articulo = response.data;
-                    document.getElementById('precioArticulo').focus();
-                })
-                .catch(error => {
-                    this.$swal('Error', 'No se pudo obtener el artículo', 'error');
-                    console.log(error);
-                });
-        },
-        eliminarArticulo(item) {
-            this.detalle = this.detalle.filter(det => det.codigo !== item.codigo);
-        },
-        guardarCompra() {
-            if (this.proveedor.id === 0 || this.detalle.length === 0) {
-                this.$swal('Error', 'Debe seleccionar Proveedor y el detalle no puede estar vacío', 'error');
-                return;
-            }
-            this.$swal({
-                title: '¿Estás seguro?',
-                text: '¿Deseas guardar la compra?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, guardar',
-                cancelButtonText: 'No, cancelar'
-            })
-                .then((result) => {
-                    if (result.isConfirmed) {
-                        this.enviarDatos();
-                    }
-
-                });
-
-
-        },
-        enviarDatos() {
-            axios.post(this.url + '/' + this.usuario.tpv + '/compras',
-                {
-                    proveedor_id: this.proveedor,
-                    monto: this.total,
-                    fecha: this.fecha,
-                    comprobante: this.comprobante,
-                    detalle: JSON.stringify(this.detalle)
+    import axios from 'axios';
+    import { useUserStore } from '@/stores/user';
+    export default {
+        data() {
+            return {
+                proveedores: [],
+                url: import.meta.env.VITE_URL,
+                articulo: {
+                    codigo: '',
+                    cantidad: 0,
                 },
-                {
-                    headers: {
-                        Authorization: this.usuario.token
-                    }
-                }
-            )
-                .then(response => {
-                    if (response.data == 'ok') {
-                        this.detalle = [];
-                        this.fecha = new Date().toISOString().substr(0, 10);
-                        //consultar si quiere registrar el pago
-                        this.$swal({
-                            title: 'Se ha registrado la compra!',
-                            text: '¿Desea registrar el pago de la compra?',
-                            icon: 'info',
-                            showCancelButton: true,
-                            confirmButtonText: 'Sí, registrar',
-                            cancelButtonText: 'No'
-                        })
-                            .then((result) => {
-                                if (result.isConfirmed) {
-                                    this.tab = 'two';
-                                }
-                            });
-                    }
-                    else {
-                        this.$swal('Error', 'No se pudo guardar la compra', 'error');
+                modalBusquedaArticulo: false,
+                search: '',
+                headers: [
+                    { text: 'Código', value: 'codigo' },
+                    { text: 'Descripción', value: 'descripcion' },
+                    { text: 'Precio', value: 'precio' },
+                    { text: 'Stock', value: 'stock' },
+                    { text: 'Acciones', value: 'actions', sortable: false }
+                ],
+                articulos: [],
+                cargando: false,
+                detalle: [],
+                fecha: new Date().toISOString().substr(0, 10),
+                proveedor: '',
+                abonado: 0,
+                comprobante: '',
+                tab: 'one',
 
-                    }
-                })
-                .catch(error => {
-                    this.$swal('Error', 'No se pudo guardar la compra', 'error');
-                    console.log(error);
-                });
-        },
-        guardarPago() {
-            if (this.proveedor.id === 0) {
-                this.$swal('Error', 'Debe seleccionar Proveedor', 'error');
-                return;
+
             }
-            this.$swal({
-                title: '¿Estás seguro?',
-                text: '¿Deseas guardar el pago?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, guardar',
-                cancelButtonText: 'No, cancelar'
-            })
-                .then((result) => {
-                    if (result.isConfirmed) {
-                        axios.post(this.url + '/' + this.usuario.tpv + '/pagos',
-                            {
-                                proveedor_id: this.proveedor,
-                                monto: this.abonado,
-                                fecha: this.fecha,
-                                comprobante: this.comprobante
-                            },
-                            {
-                                headers: {
-                                    Authorization: this.usuario.token
-                                }
-                            }
-                        )
-                            .then(response => {
-                                if (response.data.id) {
-                                    this.$swal('Pago guardado', 'El pago se guardó correctamente', 'success');
-                                    this.proveedor = {
-                                        id: 0,
-                                        nombre: ''
-                                    };
-                                    this.fecha = new Date().toISOString().substr(0, 10);
-                                    this.abonado = 0;
-                                    this.comprobante = '';
-                                }
-                                else {
-                                    this.$swal('Error', 'No se pudo guardar el pago', 'error');
-
-                                }
-                            })
-                            .catch(error => {
-                                this.$swal('Error', 'No se pudo guardar el pago', 'error');
-                                console.log(error);
-                            });
+        },
+        mounted() {
+            this.getProveedores();
+        },
+        methods: {
+            getProveedores() {
+                axios.get(this.url + '/' + this.usuario.tpv + '/proveedores',
+                    {
+                        headers: {
+                            Authorization: this.usuario.token
+                        }
                     }
+                )
+                    .then(response => {
+                        this.proveedores = response.data;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
 
+            },
+            checkEnter(event) {
+                if (event.key === 'Enter' || event.keyCode === '13' || event.key === 'Tab') {
+                    this.getArticulo();
+                }
+            },
+            buscarArticulos() {
+                if (this.search.length < 3) {
+                    return;
+                }
+                this.cargando = true;
+                axios.get(this.url + '/' + this.usuario.tpv + '/articulos/buscar/' + this.search,
+                    { headers: { Authorization: this.usuario.token } })
+                    .then(response => {
+                        this.articulos = response.data.data;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+                    .finally(() => this.cargando = false);
+            },
+            seleccionarArticulo(item) {
+                this.articulo.id = item.id;
+                this.articulo.codigo = item.codigo;
+                this.articulo.descripcion = item.descripcion;
+                this.articulo.precio = item.precio;
+                this.articulo.stock = item.stock;
+                this.articulo.costo = item.costo;
+                this.articulo.iva = item.iva;
+                this.articulo.foto = item.foto;
+                this.modalBusquedaArticulo = false;
+                this.$nextTick(() => {
+                    document.getElementById('codigo').focus();
                 });
-        }
+            },
+            agregarArticulo() {
+                if (this.articulo.cantidad === 0) {
+                    return;
+                }
+                this.articulo.subtotal = this.articulo.costo * this.articulo.cantidad;
+                this.detalle.push({ ...this.articulo });
+                this.articulo = {
+                    codigo: ''
+                };
+                this.$nextTick(() => {
+                    document.getElementById('codigo').focus();
+                });
+            },
+            getArticulo() {
+                axios.get(this.url + '/' + this.usuario.tpv + '/articulos/' + this.articulo.codigo,
+                    { headers: { Authorization: this.usuario.token } })
+                    .then(response => {
+                        if (!response.data.id) {
+                            this.$swal('Artículo no encontrado', 'El artículo no se encuentra registrado', 'error');
+                            return;
+                        }
+                        this.articulo = response.data;
+                        document.getElementById('precioArticulo').focus();
+                    })
+                    .catch(error => {
+                        this.$swal('Error', 'No se pudo obtener el artículo', 'error');
+                        console.log(error);
+                    });
+            },
+            eliminarArticulo(item) {
+                this.detalle = this.detalle.filter(det => det.codigo !== item.codigo);
+            },
+            guardarCompra() {
+                if (this.proveedor.id === 0 || this.detalle.length === 0) {
+                    this.$swal('Error', 'Debe seleccionar Proveedor y el detalle no puede estar vacío', 'error');
+                    return;
+                }
+                this.$swal({
+                    title: '¿Estás seguro?',
+                    text: '¿Deseas guardar la compra?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, guardar',
+                    cancelButtonText: 'No, cancelar'
+                })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+                            this.enviarDatos();
+                        }
 
-    },
-    computed: {
-        total() {
-            return this.detalle.reduce((acc, item) => acc + item.subtotal, 0) * 1;
-        }
-    },
-    setup() {
-        const usuario = useUserStore();
-        return {
-            usuario
-        }
+                    });
 
+
+            },
+            enviarDatos() {
+                axios.post(this.url + '/' + this.usuario.tpv + '/compras',
+                    {
+                        proveedor_id: this.proveedor,
+                        monto: this.total,
+                        fecha: this.fecha,
+                        comprobante: this.comprobante,
+                        detalle: JSON.stringify(this.detalle)
+                    },
+                    {
+                        headers: {
+                            Authorization: this.usuario.token
+                        }
+                    }
+                )
+                    .then(response => {
+                        if (response.data == 'ok') {
+                            this.detalle = [];
+                            this.fecha = new Date().toISOString().substr(0, 10);
+                            //consultar si quiere registrar el pago
+                            // this.$swal({
+                            //     title: 'Se ha registrado la compra!',
+                            //     text: '¿Desea registrar el pago de la compra?',
+                            //     icon: 'info',
+                            //     showCancelButton: true,
+                            //     confirmButtonText: 'Sí, registrar',
+                            //     cancelButtonText: 'No'
+                            // })
+                            //     .then((result) => {
+                            //         if (result.isConfirmed) {
+                            //             this.tab = 'two';
+                            //         }
+                            //     });
+                        }
+                        else {
+                            this.$swal('Error', 'No se pudo guardar la compra', 'error');
+
+                        }
+                    })
+                    .catch(error => {
+                        this.$swal('Error', 'No se pudo guardar la compra', 'error');
+                        console.log(error);
+                    });
+            },
+            guardarPago() {
+                if (this.proveedor.id === 0) {
+                    this.$swal('Error', 'Debe seleccionar Proveedor', 'error');
+                    return;
+                }
+                this.$swal({
+                    title: '¿Estás seguro?',
+                    text: '¿Deseas guardar el pago?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, guardar',
+                    cancelButtonText: 'No, cancelar'
+                })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+                            axios.post(this.url + '/' + this.usuario.tpv + '/pagos',
+                                {
+                                    proveedor_id: this.proveedor,
+                                    monto: this.abonado,
+                                    fecha: this.fecha,
+                                    comprobante: this.comprobante
+                                },
+                                {
+                                    headers: {
+                                        Authorization: this.usuario.token
+                                    }
+                                }
+                            )
+                                .then(response => {
+                                    if (response.data.id) {
+                                        this.$swal('Pago guardado', 'El pago se guardó correctamente', 'success');
+                                        this.proveedor = {
+                                            id: 0,
+                                            nombre: ''
+                                        };
+                                        this.fecha = new Date().toISOString().substr(0, 10);
+                                        this.abonado = 0;
+                                        this.comprobante = '';
+                                    }
+                                    else {
+                                        this.$swal('Error', 'No se pudo guardar el pago', 'error');
+
+                                    }
+                                })
+                                .catch(error => {
+                                    this.$swal('Error', 'No se pudo guardar el pago', 'error');
+                                    console.log(error);
+                                });
+                        }
+
+                    });
+            }
+
+        },
+        computed: {
+            total() {
+                return this.detalle.reduce((acc, item) => acc + item.subtotal, 0) * 1;
+            }
+        },
+        setup() {
+            const usuario = useUserStore();
+            return {
+                usuario
+            }
+
+
+        }
 
     }
-
-}
 </script>
 
 <style scoped></style>

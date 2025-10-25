@@ -35,7 +35,7 @@
                             <v-row>
                                 <v-col cols="4">
                                     <v-text-field v-model="articulo.codigo" label="Código" required variant="outlined"
-                                        :rules="codigoRule"></v-text-field>
+                                        :rules="codigoRule" :loading="generandoCodigo"></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
                                     <v-text-field v-model="articulo.descripcion" label="Descripción" required
@@ -44,6 +44,16 @@
                                 <v-col cols="2">
                                     <v-text-field v-model="articulo.iva" label="IVA" required variant="outlined"
                                         suffix="%" :rules="reglasIva"></v-text-field>
+                                </v-col>
+                            </v-row>
+
+                            <v-row style="margin-top: -30px;">
+                                <v-col cols="10" md="4">
+                                    <v-btn color="primary" variant="outlined" :loading="generandoCodigo"
+                                        :disabled="generandoCodigo" @click="generarCodigo" prepend-icon="mdi-refresh"
+                                        size="small" class="mt-n2">
+                                        Generar código
+                                    </v-btn>
                                 </v-col>
                             </v-row>
 
@@ -146,7 +156,8 @@
                     }
                 ],
                 modalNuevoProveedor: false,
-                modalNuevaCategoria: false
+                modalNuevaCategoria: false,
+                generandoCodigo: false
 
             }
         },
@@ -226,6 +237,27 @@
                         }
                     })
 
+            },
+            generarCodigo() {
+                this.generandoCodigo = true;
+
+                axios.get(this.url + '/' + this.usuario.tpv + '/articulos/funciones/codigoDisponible', {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
+                })
+                    .then(response => {
+                        if (response.data.codigo_disponible) {
+                            this.articulo.codigo = response.data.codigo_disponible;
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this.$swal('Error', 'No se pudo generar el código automáticamente', 'error');
+                    })
+                    .finally(() => {
+                        this.generandoCodigo = false;
+                    });
             },
             vaciarFormulario() {
                 this.articulo.codigo = '';
