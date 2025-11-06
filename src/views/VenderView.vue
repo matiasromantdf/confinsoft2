@@ -431,36 +431,16 @@
           return;
         }
 
-        let yaExiste = false;
-        this.detalle.forEach(item => {
-          if (item.codigo == this.articulo.codigo) {
-            yaExiste = true;
-            item.cantidad += this.articulo.cantidad * 1;
-            item.subtotal = (item.cantidad * item.precio);
-            this.articulo = {
-              id: '',
-              descripcion: '',
-              cantidad: 1,
-              precio: '',
-              iva: '',
-              subtotal: '',
-              foto: '',
-              codigo: '',
-            }
-          }
-
-        });
-        if (yaExiste) {
-          var elemCodigo = document.getElementById('codigo');
-          elemCodigo.focus();
-          return;
-        }
-
+        // Calcular subtotal
         this.articulo.subtotal = (this.articulo.cantidad * this.articulo.precio);
-        //pequeño hack para que el objeto se guarde en el array sin referencias
+
+        // Clonar el objeto para evitar referencias
         let articuloAlDetalle = JSON.parse(JSON.stringify(this.articulo));
 
+        // Agregar al detalle sin verificar duplicados
         this.detalle.unshift(articuloAlDetalle);
+
+        // Limpiar formulario
         this.articulo = {
           id: '',
           descripcion: '',
@@ -471,10 +451,10 @@
           foto: '',
           codigo: '',
         }
+
+        // Enfocar campo código
         var elemCodigo = document.getElementById('codigo');
         elemCodigo.focus();
-
-
       },
       cambiarPrecio() {
         if (this.porcBonif == '' || isNaN(this.porcBonif) || this.porcBonif == 0 || this.porcBonif == undefined || this.porcBonif == null || this.porcBonif > 100) {
@@ -553,21 +533,23 @@
           if (this.detalle.length > 0) {
             this.$swal.fire({
               title: 'Cambiar cantidad',
-              input: 'number',
+              input: 'text',
               inputAttributes: {
                 autocapitalize: 'off',
-                min: 1,
+                type: 'number',
+                step: '0.01',
+                min: '0.01'
               },
               showCancelButton: true,
               confirmButtonText: 'Aceptar',
               cancelButtonText: 'Cancelar',
               showLoaderOnConfirm: true,
               preConfirm: (cantidad) => {
-                if (cantidad === '' || isNaN(cantidad) || Number(cantidad) < 1) {
-                  this.$swal.fire('Debe ingresar una cantidad válida (mayor o igual a 1)');
-                  return;
+                const valor = parseFloat(cantidad);
+                if (isNaN(valor) || valor <= 0) {
+                  this.$swal.showValidationMessage('Debe ingresar una cantidad válida mayor a 0');
+                  return false;
                 }
-                let valor = Number(cantidad);
                 let ultimoIndice = 0;
                 this.detalle[ultimoIndice].cantidad = valor;
                 this.detalle[ultimoIndice].subtotal = this.detalle[ultimoIndice].precio * valor;
@@ -590,21 +572,25 @@
       cambiarCantidad(item) {
         this.$swal.fire({
           title: 'Cambiar cantidad',
-          input: 'number',
+          input: 'text',
           inputAttributes: {
-            autocapitalize: 'off'
+            autocapitalize: 'off',
+            type: 'number',
+            step: '0.01',
+            min: '0.01'
           },
           showCancelButton: true,
           confirmButtonText: 'Aceptar',
           cancelButtonText: 'Cancelar',
           showLoaderOnConfirm: true,
           preConfirm: (cantidad) => {
-            if (cantidad == 0 || cantidad == '') {
-              this.$swal.fire('Debe ingresar una cantidad válida');
-              return;
+            const valor = parseFloat(cantidad);
+            if (isNaN(valor) || valor <= 0) {
+              this.$swal.showValidationMessage('Debe ingresar una cantidad válida mayor a 0');
+              return false;
             }
-            item.cantidad = cantidad;
-            item.subtotal = item.precio * cantidad;
+            item.cantidad = valor;
+            item.subtotal = item.precio * valor;
           },
           allowOutsideClick: () => !this.$swal.isLoading()
         })
