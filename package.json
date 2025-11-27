@@ -10,13 +10,15 @@
     "@mdi/font": "7.0.96",
     "axios": "^1.6.7",
     "chart.js": "^4.4.3",
+    "file-saver": "^2.0.5",
     "pinia": "^2.1.7",
     "roboto-fontface": "*",
     "sweetalert2": "^11.6.13",
     "vue": "^3.3.0",
     "vue-router": "^4.2.5",
     "vue-sweetalert2": "^5.0.5",
-    "vuetify": "^3.6.10"
+    "vuetify": "^3.6.10",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.0",

@@ -91,7 +91,16 @@
                                 </v-btn>
                             </template> </v-data-table>
 
-
+                        <v-row>
+                            <v-col>
+                                <!-- boton para exportar a excel -->
+                                <v-btn color="success" :disabled="facturas.length === 0 || loading"
+                                    @click="exportarAExcel">
+                                    <v-icon left>mdi-file-excel</v-icon>
+                                    Exportar a Excel
+                                </v-btn>
+                            </v-col>
+                        </v-row>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -102,6 +111,8 @@
 <script>
     import axios from 'axios';
     import { useUserStore } from '../stores/user';
+    import * as XLSX from 'xlsx';
+    import { saveAs } from 'file-saver';
 
     export default {
         name: 'FacturasView',
@@ -300,6 +311,40 @@
                     }
                 });
             },
+
+            //exportar la tabla a excel
+            exportarAExcel() {
+                if (this.facturas.length === 0) {
+                    this.$swal('Advertencia', 'No hay datos para exportar.', 'warning');
+                    return;
+                }
+
+                // Preparar los datos para exportar
+                const datosParaExportar = this.facturas.map(item => ({
+                    'N° Factura': String(item.factura?.numero_factura).padStart(8, '0'),
+                    'Fecha': this.formatearFecha(item.factura?.fecha),
+                    'Cliente': item.cliente?.nombre || '',
+                    'CAE': item.factura?.cae || '',
+                    'Vto CAE': this.formatearFecha(item.factura?.vto_cae),
+                    'Monto': this.formatearMonto(item.monto),
+                    'Tipo': this.getTipoFacturaTexto(item.factura?.tipo_factura),
+                    'Nota de Crédito': item.factura?.nota_de_credito ? `N°${item.factura.nota_de_credito.numero_nota}` : ''
+                }));
+
+                // Crear una hoja de cálculo
+                const worksheet = XLSX.utils.json_to_sheet(datosParaExportar);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Facturas');
+
+                // Generar el archivo Excel
+                const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+                // Descargar el archivo
+                const fechaActual = new Date().toISOString().split('T')[0];
+                saveAs(blob, `Facturas_${fechaActual}.xlsx`);
+            },
+
             establecerFechasDefault() {
                 const hoy = new Date();
                 const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
