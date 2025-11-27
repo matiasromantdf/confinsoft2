@@ -43,17 +43,17 @@
 
                             <!-- Slot para formatear número de factura -->
                             <template v-slot:item.factura.numero_factura="{ item }">
-                                {{ String(item?.numero_factura).padStart(8, '0') }}
+                                {{ String(item.factura?.numero_factura).padStart(8, '0') }}
                             </template>
 
                             <!-- Slot para formatear fechas -->
                             <template v-slot:item.factura.fecha="{ item }">
-                                {{ formatearFecha(item?.created_at) }}
+                                {{ formatearFecha(item.factura?.fecha) }}
                             </template>
 
                             <!-- Slot para formatear vencimiento CAE -->
                             <template v-slot:item.factura.vto_cae="{ item }">
-                                {{ formatearFecha(item?.vto_cae) }}
+                                {{ formatearFecha(item.factura?.vto_cae) }}
                             </template>
 
                             <!-- Slot para formatear montos -->
@@ -63,8 +63,8 @@
 
                             <!-- Slot para mostrar tipo de factura -->
                             <template v-slot:item.factura.tipo_factura="{ item }">
-                                <v-chip :color="getTipoFacturaColor(item?.tipo_factura)" size="small">
-                                    {{ getTipoFacturaTexto(item?.tipo_factura) }}
+                                <v-chip :color="getTipoFacturaColor(item.factura?.tipo_factura)" size="small">
+                                    {{ getTipoFacturaTexto(item.factura?.tipo_factura) }}
                                 </v-chip>
                             </template>
 
@@ -74,7 +74,7 @@
                                     <v-icon color="warning">
                                         mdi-file-document-minus
                                     </v-icon>
-                                    <span> N°{{ item.nota_de_credito.numero_nota }}</span>
+                                    <span> N°{{ item.factura.nota_de_credito.numero_nota }}</span>
                                 </div>
                                 <span v-else>-</span>
                             </template>
@@ -82,13 +82,13 @@
                             <!-- Slot para acciones -->
                             <template v-slot:item.acciones="{ item }">
                                 <v-btn icon size="small" color="primary" @click="verFactura(item)"
-                                    :title="`Ver factura N° ${String(item?.numero_factura).padStart(8, '0')}`"
+                                    :title="`Ver factura N° ${String(item.factura?.numero_factura).padStart(8, '0')}`"
                                     class="mr-1">
                                     <v-icon>mdi-eye</v-icon>
                                 </v-btn>
-                                <v-btn v-if="!item?.nota_de_credito" icon size="small" color="warning"
+                                <v-btn v-if="!item.factura?.nota_de_credito" icon size="small" color="warning"
                                     @click="generarNotaCredito(item)"
-                                    :title="`Generar nota de crédito para factura N° ${String(item?.numero_factura).padStart(8, '0')}`">
+                                    :title="`Generar nota de crédito para factura N° ${String(item.factura?.numero_factura).padStart(8, '0')}`">
                                     <v-icon>mdi-file-document-minus</v-icon>
                                 </v-btn>
                             </template> </v-data-table>
@@ -163,9 +163,12 @@
                 this.facturas = [];
 
                 try {
+                    let fechadesdeConHora = this.fechaDesde + ' 00:00:00';
+                    let fechaHastaConHora = this.fechaHasta + ' 23:59:59';
+
                     const datos = new FormData();
-                    datos.append('fecha_desde', this.fechaDesde);
-                    datos.append('fecha_hasta', this.fechaHasta);
+                    datos.append('fecha_desde', fechadesdeConHora);
+                    datos.append('fecha_hasta', fechaHastaConHora);
 
                     const response = await axios.get(
                         `${this.url}/${this.usuario.tpv}/ventas/facturas`,
