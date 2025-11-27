@@ -28,10 +28,12 @@
                                 </v-btn>
                             </v-col>
                         </v-row>
-                        <!-- Alert para mensajes -->
-                        <v-alert v-if="mensaje" :type="tipoMensaje" class="mt-4">
-                            {{ mensaje }}
-                        </v-alert>
+                        <v-row>
+                            <!-- Alert para mensajes -->
+                            <v-alert v-if="mensaje" :type="tipoMensaje" class="mt-4">
+                                {{ mensaje }}
+                            </v-alert>
+                        </v-row>
 
                         <!-- Tabla de facturas -->
                         <v-data-table :headers="cabeceras" :items="facturas" :loading="loading"
