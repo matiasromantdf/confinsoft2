@@ -128,7 +128,7 @@
                                     <div class="text-caption text-grey-darken-1">Total</div>
                                     <div class="text-h6 font-weight-bold text-success">${{
                                         parseFloat(ventaSeleccionada?.monto
-                                        || 0).toFixed(2) }}
+                                            || 0).toFixed(2) }}
                                     </div>
                                 </v-card>
                             </v-col>
@@ -170,7 +170,7 @@
                                     <div class="text-caption text-grey-darken-1">Recargo Financiero</div>
                                     <div class="text-h6 font-weight-bold text-info">${{
                                         parseFloat(ventaSeleccionada?.recargo ||
-                                        0).toFixed(2) }}</div>
+                                            0).toFixed(2) }}</div>
                                 </v-card>
                             </v-col>
                         </v-row>
@@ -250,7 +250,7 @@
                                         <span>Recargo financiero:</span>
                                         <span class="font-weight-medium text-info">+${{
                                             parseFloat(ventaSeleccionada?.recargo ||
-                                            0).toFixed(2) }}</span>
+                                                0).toFixed(2) }}</span>
                                     </div>
                                     <v-divider class="my-2"></v-divider>
                                     <div class="d-flex justify-space-between">
@@ -286,7 +286,7 @@
                 ventas: [],
                 cabeceras: [
                     { title: 'Numero', key: 'numero', value: 'numero' },
-                    { title: 'Fecha', key: 'fecha', value: item => item.created_at.substr(0, 10) },
+                    { title: 'Fecha', key: 'fecha', value: item => this.formatearFecha(item.created_at) },
                     { title: 'Monto', key: 'monto', value: item => item.monto },
                     { title: 'Recargo Financ.', key: 'recargo', value: item => item.recargo },
                     { title: 'Descuento', key: 'descuento', value: 'descuento' },
@@ -338,22 +338,27 @@
             }
         },
         methods: {
+            formatearFecha(fecha) {
+                if (!fecha) return '';
+                const opciones = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+                return new Date(fecha).toLocaleDateString('es-AR', opciones);
+            },
             getVentas() {
+                let desdeConHora = this.desde + ' 00:00:00';
+                let hastaConHora = this.hasta + ' 23:59:59';
                 this.cargando2 = true;
                 axios.get(this.url + '/' + this.usuario.tpv + '/ventas/filtradas', {
                     headers: {
                         Authorization: this.usuario.token
                     },
                     params: {
-                        desde: this.desde,
-                        hasta: this.hasta,
+                        desde: desdeConHora,
+                        hasta: hastaConHora,
                         param: 'porventa'
                     }
                 })
                     .then(response => {
                         this.ventas = response.data;
-                        console.log(this.ventas);
-                        console.log(this.cabeceras)
                     })
                     .catch(error => {
                         console.log(error);

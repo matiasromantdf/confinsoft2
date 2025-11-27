@@ -28,11 +28,14 @@
                                 </v-btn>
                             </v-col>
                         </v-row>
-                        <v-row>
-                            <!-- Alert para mensajes -->
-                            <v-alert v-if="mensaje" :type="tipoMensaje" class="mt-4">
-                                {{ mensaje }}
-                            </v-alert>
+                        <!-- Alert para mensajes -->
+                        <v-row class="mb-3">
+                            <v-col>
+                                <v-alert v-if="mensaje" :type="tipoMensaje" class="mt-4">
+                                    {{ mensaje }}
+                                </v-alert>
+                            </v-col>
+
                         </v-row>
 
                         <!-- Tabla de facturas -->
@@ -48,7 +51,7 @@
 
                             <!-- Slot para formatear fechas -->
                             <template v-slot:item.factura.fecha="{ item }">
-                                {{ formatearFecha(item.factura?.fecha) }}
+                                {{ formatearFechaYHora(item.factura?.created_at) }}
                             </template>
 
                             <!-- Slot para formatear vencimiento CAE -->
@@ -93,7 +96,7 @@
                                 </v-btn>
                             </template> </v-data-table>
 
-                        <v-row>
+                        <v-row class="mt-4" justify="end">
                             <v-col>
                                 <!-- boton para exportar a excel -->
                                 <v-btn color="success" :disabled="facturas.length === 0 || loading"
@@ -166,16 +169,12 @@
                     let fechadesdeConHora = this.fechaDesde + ' 00:00:00';
                     let fechaHastaConHora = this.fechaHasta + ' 23:59:59';
 
-                    const datos = new FormData();
-                    datos.append('fecha_desde', fechadesdeConHora);
-                    datos.append('fecha_hasta', fechaHastaConHora);
-
                     const response = await axios.get(
                         `${this.url}/${this.usuario.tpv}/ventas/facturas`,
                         {
                             params: {
-                                fecha_desde: this.fechaDesde,
-                                fecha_hasta: this.fechaHasta
+                                fecha_desde: fechadesdeConHora,
+                                fecha_hasta: fechaHastaConHora
                             },
                             headers: {
                                 Authorization: this.usuario.token
@@ -219,6 +218,15 @@
                 const fechaObj = new Date(fecha);
                 return fechaObj.toLocaleDateString('es-AR', opciones);
 
+            },
+            formatearFechaYHora(fecha) {
+                if (!fecha) return '';
+                const opciones = {
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit'
+                };
+                const fechaObj = new Date(fecha);
+                return fechaObj.toLocaleDateString('es-AR', opciones);
             },
             formatearMonto(monto) {
                 if (!monto) return '0.00';
@@ -330,7 +338,7 @@
                 // Preparar los datos para exportar
                 const datosParaExportar = this.facturas.map(item => ({
                     'N° Factura': String(item.factura?.numero_factura).padStart(8, '0'),
-                    'Fecha': this.formatearFecha(item.factura?.fecha),
+                    'Fecha': this.formatearFechaYHora(item.factura?.created_at),
                     'Cliente': item.cliente?.nombre || '',
                     'CAE': item.factura?.cae || '',
                     'Vto CAE': this.formatearFecha(item.factura?.vto_cae),
