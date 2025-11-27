@@ -48,7 +48,7 @@
                 <!-- </v-list-group> -->
                 <v-list-group value="Ventas">
                     <template v-slot:activator="{ props }">
-                        <v-list-item v-bind="props" prepend-icon="" title="Informes de Ventas"></v-list-item>
+                        <v-list-item v-bind="props" prepend-icon="" title="Ventas"></v-list-item>
                     </template>
                     <v-list-item title="Caja" prepend-icon="mdi-cash-check" value="caja"
                         @click="$router.push('/caja')"></v-list-item>
