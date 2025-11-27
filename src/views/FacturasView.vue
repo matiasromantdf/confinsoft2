@@ -46,7 +46,7 @@
 
                             <!-- Slot para formatear fechas -->
                             <template v-slot:item.factura.fecha="{ item }">
-                                {{ formatearFecha(item.factura?.fecha) }}
+                                {{ formatearFecha(item.factura?.created_at) }}
                             </template>
 
                             <!-- Slot para formatear vencimiento CAE -->
