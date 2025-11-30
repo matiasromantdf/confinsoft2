@@ -646,7 +646,7 @@
       if (this.usuario.comercioTiene('facturacion')) {
         this.getTiposDeComprobante();
       }
-      if (this.usuario.diasDeSuscripcion < 0) {
+      if (this.usuario.diasDeSuscripcion <= 0) {
         this.$swal.fire({
           icon: 'warning',
           title: 'Atención',
