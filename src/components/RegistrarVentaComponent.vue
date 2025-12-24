@@ -309,7 +309,7 @@
                                         this.$swal.fire({
                                             icon: 'error',
                                             title: 'Error',
-                                            text: error.response.error,
+                                            text: error.error,
                                         })
                                     })
                                     .finally(() => {
