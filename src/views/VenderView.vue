@@ -280,6 +280,7 @@
         cargando: false,
         comprobantes: [],
         comisionistas: [],
+        hideHelp: localStorage.getItem('hideHelpVenderView') === 'true' ? true : false,
 
 
       };
@@ -598,10 +599,14 @@
       mostrarAyuda() {
         this.$swal.fire({
           title: 'Ayuda',
-          html: '<p># Para buscar un artículo, presione F2</p><p># Para cambiar la cantidad del ultimo artículo seleccionado, presione "*" o haga doble clic en cantidad</p><p># Para cobrar la venta haga clic en el cuadro "Total" o presiones "F4"</p>',
+          html: '<p># Para buscar un artículo, presione F2</p><p># Para cambiar la cantidad del ultimo artículo seleccionado, presione "*" o haga doble clic en cantidad</p><p># Para cobrar la venta haga clic en el cuadro "Total" o presiones "F4"</p> <label style="margin-top:10px; font-size:0.8em;">Puede desactivar esta ayuda haciendo clic en "No mostrar más"</label> <br/> <button style="margin-top:10px;" class="swal2-confirm swal2-styled" onclick="localStorage.setItem(\'hideHelpVenderView\', \'true\'); document.querySelector(\'.swal2-container\').style.display = \'none\';">No mostrar más</button>',
           icon: 'info',
-          confirmButtonText: 'Aceptar'
+          confirmButtonText: 'Aceptar',
         })
+      },
+      noMostrarMas() {
+        localStorage.setItem('hideHelpVenderView', 'true');
+        this.hideHelp = true;
       },
       buscarCodigoIVA() {
         let url = this.url + '/' + this.usuario.tpv + '/facturas/consultarCondicionIvaReceptor';
@@ -660,6 +665,9 @@
           title: 'Atención',
           text: 'Su suscripción vencerá en ' + this.usuario.diasDeSuscripcion + ' días. Luego no podrá registrar ventas',
         })
+      }
+      if (!this.hideHelp) {
+        this.mostrarAyuda();
       }
     },
     setup() {
