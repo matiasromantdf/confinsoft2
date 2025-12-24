@@ -65,7 +65,7 @@
                             </v-select>
                         </v-col>
                     </v-row>
-                    <v-row v-for="(pago, i) in pagos " class="bg-teal-lighten-5 border">
+                    <v-row v-for="(pago, i) in pagos" class="bg-teal-lighten-5 border">
                         <v-col cols="4">
                             <v-select variant="underlined" v-model="pago.medio" :items="mediosDePago"
                                 label="Medio de pago" item-title="nombre" item-value="id"
@@ -120,440 +120,440 @@
 </template>
 
 <script>
-import { useUserStore } from '../stores/user';
-import axios from 'axios';
-let formatoARS = new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    minimumFractionDigits: 2
+    import { useUserStore } from '../stores/user';
+    import axios from 'axios';
+    let formatoARS = new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        minimumFractionDigits: 2
 
 
-});
+    });
 
-export default {
-    data() {
-        return {
-            pagos: [
-                {
-                    monto: 0,
-                    medio: 1,
-                    recargo: 0,
-                },
-            ],
-            url: import.meta.env.VITE_URL,
-            tipo_cbte: 0,
-            mediosDePago: [
-                {
-                    id: 1,
-                    nombre: 'Efectivo'
-                },
-                {
-                    id: 2,
-                    nombre: 'Crédito'
-                },
-                {
-                    id: 3,
-                    nombre: 'Débito'
-                },
-                {
-                    id: 4,
-                    nombre: 'Transferencia'
-                },
+    export default {
+        data() {
+            return {
+                pagos: [
+                    {
+                        monto: 0,
+                        medio: 1,
+                        recargo: 0,
+                    },
+                ],
+                url: import.meta.env.VITE_URL,
+                tipo_cbte: 0,
+                mediosDePago: [
+                    {
+                        id: 1,
+                        nombre: 'Efectivo'
+                    },
+                    {
+                        id: 2,
+                        nombre: 'Crédito'
+                    },
+                    {
+                        id: 3,
+                        nombre: 'Débito'
+                    },
+                    {
+                        id: 4,
+                        nombre: 'Transferencia'
+                    },
 
-            ],
-            modalRecargoPago: false,
-            porcentajeRecargo: 0,
-            porcentajeDeDescuento: 0,
-            indexRecargo: 0,
-            registrandoVenta: false,
-            comisionista: null,
+                ],
+                modalRecargoPago: false,
+                porcentajeRecargo: 0,
+                porcentajeDeDescuento: 0,
+                indexRecargo: 0,
+                registrandoVenta: false,
+                comisionista: null,
 
-        }
-    },
-    methods: {
-        cerrarModalPagos() {
-            this.$emit('cerrar-modal-pagos');
-        },
-        hayPagoEnEfectivo() {
-            let hayEfectivo = false;
-            for (let i = 0; i < this.pagos.length; i++) {
-                if (this.pagos[i].medio == 1) {
-                    hayEfectivo = true;
-                }
             }
-            return hayEfectivo;
         },
-        hayPagosConRecargo() {
-            let hayRecargo = false;
-            for (let i = 0; i < this.pagos.length; i++) {
-                if (this.pagos[i].recargo > 0) {
-                    hayRecargo = true;
+        methods: {
+            cerrarModalPagos() {
+                this.$emit('cerrar-modal-pagos');
+            },
+            hayPagoEnEfectivo() {
+                let hayEfectivo = false;
+                for (let i = 0; i < this.pagos.length; i++) {
+                    if (this.pagos[i].medio == 1) {
+                        hayEfectivo = true;
+                    }
                 }
-            }
-            return hayRecargo;
-        },
-        registrarVenta() {
-            //verificar que todos los pagos tengan un medio de pago
-            for (let i = 0; i < this.pagos.length; i++) {
-                if (this.pagos[i].medio == '') {
+                return hayEfectivo;
+            },
+            hayPagosConRecargo() {
+                let hayRecargo = false;
+                for (let i = 0; i < this.pagos.length; i++) {
+                    if (this.pagos[i].recargo > 0) {
+                        hayRecargo = true;
+                    }
+                }
+                return hayRecargo;
+            },
+            registrarVenta() {
+                //verificar que todos los pagos tengan un medio de pago
+                for (let i = 0; i < this.pagos.length; i++) {
+                    if (this.pagos[i].medio == '') {
+                        this.$swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Debe seleccionar un medio de pago!',
+                        });
+                        return
+                    }
+                }
+                //verificar que se pueda dar vuelto si es necesario
+                if (this.totalPagos > this.montoAAbonar && !this.hayPagosConRecargo()) {
+                    console.log('hay vuelto');
+                    if (!this.hayPagoEnEfectivo()) {
+                        this.$swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Debe ingresar un pago en efectivo para poder dar vuelto!',
+                        });
+                        return
+                    }
+                    else {
+                        for (let i = 0; i < this.pagos.length; i++) {
+                            if (this.pagos[i].medio == 1) {
+                                this.pagos[i].monto = this.pagos[i].monto - (this.totalPagos - this.montoAAbonar);
+                            }
+                        }
+                    }
+
+                }
+                if (this.comisionista == null && this.usuario.comercioTiene('comisiones')) {
                     this.$swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Debe seleccionar un medio de pago!',
+                        text: 'Debe seleccionar un barbero!',
                     });
                     return
                 }
-            }
-            //verificar que se pueda dar vuelto si es necesario
-            if (this.totalPagos > this.montoAAbonar && !this.hayPagosConRecargo()) {
-                console.log('hay vuelto');
-                if (!this.hayPagoEnEfectivo()) {
-                    this.$swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Debe ingresar un pago en efectivo para poder dar vuelto!',
-                    });
-                    return
+
+                //si hay un descuento total, cargarlo a los items del detalle
+                if (this.porcentajeDeDescuento > 0) {
+                    for (let i = 0; i < this.detalle.length; i++) {
+                        this.detalle[i].porc_bonif = this.porcentajeDeDescuento;
+                        let precioAux = this.detalle[i].precio / (1 + (this.detalle[i].porc_bonif / 100));
+                        this.detalle[i].subtotal = precioAux * this.detalle[i].cantidad;
+
+                    }
+                }
+
+
+                //procesar
+                if (this.tipo_cbte == '0') {//si es no fiscal
+                    console.log('registrando venta no fiscal');
+                    console.log('el tipo de comp es :' + this.tipo_cbte);
+                    this.registrarVentaEnBD(false);
                 }
                 else {
-                    for (let i = 0; i < this.pagos.length; i++) {
-                        if (this.pagos[i].medio == 1) {
-                            this.pagos[i].monto = this.pagos[i].monto - (this.totalPagos - this.montoAAbonar);
-                        }
-                    }
+                    console.log('el tipo de comp es :' + this.tipo_cbte);
+                    console.log('registrando venta fiscal');
+                    this.registrarVentaEnBD(true);
+
+
                 }
 
-            }
-            if (this.comisionista == null && this.usuario.comercioTiene('comisiones')) {
-                this.$swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Debe seleccionar un barbero!',
-                });
-                return
-            }
-
-            //si hay un descuento total, cargarlo a los items del detalle
-            if (this.porcentajeDeDescuento > 0) {
-                for (let i = 0; i < this.detalle.length; i++) {
-                    this.detalle[i].porc_bonif = this.porcentajeDeDescuento;
-                    let precioAux = this.detalle[i].precio / (1 + (this.detalle[i].porc_bonif / 100));
-                    this.detalle[i].subtotal = precioAux * this.detalle[i].cantidad;
-
-                }
-            }
-
-
-            //procesar
-            if (this.tipo_cbte == '0') {//si es no fiscal
-                console.log('registrando venta no fiscal');
-                console.log('el tipo de comp es :' + this.tipo_cbte);
-                this.registrarVentaEnBD(false);
-            }
-            else {
-                console.log('el tipo de comp es :' + this.tipo_cbte);
-                console.log('registrando venta fiscal');
-                this.registrarVentaEnBD(true);
-
-
-            }
-
-        },
-        //crear funcion registrarVentaFiscal, la cual primero llama a la funcion registrarVentaEnBD y luego a la funcion solicitarCAE
-        registrarVentaEnBD(fiscal) {
-            this.registrandoVenta = true;
-            let venta = {
-                cliente_id: this.clienteId,
-                total: this.total - this.descuentoPesos + this.recargoPesos,
-                costo: this.costo,
-                detalle: JSON.stringify(this.detalle),
-                pagos: JSON.stringify(this.pagos),
-                tpv: this.usuario.tpv,
-                usuario: this.usuario.id,
-                token_caja: this.usuario.token_caja,
-                comisionista_id: this.comisionista,
-                descuento: this.descuentoPesos,
-                usuario_id: this.usuario.id
-            };
-            axios.post(this.url + '/' + this.usuario.tpv + '/ventas', venta, {
-                headers: {
-                    Authorization: this.usuario.token
-                }
-            })
-                .then(response => {
-                    if (response.data.id) {
-                        var idVenta = response.data.id;
-                        if (fiscal) {
-                            let datosFiscal = {
-                                venta_id: idVenta,
-                                tipo_cbte: this.tipo_cbte,
-                            };
-                            axios.post(this.url + '/' + this.usuario.tpv + '/facturas/facturar', datosFiscal, {
-                                headers: {
-                                    Authorization: this.usuario.token
-                                }
-                            })
-                                .then(response => {
-                                    this.$swal.fire({
-                                        icon: 'success',
-                                        title: 'Venta registrada',
-                                        text: response.data.message,
-                                    });
-                                    this.$emit('venta-registrada');
-                                    this.registrandoVenta = false;
-                                    this.$emit('cerrar-modal-pagos');
-                                    this.imprimirComprobante(idVenta);
-
-                                })
-                                .catch(error => {
-                                    this.$swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: error.response.data.message,
-                                    })
-                                })
-                                .finally(() => {
-                                    this.registrandoVenta = false;
-                                });
-
-
-                        }
-                        else {
-                            this.$swal.fire({
-                                icon: 'success',
-                                title: 'Venta registrada',
-                                text: 'La venta se ha registrado correctamente',
-                            });
-                            this.$emit('venta-registrada');
-                            this.registrandoVenta = false;
-                            this.$emit('cerrar-modal-pagos');
-                            this.imprimirComprobante(idVenta);
-
-
-                        }
-
-
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                    this.registrandoVenta = false;
-                })
-
-        },
-        async imprimirComprobante(id) {
-
-            //si es un celular, abrir el pdf en una nueva ventana
-            if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/Windows Phone/i)) {
-                let token = this.usuario.token;
-                let url = this.url + '/' + this.usuario.tpv + '/ventas/imprimirCbte/' + id + '/' + token;
-                window.open(url, '_blank');
-                return;
-            }
-            else {
-
-                let token = this.usuario.token;
-                let url = this.url + '/' + this.usuario.tpv + '/ventas/imprimirCbte/' + id + '/' + token;
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const pdfUrl = URL.createObjectURL(blob);
-
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                document.body.appendChild(iframe);
-
-                iframe.onload = function () {
-                    iframe.contentWindow.print();
-
-                    // Close the print dialog and window after a print
-
-                    iframe.contentWindow.onafterprint = function () {
-                        iframe.contentWindow.close();
-                        URL.revokeObjectURL(pdfUrl);
-                        document.body.removeChild(iframe);
-                    };
+            },
+            //crear funcion registrarVentaFiscal, la cual primero llama a la funcion registrarVentaEnBD y luego a la funcion solicitarCAE
+            registrarVentaEnBD(fiscal) {
+                this.registrandoVenta = true;
+                let venta = {
+                    cliente_id: this.clienteId,
+                    total: this.total - this.descuentoPesos + this.recargoPesos,
+                    costo: this.costo,
+                    detalle: JSON.stringify(this.detalle),
+                    pagos: JSON.stringify(this.pagos),
+                    tpv: this.usuario.tpv,
+                    usuario: this.usuario.id,
+                    token_caja: this.usuario.token_caja,
+                    comisionista_id: this.comisionista,
+                    descuento: this.descuentoPesos,
+                    usuario_id: this.usuario.id
                 };
+                axios.post(this.url + '/' + this.usuario.tpv + '/ventas', venta, {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
+                })
+                    .then(response => {
+                        if (response.data.id) {
+                            var idVenta = response.data.id;
+                            if (fiscal) {
+                                let datosFiscal = {
+                                    venta_id: idVenta,
+                                    tipo_cbte: this.tipo_cbte,
+                                };
+                                axios.post(this.url + '/' + this.usuario.tpv + '/facturas/facturar', datosFiscal, {
+                                    headers: {
+                                        Authorization: this.usuario.token
+                                    }
+                                })
+                                    .then(response => {
+                                        this.$swal.fire({
+                                            icon: 'success',
+                                            title: 'Venta registrada',
+                                            text: response.data.message,
+                                        });
+                                        this.$emit('venta-registrada');
+                                        this.registrandoVenta = false;
+                                        this.$emit('cerrar-modal-pagos');
+                                        this.imprimirComprobante(idVenta);
 
-                iframe.src = pdfUrl;
-
-            }
-
-
-
-        },
-        formatear(valor) {
-            return formatoARS.format(valor);
-        },
-        autocompletarPagos(indicePago) {
-            let resta = 0;
-            resta = this.montoAAbonar - this.totalPagos;
-            this.pagos[indicePago].monto = resta;
+                                    })
+                                    .catch(error => {
+                                        this.$swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: error.response.error,
+                                        })
+                                    })
+                                    .finally(() => {
+                                        this.registrandoVenta = false;
+                                    });
 
 
-        },
-        agregarCampoPago() {
-            this.pagos.push({ monto: 0, medio: 1, recargo: 0 });
-            console.log(this.pagos);
-        },
-        vaciarPagos() {
-            this.pagos = [];
-            this.pagos.push({ monto: 0, medio: 1, recargo: 0 });
-            this.porcentajeDeDescuento = 0;
+                            }
+                            else {
+                                this.$swal.fire({
+                                    icon: 'success',
+                                    title: 'Venta registrada',
+                                    text: 'La venta se ha registrado correctamente',
+                                });
+                                this.$emit('venta-registrada');
+                                this.registrandoVenta = false;
+                                this.$emit('cerrar-modal-pagos');
+                                this.imprimirComprobante(idVenta);
 
-        },
-        abrirModalPagos(i) {
-            this.modalRecargoPago = true;
-            this.indexRecargo = i;
-        },
-        establecerRecargo() {
-            let monto = this.pagos[this.indexRecargo].monto;
-            let recargo = monto * (this.porcentajeRecargo / 100);
-            this.pagos[this.indexRecargo].recargo = recargo;
-            this.recargo = 0;
-            this.modalRecargoPago = false;
-        },
-        hayDescuentosEnDetalle() {
-            let resultado = false;
-            this.detalle.forEach(item => {
-                if (item.porc_bonif > 0) {
-                    resultado = true;
+
+                            }
+
+
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this.registrandoVenta = false;
+                    })
+
+            },
+            async imprimirComprobante(id) {
+
+                //si es un celular, abrir el pdf en una nueva ventana
+                if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/Windows Phone/i)) {
+                    let token = this.usuario.token;
+                    let url = this.url + '/' + this.usuario.tpv + '/ventas/imprimirCbte/' + id + '/' + token;
+                    window.open(url, '_blank');
+                    return;
                 }
-            });
-            return resultado;
-        },
+                else {
 
+                    let token = this.usuario.token;
+                    let url = this.url + '/' + this.usuario.tpv + '/ventas/imprimirCbte/' + id + '/' + token;
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+                    const pdfUrl = URL.createObjectURL(blob);
 
-    },
-    computed: {
-        totalPagos() {
-            let total = 0;
-            this.pagos.forEach(pago => {
-                total += parseFloat(pago.monto) + parseFloat(pago.recargo);
-            });
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
 
-            return total;
-        },
-        descuentoPesos() {
-            if (this.variacion != '0') {
-                return this.variacion * -1;
-            }
-            else {
-                return this.total * (this.porcentajeDeDescuento / 100);
-            }
-        },
-        recargoPesos() {
-            let recargo = 0;
-            for (let i = 0; i < this.pagos.length; i++) {
-                if (this.pagos[i].recargo != undefined) {
-                    recargo += parseFloat(this.pagos[i].recargo);
+                    iframe.onload = function () {
+                        iframe.contentWindow.print();
+
+                        // Close the print dialog and window after a print
+
+                        iframe.contentWindow.onafterprint = function () {
+                            iframe.contentWindow.close();
+                            URL.revokeObjectURL(pdfUrl);
+                            document.body.removeChild(iframe);
+                        };
+                    };
+
+                    iframe.src = pdfUrl;
+
                 }
-                return recargo;
+
+
+
+            },
+            formatear(valor) {
+                return formatoARS.format(valor);
+            },
+            autocompletarPagos(indicePago) {
+                let resta = 0;
+                resta = this.montoAAbonar - this.totalPagos;
+                this.pagos[indicePago].monto = resta;
+
+
+            },
+            agregarCampoPago() {
+                this.pagos.push({ monto: 0, medio: 1, recargo: 0 });
+                console.log(this.pagos);
+            },
+            vaciarPagos() {
+                this.pagos = [];
+                this.pagos.push({ monto: 0, medio: 1, recargo: 0 });
+                this.porcentajeDeDescuento = 0;
+
+            },
+            abrirModalPagos(i) {
+                this.modalRecargoPago = true;
+                this.indexRecargo = i;
+            },
+            establecerRecargo() {
+                let monto = this.pagos[this.indexRecargo].monto;
+                let recargo = monto * (this.porcentajeRecargo / 100);
+                this.pagos[this.indexRecargo].recargo = recargo;
+                this.recargo = 0;
+                this.modalRecargoPago = false;
+            },
+            hayDescuentosEnDetalle() {
+                let resultado = false;
+                this.detalle.forEach(item => {
+                    if (item.porc_bonif > 0) {
+                        resultado = true;
+                    }
+                });
+                return resultado;
+            },
+
+
+        },
+        computed: {
+            totalPagos() {
+                let total = 0;
+                this.pagos.forEach(pago => {
+                    total += parseFloat(pago.monto) + parseFloat(pago.recargo);
+                });
+
+                return total;
+            },
+            descuentoPesos() {
+                if (this.variacion != '0') {
+                    return this.variacion * -1;
+                }
+                else {
+                    return this.total * (this.porcentajeDeDescuento / 100);
+                }
+            },
+            recargoPesos() {
+                let recargo = 0;
+                for (let i = 0; i < this.pagos.length; i++) {
+                    if (this.pagos[i].recargo != undefined) {
+                        recargo += parseFloat(this.pagos[i].recargo);
+                    }
+                    return recargo;
+                }
+            },
+            montoAAbonar() {
+                let total = this.total - this.descuentoPesos + this.recargoPesos;
+                return total * 1;
+            },
+
+
+        },
+        props: {
+            clienteId: {
+                type: Number
+            },
+            total: {
+                type: Number
+            },
+            costo: {
+                type: Number
+            },
+            detalle: {
+                type: Array
+            },
+            usuario: {
+                type: Object
+            },
+            variacion: {
+                type: Number
+            },
+            comprobantes: {
+                type: Array
+            },
+            comisionistas: {
+                type: Array
             }
-        },
-        montoAAbonar() {
-            let total = this.total - this.descuentoPesos + this.recargoPesos;
-            return total * 1;
-        },
 
+        },
+        setup() {
 
-    },
-    props: {
-        clienteId: {
-            type: Number
+            const usuario = useUserStore();
+            return { usuario };
+
         },
-        total: {
-            type: Number
+        emits: ['venta-registrada', 'cerrar-modal-pagos'],
+        created() {
+            this.vaciarPagos();
         },
-        costo: {
-            type: Number
-        },
-        detalle: {
-            type: Array
-        },
-        usuario: {
-            type: Object
-        },
-        variacion: {
-            type: Number
-        },
-        comprobantes: {
-            type: Array
-        },
-        comisionistas: {
-            type: Array
+        mounted() {
+            // console.log(this.comprobantes);
+            console.log('la variacion es: ' + this.variacion);
         }
-
-    },
-    setup() {
-
-        const usuario = useUserStore();
-        return { usuario };
-
-    },
-    emits: ['venta-registrada', 'cerrar-modal-pagos'],
-    created() {
-        this.vaciarPagos();
-    },
-    mounted() {
-        // console.log(this.comprobantes);
-        console.log('la variacion es: ' + this.variacion);
     }
-}
 </script>
 
 <style scoped>
-#icono-mas-pago {
+    #icono-mas-pago {
 
-    color: rgb(20, 27, 56);
-    cursor: pointer;
-    font-size: 1.7rem;
-    margin-top: 10px;
-}
+        color: rgb(20, 27, 56);
+        cursor: pointer;
+        font-size: 1.7rem;
+        margin-top: 10px;
+    }
 
-#icono-mas-pago:hover {
-    color: rgb(9, 99, 184);
-}
+    #icono-mas-pago:hover {
+        color: rgb(9, 99, 184);
+    }
 
-#icono-autocomplete {
-    float: left;
-    color: rgb(9, 99, 184);
-    cursor: pointer;
-    height: 30px;
-    font-size: 25px;
-}
+    #icono-autocomplete {
+        float: left;
+        color: rgb(9, 99, 184);
+        cursor: pointer;
+        height: 30px;
+        font-size: 25px;
+    }
 
-.fondo {
-    background-color: #c5c1c1;
-    opacity: 0.5;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-}
+    .fondo {
+        background-color: #c5c1c1;
+        opacity: 0.5;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
 
-.todo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    z-index: 1000;
-}
+    .todo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        z-index: 1000;
+    }
 
-.modal-pagos {
-    background-color: rgb(255, 255, 255);
-    border-radius: 10px;
-    width: 600px;
-    z-index: 1000;
-    border: 1px solid #838282;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    max-height: 80%;
-    overflow-y: auto;
+    .modal-pagos {
+        background-color: rgb(255, 255, 255);
+        border-radius: 10px;
+        width: 600px;
+        z-index: 1000;
+        border: 1px solid #838282;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        max-height: 80%;
+        overflow-y: auto;
 
-}
+    }
 </style>
