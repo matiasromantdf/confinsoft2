@@ -306,10 +306,18 @@
 
                                     })
                                     .catch(error => {
+                                        let mensaje = 'Error inesperado';
+
+                                        if (error.response?.data?.error) {
+                                            mensaje = error.response.data.error;
+
+                                            // Limpieza básica del mensaje
+                                            mensaje = mensaje.replace(/^Error al generar factura:\s*/i, '');
+                                        }
                                         this.$swal.fire({
                                             icon: 'error',
                                             title: 'Error',
-                                            text: error.error,
+                                            text: mensaje,
                                         })
                                     })
                                     .finally(() => {
