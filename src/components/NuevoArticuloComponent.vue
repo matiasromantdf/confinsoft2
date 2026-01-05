@@ -60,7 +60,7 @@
 
                             <v-row>
                                 <v-col cols="4">
-                                    <v-text-field v-model="articulo.precio" label="Precio" required
+                                    <v-text-field v-model="articulo.precio" label="Precio (bruto)" required
                                         variant="outlined"></v-text-field>
                                 </v-col>
                                 <v-col cols="4">
