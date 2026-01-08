@@ -54,6 +54,8 @@
                         @click="$router.push('/caja')"></v-list-item>
                     <v-list-item title="Facturas" prepend-icon="mdi-receipt-text" value="facturas"
                         @click="$router.push('/facturas')" v-if="usuario.rol == 1"></v-list-item>
+                    <v-list-item title="IVA Ventas" prepend-icon="mdi-file-document-outline" value="iva-ventas"
+                        @click="$router.push('/iva-ventas')" v-if="usuario.rol == 1"></v-list-item>
                     <v-list-item title="Ventas" prepend-icon="mdi-calendar-month-outline" value="listar-ventas"
                         @click="$router.push('/historial-de-ventas')" v-if="usuario.rol == 1"></v-list-item>
                     <v-list-item title="Comisiones" prepend-icon="mdi-chart-pie" value="comisiones"

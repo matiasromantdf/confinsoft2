@@ -50,7 +50,7 @@ const router = createRouter({
     {
       path: "/compras",
       name: "compras",
-      component: () => import("../views/ComprasView.vue"),
+      component: () => import("../views/ComprasView2.vue"),
     },
     {
       path: "/listado-de-categorias",
@@ -141,6 +141,11 @@ const router = createRouter({
       path: "/facturas",
       name: "facturas",
       component: () => import("../views/FacturasView.vue"),
+    },
+    {
+      path: "/iva-ventas",
+      name: "iva-ventas",
+      component: () => import("../views/IvaVentasView.vue"),
     },
   ],
 });
