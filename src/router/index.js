@@ -50,7 +50,7 @@ const router = createRouter({
     {
       path: "/compras",
       name: "compras",
-      component: () => import("../views/ComprasView2.vue"),
+      component: () => import("../views/ComprasView.vue"),
     },
     {
       path: "/listado-de-categorias",
