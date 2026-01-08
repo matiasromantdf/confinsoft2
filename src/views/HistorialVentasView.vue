@@ -49,6 +49,19 @@
                             <v-col>
                                 <v-data-table :items="ventas" :headers="cabeceras" no-data-text="sin datos"
                                     items-per-page-text="filas">
+                                    <template v-slot:item.numero="{ item }">
+                                        <div class="d-flex align-center">
+                                            <span>{{ item.numero }}</span>
+                                            <v-tooltip v-if="item.factura" location="top">
+                                                <template v-slot:activator="{ props }">
+                                                    <v-icon v-bind="props" color="success" size="small" class="ml-2">
+                                                        mdi-file-document-check
+                                                    </v-icon>
+                                                </template>
+                                                <span>Factura Nº {{ item.factura.numero_factura }}</span>
+                                            </v-tooltip>
+                                        </div>
+                                    </template>
                                     <template v-slot:item.verDetalle="{ item }">
                                         <v-btn @click="mostrarDetalle(item)" variant="flat">Ver detalle</v-btn>
                                     </template>
@@ -63,11 +76,11 @@
                                                 <v-list-item @click="mostrarDetalle(item)">
                                                     <v-list-item-title>Ver detalle</v-list-item-title>
                                                 </v-list-item>
-                                                <!-- <v-list-item @click="eliminar(item)">
-                                                    <v-list-item-title>Anular Venta</v-list-item-title>
-                                                </v-list-item> -->
                                                 <v-list-item @click="reimprimir(item)">
                                                     <v-list-item-title>Reimprimir</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item @click="eliminarVenta(item)">
+                                                    <v-list-item-title>Eliminar Venta</v-list-item-title>
                                                 </v-list-item>
                                             </v-list>
                                         </v-menu>
@@ -196,7 +209,7 @@
 
                                     <template v-slot:item.precio="{ item }">
                                         <span class="font-weight-medium">${{ parseFloat(item.precio).toFixed(2)
-                                        }}</span>
+                                            }}</span>
                                     </template>
 
 
@@ -237,7 +250,7 @@
                                         v-if="parseFloat(calcularDescuentosDetalle()) > 0">
                                         <span>Descuentos por item:</span>
                                         <span class="font-weight-medium text-orange">-${{ calcularDescuentosDetalle()
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <div class="d-flex justify-space-between mb-2"
                                         v-if="parseFloat(ventaSeleccionada?.descuento || 0) > 0">
@@ -517,6 +530,43 @@
                         console.log('reimprimir');
                     }
                 })
+            },
+            eliminarVenta(item) {
+                this.$swal({
+                    title: '¿Estás seguro?',
+                    text: "Se eliminará la venta #" + item.numero,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.cargando = true;
+                        axios.post(this.url + '/' + this.usuario.tpv + '/ventas/rollback/' + item.id, {}, {
+                            headers: {
+                                Authorization: this.usuario.token
+                            }
+                        }).then(response => {
+                            this.$swal(
+                                'Venta eliminada',
+                                'La venta se ha eliminado correctamente',
+                                'success'
+                            );
+                            this.getVentas();
+                        }).catch(error => {
+                            console.log(error);
+                            this.$swal(
+                                'Error',
+                                'No se pudo eliminar la venta',
+                                'error'
+                            );
+                        }).finally(() => {
+                            this.cargando = false;
+                        });
+                    }
+                });
             }
 
         },
