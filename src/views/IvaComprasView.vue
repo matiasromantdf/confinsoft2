@@ -54,7 +54,8 @@
                         <v-row v-if="datos && datos.comprobantes">
                             <v-col cols="12">
                                 <v-data-table :headers="headers" :items="datos.comprobantes" :loading="loading"
-                                    class="elevation-1" items-per-page="50" :items-per-page-options="[10, 25, 50, 100]">
+                                    class="elevation-1" items-per-page="50" :items-per-page-options="[10, 25, 50, 100]"
+                                    :items-per-page-text="'Filas por página'">
                                     <template v-slot:item.fecha="{ item }">
                                         {{ formatearFecha(item.fecha) }}
                                     </template>
