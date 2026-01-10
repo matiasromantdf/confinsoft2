@@ -14,7 +14,7 @@
                             <v-card>
                                 <v-card-title class="d-flex align-center">
                                     <v-icon class="mr-2">mdi-receipt-text-outline</v-icon>
-                                    Datos de la Factura
+                                    Datos de la Compra
                                 </v-card-title>
                                 <v-card-text>
                                     <v-container>
@@ -38,8 +38,20 @@
 
                                         <v-divider class="my-4"></v-divider>
 
-                                        <!-- Datos del Comprobante -->
+                                        <!-- Switch Compra Fiscal o No Fiscal -->
                                         <v-row>
+                                            <v-col cols="12">
+                                                <v-switch v-model="esCompraFiscal" color="primary"
+                                                    label="¿Es una compra con factura fiscal?"
+                                                    hint="Active si tiene factura con datos fiscales (IVA, CUIT, etc.)"
+                                                    persistent-hint></v-switch>
+                                            </v-col>
+                                        </v-row>
+
+                                        <v-divider class="my-4" v-if="esCompraFiscal"></v-divider>
+
+                                        <!-- Datos del Comprobante (solo si es fiscal) -->
+                                        <v-row v-if="esCompraFiscal">
                                             <v-col cols="12">
                                                 <h4 class="mb-2">Datos del Comprobante</h4>
                                             </v-col>
@@ -58,8 +70,8 @@
                                             </v-col>
                                         </v-row>
 
-                                        <!-- Datos del Proveedor Emisor -->
-                                        <v-row>
+                                        <!-- Datos del Proveedor Emisor (solo si es fiscal) -->
+                                        <v-row v-if="esCompraFiscal">
                                             <v-col md="6" cols="12">
                                                 <v-select v-model="compra.codigo_documento_vendedor"
                                                     :items="[{ value: 80, title: 'CUIT' }, { value: 96, title: 'DNI' }, { value: 86, title: 'CDI' }]"
@@ -74,8 +86,22 @@
 
                                         <v-divider class="my-4"></v-divider>
 
-                                        <!-- Montos de IVA -->
-                                        <v-row>
+                                        <!-- Monto Total (si NO es fiscal) -->
+                                        <v-row v-if="!esCompraFiscal">
+                                            <v-col cols="12">
+                                                <h4 class="mb-2">Monto de la Compra</h4>
+                                            </v-col>
+                                            <v-col md="6" cols="12">
+                                                <v-text-field v-model="compra.monto_no_fiscal" label="Monto Total *"
+                                                    variant="outlined" type="text" prefix="$"
+                                                    @input="formatearCampoMoneda('monto_no_fiscal', $event)"
+                                                    @blur="finalizarFormato('monto_no_fiscal')"
+                                                    hint="Ingrese el monto total de la compra"></v-text-field>
+                                            </v-col>
+                                        </v-row>
+
+                                        <!-- Montos de IVA (solo si es fiscal) -->
+                                        <v-row v-if="esCompraFiscal">
                                             <v-col cols="12">
                                                 <h4 class="mb-2">Discriminación de IVA</h4>
                                             </v-col>
@@ -144,7 +170,7 @@
                                         <v-divider class="my-4"></v-divider>
 
                                         <!-- Otros Conceptos -->
-                                        <v-row>
+                                        <v-row v-if="esCompraFiscal">
                                             <v-col cols="12">
                                                 <h4 class="mb-2">Otros Conceptos</h4>
                                             </v-col>
@@ -377,12 +403,14 @@
                 proveedores: [],
                 url: import.meta.env.VITE_URL,
                 numeroFacturaMascara: '',
+                esCompraFiscal: true,
                 compra: {
                     tipo_comprobante: null,
                     punto_venta: null,
                     numero_comprobante: '',
                     codigo_documento_vendedor: 80,
                     cuit_proveedor: '',
+                    monto_no_fiscal: '0',
                     neto_gravado_21: '0',
                     iva_21: '0',
                     neto_gravado_10_5: '0',
@@ -644,8 +672,18 @@
             },
             guardarCompra() {
                 // Validaciones
-                if (!this.proveedor || !this.compra.tipo_comprobante) {
-                    this.$swal('Error', 'Debe completar los campos obligatorios (Proveedor y Tipo de Comprobante)', 'error');
+                if (!this.proveedor) {
+                    this.$swal('Error', 'Debe seleccionar un proveedor', 'error');
+                    return;
+                }
+
+                if (this.esCompraFiscal && !this.compra.tipo_comprobante) {
+                    this.$swal('Error', 'Debe seleccionar el tipo de comprobante', 'error');
+                    return;
+                }
+
+                if (!this.esCompraFiscal && this.totalCompra === 0) {
+                    this.$swal('Error', 'Debe ingresar el monto de la compra', 'error');
                     return;
                 }
 
@@ -681,27 +719,27 @@
                     proveedor_id: this.proveedor,
                     fecha: this.fecha,
                     monto: this.totalCompra,
-                    es_compra_fiscal: 1,
-                    tipo_comprobante: this.compra.tipo_comprobante,
-                    punto_venta: this.compra.punto_venta,
-                    numero_comprobante: this.compra.numero_comprobante,
-                    codigo_documento_vendedor: this.compra.codigo_documento_vendedor,
-                    cuit_proveedor: this.compra.cuit_proveedor,
-                    neto_gravado_21: convertirANumero(this.compra.neto_gravado_21),
-                    iva_21: convertirANumero(this.compra.iva_21),
-                    neto_gravado_10_5: convertirANumero(this.compra.neto_gravado_10_5),
-                    iva_10_5: convertirANumero(this.compra.iva_10_5),
-                    neto_gravado_27: convertirANumero(this.compra.neto_gravado_27),
-                    iva_27: convertirANumero(this.compra.iva_27),
-                    neto_gravado_5: convertirANumero(this.compra.neto_gravado_5),
-                    iva_5: convertirANumero(this.compra.iva_5),
-                    neto_gravado_2_5: convertirANumero(this.compra.neto_gravado_2_5),
-                    iva_2_5: convertirANumero(this.compra.iva_2_5),
-                    exento: convertirANumero(this.compra.exento),
-                    no_gravado: convertirANumero(this.compra.no_gravado),
-                    percepciones_iva: convertirANumero(this.compra.percepciones_iva),
-                    percepciones_iibb: convertirANumero(this.compra.percepciones_iibb),
-                    otros_tributos: convertirANumero(this.compra.otros_tributos)
+                    es_compra_fiscal: this.esCompraFiscal ? 1 : 0,
+                    tipo_comprobante: this.esCompraFiscal ? this.compra.tipo_comprobante : null,
+                    punto_venta: this.esCompraFiscal ? this.compra.punto_venta : null,
+                    numero_comprobante: this.esCompraFiscal ? this.compra.numero_comprobante : null,
+                    codigo_documento_vendedor: this.esCompraFiscal ? this.compra.codigo_documento_vendedor : null,
+                    cuit_proveedor: this.esCompraFiscal ? this.compra.cuit_proveedor : null,
+                    neto_gravado_21: this.esCompraFiscal ? convertirANumero(this.compra.neto_gravado_21) : 0,
+                    iva_21: this.esCompraFiscal ? convertirANumero(this.compra.iva_21) : 0,
+                    neto_gravado_10_5: this.esCompraFiscal ? convertirANumero(this.compra.neto_gravado_10_5) : 0,
+                    iva_10_5: this.esCompraFiscal ? convertirANumero(this.compra.iva_10_5) : 0,
+                    neto_gravado_27: this.esCompraFiscal ? convertirANumero(this.compra.neto_gravado_27) : 0,
+                    iva_27: this.esCompraFiscal ? convertirANumero(this.compra.iva_27) : 0,
+                    neto_gravado_5: this.esCompraFiscal ? convertirANumero(this.compra.neto_gravado_5) : 0,
+                    iva_5: this.esCompraFiscal ? convertirANumero(this.compra.iva_5) : 0,
+                    neto_gravado_2_5: this.esCompraFiscal ? convertirANumero(this.compra.neto_gravado_2_5) : 0,
+                    iva_2_5: this.esCompraFiscal ? convertirANumero(this.compra.iva_2_5) : 0,
+                    exento: this.esCompraFiscal ? convertirANumero(this.compra.exento) : 0,
+                    no_gravado: this.esCompraFiscal ? convertirANumero(this.compra.no_gravado) : 0,
+                    percepciones_iva: this.esCompraFiscal ? convertirANumero(this.compra.percepciones_iva) : 0,
+                    percepciones_iibb: this.esCompraFiscal ? convertirANumero(this.compra.percepciones_iibb) : 0,
+                    otros_tributos: this.esCompraFiscal ? convertirANumero(this.compra.otros_tributos) : 0
                 };
 
                 if (this.cargarDetalle) {
@@ -736,10 +774,12 @@
                 this.cargarDetalle = false;
                 this.tab = 'one';
                 this.numeroFacturaMascara = '';
+                this.esCompraFiscal = true;
                 this.compra = {
                     tipo_comprobante: null,
                     punto_venta: null,
                     numero_comprobante: '',
+                    monto_no_fiscal: '0',
                     codigo_documento_vendedor: 80,
                     cuit_proveedor: '',
                     neto_gravado_21: '0',
@@ -772,6 +812,12 @@
                     return isNaN(numero) ? 0 : numero;
                 };
 
+                // Si no es compra fiscal, retornar el monto no fiscal
+                if (!this.esCompraFiscal) {
+                    return convertirANumero(this.compra.monto_no_fiscal);
+                }
+
+                // Si es fiscal, calcular la suma de todos los conceptos
                 return convertirANumero(this.compra.neto_gravado_21) +
                     convertirANumero(this.compra.iva_21) +
                     convertirANumero(this.compra.neto_gravado_10_5) +
