@@ -82,6 +82,8 @@
                         @click="$router.push('/listado-de-proveedores')"></v-list-item>
                     <v-list-item title="Historial" prepend-icon="mdi-calendar-month-outline" value="historialCompras"
                         @click="$router.push('/historial-de-compras')"></v-list-item>
+                    <v-list-item title="IVA Compras" prepend-icon="mdi-file-document-outline" value="iva-compras"
+                        @click="$router.push('/iva-compras')"></v-list-item>
 
 
 

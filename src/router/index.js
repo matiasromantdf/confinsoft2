@@ -147,6 +147,11 @@ const router = createRouter({
       name: "iva-ventas",
       component: () => import("../views/IvaVentasView.vue"),
     },
+    {
+      path: "/iva-compras",
+      name: "iva-compras",
+      component: () => import("../views/IvaComprasView.vue"),
+    },
   ],
 });
 router.beforeEach((to, from, next) => {

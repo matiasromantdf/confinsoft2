@@ -49,15 +49,12 @@
                                                     label="Tipo de Comprobante *" item-title="title" item-value="value"
                                                     variant="outlined"></v-select>
                                             </v-col>
-                                            <v-col md="4" cols="12">
-                                                <v-text-field v-model="compra.punto_venta" label="Punto de Venta *"
-                                                    variant="outlined" type="number" hint="5 dígitos"
-                                                    @blur="formatearPuntoVenta"></v-text-field>
-                                            </v-col>
-                                            <v-col md="4" cols="12">
-                                                <v-text-field v-model="compra.numero_comprobante"
-                                                    label="Número de Comprobante *" variant="outlined"
-                                                    hint="Ej: 00012345"></v-text-field>
+                                            <v-col md="8" cols="12">
+                                                <v-text-field v-model="numeroFacturaMascara"
+                                                    label="Número de Factura (del proveedor) *" variant="outlined"
+                                                    placeholder="00001-00000001" hint="Formato: 00001-00000001"
+                                                    @input="aplicarMascaraFactura"
+                                                    @blur="formatearNumeroFactura"></v-text-field>
                                             </v-col>
                                         </v-row>
 
@@ -84,58 +81,63 @@
                                             </v-col>
                                             <!-- IVA 21% -->
                                             <v-col md="3" cols="6">
-                                                <v-text-field v-model.number="compra.neto_gravado_21" label="Neto 21%"
-                                                    variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.neto_gravado_21" label="Neto 21%"
+                                                    variant="outlined" type="text" prefix="$"
+                                                    @input="formatearCampoMoneda('neto_gravado_21', $event)"
+                                                    @blur="finalizarFormato('neto_gravado_21')"></v-text-field>
                                             </v-col>
                                             <v-col md="3" cols="6">
-                                                <v-text-field v-model.number="compra.iva_21" label="IVA 21%"
-                                                    variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.iva_21" label="IVA 21%" variant="outlined"
+                                                    type="text" prefix="$" readonly
+                                                    bg-color="grey-lighten-3"></v-text-field>
                                             </v-col>
                                             <!-- IVA 10.5% -->
                                             <v-col md="3" cols="6">
-                                                <v-text-field v-model.number="compra.neto_gravado_10_5"
-                                                    label="Neto 10.5%" variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.neto_gravado_10_5" label="Neto 10.5%"
+                                                    variant="outlined" type="text" prefix="$"
+                                                    @input="formatearCampoMoneda('neto_gravado_10_5', $event)"
+                                                    @blur="finalizarFormato('neto_gravado_10_5')"></v-text-field>
                                             </v-col>
                                             <v-col md="3" cols="6">
-                                                <v-text-field v-model.number="compra.iva_10_5" label="IVA 10.5%"
-                                                    variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.iva_10_5" label="IVA 10.5%"
+                                                    variant="outlined" type="text" prefix="$" readonly
+                                                    bg-color="grey-lighten-3"></v-text-field>
                                             </v-col>
                                             <!-- IVA 27% -->
                                             <v-col md="3" cols="6">
-                                                <v-text-field v-model.number="compra.neto_gravado_27" label="Neto 27%"
-                                                    variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.neto_gravado_27" label="Neto 27%"
+                                                    variant="outlined" type="text" prefix="$"
+                                                    @input="formatearCampoMoneda('neto_gravado_27', $event)"
+                                                    @blur="finalizarFormato('neto_gravado_27')"></v-text-field>
                                             </v-col>
                                             <v-col md="3" cols="6">
-                                                <v-text-field v-model.number="compra.iva_27" label="IVA 27%"
-                                                    variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.iva_27" label="IVA 27%" variant="outlined"
+                                                    type="text" prefix="$" readonly
+                                                    bg-color="grey-lighten-3"></v-text-field>
                                             </v-col>
                                             <!-- IVA 5% -->
                                             <v-col md="3" cols="6">
-                                                <v-text-field v-model.number="compra.neto_gravado_5" label="Neto 5%"
-                                                    variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.neto_gravado_5" label="Neto 5%"
+                                                    variant="outlined" type="text" prefix="$"
+                                                    @input="formatearCampoMoneda('neto_gravado_5', $event)"
+                                                    @blur="finalizarFormato('neto_gravado_5')"></v-text-field>
                                             </v-col>
                                             <v-col md="3" cols="6">
-                                                <v-text-field v-model.number="compra.iva_5" label="IVA 5%"
-                                                    variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.iva_5" label="IVA 5%" variant="outlined"
+                                                    type="text" prefix="$" readonly
+                                                    bg-color="grey-lighten-3"></v-text-field>
                                             </v-col>
                                             <!-- IVA 2.5% -->
                                             <v-col md="3" cols="6">
-                                                <v-text-field v-model.number="compra.neto_gravado_2_5" label="Neto 2.5%"
-                                                    variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.neto_gravado_2_5" label="Neto 2.5%"
+                                                    variant="outlined" type="text" prefix="$"
+                                                    @input="formatearCampoMoneda('neto_gravado_2_5', $event)"
+                                                    @blur="finalizarFormato('neto_gravado_2_5')"></v-text-field>
                                             </v-col>
                                             <v-col md="3" cols="6">
-                                                <v-text-field v-model.number="compra.iva_2_5" label="IVA 2.5%"
-                                                    variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.iva_2_5" label="IVA 2.5%"
+                                                    variant="outlined" type="text" prefix="$" readonly
+                                                    bg-color="grey-lighten-3"></v-text-field>
                                             </v-col>
                                         </v-row>
 
@@ -147,29 +149,34 @@
                                                 <h4 class="mb-2">Otros Conceptos</h4>
                                             </v-col>
                                             <v-col md="3" cols="6">
-                                                <v-text-field v-model.number="compra.exento" label="Exento"
-                                                    variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.exento" label="Exento" variant="outlined"
+                                                    type="text" prefix="$"
+                                                    @input="formatearCampoMoneda('exento', $event)"
+                                                    @blur="finalizarFormato('exento')"></v-text-field>
                                             </v-col>
                                             <v-col md="3" cols="6">
-                                                <v-text-field v-model.number="compra.no_gravado" label="No Gravado"
-                                                    variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.no_gravado" label="No Gravado"
+                                                    variant="outlined" type="text" prefix="$"
+                                                    @input="formatearCampoMoneda('no_gravado', $event)"
+                                                    @blur="finalizarFormato('no_gravado')"></v-text-field>
                                             </v-col>
                                             <v-col md="2" cols="4">
-                                                <v-text-field v-model.number="compra.percepciones_iva"
-                                                    label="Percepciones IVA" variant="outlined" type="number"
-                                                    step="0.01" @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.percepciones_iva" label="Percepciones IVA"
+                                                    variant="outlined" type="text" prefix="$"
+                                                    @input="formatearCampoMoneda('percepciones_iva', $event)"
+                                                    @blur="finalizarFormato('percepciones_iva')"></v-text-field>
                                             </v-col>
                                             <v-col md="2" cols="4">
-                                                <v-text-field v-model.number="compra.percepciones_iibb"
-                                                    label="Percepciones IIBB" variant="outlined" type="number"
-                                                    step="0.01" @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.percepciones_iibb"
+                                                    label="Percepciones IIBB" variant="outlined" type="text" prefix="$"
+                                                    @input="formatearCampoMoneda('percepciones_iibb', $event)"
+                                                    @blur="finalizarFormato('percepciones_iibb')"></v-text-field>
                                             </v-col>
                                             <v-col md="2" cols="4">
-                                                <v-text-field v-model.number="compra.otros_tributos"
-                                                    label="Otros Tributos" variant="outlined" type="number" step="0.01"
-                                                    @input="calcularTotal"></v-text-field>
+                                                <v-text-field v-model="compra.otros_tributos" label="Otros Tributos"
+                                                    variant="outlined" type="text" prefix="$"
+                                                    @input="formatearCampoMoneda('otros_tributos', $event)"
+                                                    @blur="finalizarFormato('otros_tributos')"></v-text-field>
                                             </v-col>
                                         </v-row>
 
@@ -178,9 +185,9 @@
                                         <!-- Total -->
                                         <v-row>
                                             <v-col md="6" cols="12">
-                                                <v-text-field :value="formatear(totalCompra)"
+                                                <v-text-field :model-value="formatear(totalCompra)"
                                                     label="Total de la Factura" variant="outlined" readonly
-                                                    class="text-h6"></v-text-field>
+                                                    class="text-h6" bg-color="blue-grey-lighten-5"></v-text-field>
                                             </v-col>
                                         </v-row>
 
@@ -369,27 +376,28 @@
             return {
                 proveedores: [],
                 url: import.meta.env.VITE_URL,
+                numeroFacturaMascara: '',
                 compra: {
                     tipo_comprobante: null,
                     punto_venta: null,
                     numero_comprobante: '',
                     codigo_documento_vendedor: 80,
                     cuit_proveedor: '',
-                    neto_gravado_21: 0,
-                    iva_21: 0,
-                    neto_gravado_10_5: 0,
-                    iva_10_5: 0,
-                    neto_gravado_27: 0,
-                    iva_27: 0,
-                    neto_gravado_5: 0,
-                    iva_5: 0,
-                    neto_gravado_2_5: 0,
-                    iva_2_5: 0,
-                    exento: 0,
-                    no_gravado: 0,
-                    percepciones_iva: 0,
-                    percepciones_iibb: 0,
-                    otros_tributos: 0
+                    neto_gravado_21: '0',
+                    iva_21: '0',
+                    neto_gravado_10_5: '0',
+                    iva_10_5: '0',
+                    neto_gravado_27: '0',
+                    iva_27: '0',
+                    neto_gravado_5: '0',
+                    iva_5: '0',
+                    neto_gravado_2_5: '0',
+                    iva_2_5: '0',
+                    exento: '0',
+                    no_gravado: '0',
+                    percepciones_iva: '0',
+                    percepciones_iibb: '0',
+                    otros_tributos: '0'
                 },
                 articulo: {
                     codigo: '',
@@ -441,9 +449,127 @@
             calcularTotal() {
                 // Se calcula automáticamente con el computed totalCompra
             },
+            formatearCampoMoneda(campo, event) {
+                let valor = event.target.value;
+
+                // Eliminar todo excepto números y coma
+                valor = valor.replace(/[^0-9,]/g, '');
+
+                // Permitir campo vacío
+                if (!valor || valor === '') {
+                    this.compra[campo] = '';
+                    return;
+                }
+
+                // Solo permitir una coma
+                const partes = valor.split(',');
+                if (partes.length > 2) {
+                    valor = partes[0] + ',' + partes.slice(1).join('');
+                }
+
+                // Limitar decimales a 2
+                if (partes.length === 2 && partes[1].length > 2) {
+                    valor = partes[0] + ',' + partes[1].substring(0, 2);
+                }
+
+                // Formatear el valor
+                const partesNumero = valor.split(',');
+                let parteEntera = partesNumero[0];
+                const parteDecimal = partesNumero[1];
+
+                // Formatear parte entera con puntos de miles
+                if (parteEntera) {
+                    parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                }
+
+                // Reconstruir el número
+                if (parteDecimal !== undefined) {
+                    this.compra[campo] = parteEntera + ',' + parteDecimal;
+                } else {
+                    this.compra[campo] = parteEntera;
+                }
+            },
+            finalizarFormato(campo) {
+                let valor = this.compra[campo];
+                if (!valor || valor === '0' || valor === '') {
+                    this.compra[campo] = '0,00';
+
+                    // Si es un campo de neto, poner el IVA en 0 también
+                    if (campo.startsWith('neto_gravado_')) {
+                        const alicuota = campo.replace('neto_gravado_', '');
+                        this.compra['iva_' + alicuota] = '0,00';
+                    }
+                    return;
+                }
+
+                // Eliminar puntos de miles y convertir coma a punto para cálculo
+                valor = valor.toString().replace(/\./g, '').replace(',', '.');
+                const numero = parseFloat(valor);
+
+                if (isNaN(numero)) {
+                    this.compra[campo] = '0,00';
+                    return;
+                }
+
+                // Formatear con dos decimales en formato argentino
+                this.compra[campo] = numero.toLocaleString('es-AR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+                // Si es un campo de neto gravado, calcular automáticamente el IVA
+                if (campo.startsWith('neto_gravado_')) {
+                    const alicuota = campo.replace('neto_gravado_', '');
+                    let porcentaje = 0;
+
+                    // Determinar el porcentaje según la alícuota
+                    if (alicuota === '21') porcentaje = 0.21;
+                    else if (alicuota === '10_5') porcentaje = 0.105;
+                    else if (alicuota === '27') porcentaje = 0.27;
+                    else if (alicuota === '5') porcentaje = 0.05;
+                    else if (alicuota === '2_5') porcentaje = 0.025;
+
+                    // Calcular el IVA
+                    const iva = numero * porcentaje;
+                    this.compra['iva_' + alicuota] = iva.toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            },
             formatearPuntoVenta() {
                 if (this.compra.punto_venta) {
                     this.compra.punto_venta = String(this.compra.punto_venta).padStart(5, '0');
+                }
+            },
+            aplicarMascaraFactura(event) {
+                let valor = this.numeroFacturaMascara.replace(/[^0-9]/g, '');
+
+                if (valor.length > 13) {
+                    valor = valor.substring(0, 13);
+                }
+
+                if (valor.length > 5) {
+                    this.numeroFacturaMascara = valor.substring(0, 5) + '-' + valor.substring(5);
+                } else {
+                    this.numeroFacturaMascara = valor;
+                }
+            },
+            formatearNumeroFactura() {
+                const valor = this.numeroFacturaMascara.replace(/[^0-9]/g, '');
+
+                if (valor.length >= 5) {
+                    const puntoVenta = valor.substring(0, 5).padStart(5, '0');
+                    const numero = valor.substring(5).padStart(8, '0');
+
+                    this.compra.punto_venta = puntoVenta;
+                    this.compra.numero_comprobante = numero;
+                    this.numeroFacturaMascara = puntoVenta + '-' + numero;
+                } else if (valor.length > 0) {
+                    const puntoVenta = valor.padStart(5, '0');
+                    this.compra.punto_venta = puntoVenta;
+                    this.compra.numero_comprobante = '';
+                    this.numeroFacturaMascara = puntoVenta + '-';
                 }
             },
             checkEnter(event) {
@@ -543,6 +669,14 @@
                     });
             },
             enviarDatos() {
+                // Función auxiliar para convertir valores formateados a número
+                const convertirANumero = (valor) => {
+                    if (!valor || valor === '0') return 0;
+                    // Eliminar puntos de miles y convertir coma a punto
+                    const limpio = valor.toString().replace(/\./g, '').replace(',', '.');
+                    return parseFloat(limpio) || 0;
+                };
+
                 const datosCompra = {
                     proveedor_id: this.proveedor,
                     fecha: this.fecha,
@@ -553,21 +687,21 @@
                     numero_comprobante: this.compra.numero_comprobante,
                     codigo_documento_vendedor: this.compra.codigo_documento_vendedor,
                     cuit_proveedor: this.compra.cuit_proveedor,
-                    neto_gravado_21: this.compra.neto_gravado_21,
-                    iva_21: this.compra.iva_21,
-                    neto_gravado_10_5: this.compra.neto_gravado_10_5,
-                    iva_10_5: this.compra.iva_10_5,
-                    neto_gravado_27: this.compra.neto_gravado_27,
-                    iva_27: this.compra.iva_27,
-                    neto_gravado_5: this.compra.neto_gravado_5,
-                    iva_5: this.compra.iva_5,
-                    neto_gravado_2_5: this.compra.neto_gravado_2_5,
-                    iva_2_5: this.compra.iva_2_5,
-                    exento: this.compra.exento,
-                    no_gravado: this.compra.no_gravado,
-                    percepciones_iva: this.compra.percepciones_iva,
-                    percepciones_iibb: this.compra.percepciones_iibb,
-                    otros_tributos: this.compra.otros_tributos
+                    neto_gravado_21: convertirANumero(this.compra.neto_gravado_21),
+                    iva_21: convertirANumero(this.compra.iva_21),
+                    neto_gravado_10_5: convertirANumero(this.compra.neto_gravado_10_5),
+                    iva_10_5: convertirANumero(this.compra.iva_10_5),
+                    neto_gravado_27: convertirANumero(this.compra.neto_gravado_27),
+                    iva_27: convertirANumero(this.compra.iva_27),
+                    neto_gravado_5: convertirANumero(this.compra.neto_gravado_5),
+                    iva_5: convertirANumero(this.compra.iva_5),
+                    neto_gravado_2_5: convertirANumero(this.compra.neto_gravado_2_5),
+                    iva_2_5: convertirANumero(this.compra.iva_2_5),
+                    exento: convertirANumero(this.compra.exento),
+                    no_gravado: convertirANumero(this.compra.no_gravado),
+                    percepciones_iva: convertirANumero(this.compra.percepciones_iva),
+                    percepciones_iibb: convertirANumero(this.compra.percepciones_iibb),
+                    otros_tributos: convertirANumero(this.compra.otros_tributos)
                 };
 
                 if (this.cargarDetalle) {
@@ -601,27 +735,28 @@
                 this.proveedor = '';
                 this.cargarDetalle = false;
                 this.tab = 'one';
+                this.numeroFacturaMascara = '';
                 this.compra = {
                     tipo_comprobante: null,
                     punto_venta: null,
                     numero_comprobante: '',
                     codigo_documento_vendedor: 80,
                     cuit_proveedor: '',
-                    neto_gravado_21: 0,
-                    iva_21: 0,
-                    neto_gravado_10_5: 0,
-                    iva_10_5: 0,
-                    neto_gravado_27: 0,
-                    iva_27: 0,
-                    neto_gravado_5: 0,
-                    iva_5: 0,
-                    neto_gravado_2_5: 0,
-                    iva_2_5: 0,
-                    exento: 0,
-                    no_gravado: 0,
-                    percepciones_iva: 0,
-                    percepciones_iibb: 0,
-                    otros_tributos: 0
+                    neto_gravado_21: '0',
+                    iva_21: '0',
+                    neto_gravado_10_5: '0',
+                    iva_10_5: '0',
+                    neto_gravado_27: '0',
+                    iva_27: '0',
+                    neto_gravado_5: '0',
+                    iva_5: '0',
+                    neto_gravado_2_5: '0',
+                    iva_2_5: '0',
+                    exento: '0',
+                    no_gravado: '0',
+                    percepciones_iva: '0',
+                    percepciones_iibb: '0',
+                    otros_tributos: '0'
                 };
             },
             formatear(valor) {
@@ -630,21 +765,28 @@
         },
         computed: {
             totalCompra() {
-                return parseFloat(this.compra.neto_gravado_21 || 0) +
-                    parseFloat(this.compra.iva_21 || 0) +
-                    parseFloat(this.compra.neto_gravado_10_5 || 0) +
-                    parseFloat(this.compra.iva_10_5 || 0) +
-                    parseFloat(this.compra.neto_gravado_27 || 0) +
-                    parseFloat(this.compra.iva_27 || 0) +
-                    parseFloat(this.compra.neto_gravado_5 || 0) +
-                    parseFloat(this.compra.iva_5 || 0) +
-                    parseFloat(this.compra.neto_gravado_2_5 || 0) +
-                    parseFloat(this.compra.iva_2_5 || 0) +
-                    parseFloat(this.compra.exento || 0) +
-                    parseFloat(this.compra.no_gravado || 0) +
-                    parseFloat(this.compra.percepciones_iva || 0) +
-                    parseFloat(this.compra.percepciones_iibb || 0) +
-                    parseFloat(this.compra.otros_tributos || 0);
+                const convertirANumero = (valor) => {
+                    if (!valor || valor === '0' || valor === '' || valor === '0,00') return 0;
+                    const limpio = valor.toString().replace(/\./g, '').replace(',', '.');
+                    const numero = parseFloat(limpio);
+                    return isNaN(numero) ? 0 : numero;
+                };
+
+                return convertirANumero(this.compra.neto_gravado_21) +
+                    convertirANumero(this.compra.iva_21) +
+                    convertirANumero(this.compra.neto_gravado_10_5) +
+                    convertirANumero(this.compra.iva_10_5) +
+                    convertirANumero(this.compra.neto_gravado_27) +
+                    convertirANumero(this.compra.iva_27) +
+                    convertirANumero(this.compra.neto_gravado_5) +
+                    convertirANumero(this.compra.iva_5) +
+                    convertirANumero(this.compra.neto_gravado_2_5) +
+                    convertirANumero(this.compra.iva_2_5) +
+                    convertirANumero(this.compra.exento) +
+                    convertirANumero(this.compra.no_gravado) +
+                    convertirANumero(this.compra.percepciones_iva) +
+                    convertirANumero(this.compra.percepciones_iibb) +
+                    convertirANumero(this.compra.otros_tributos);
             }
         },
         setup() {
