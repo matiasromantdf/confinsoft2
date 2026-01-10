@@ -61,12 +61,18 @@
                                                     label="Tipo de Comprobante *" item-title="title" item-value="value"
                                                     variant="outlined"></v-select>
                                             </v-col>
-                                            <v-col md="8" cols="12">
-                                                <v-text-field v-model="numeroFacturaMascara"
-                                                    label="Número de Factura (del proveedor) *" variant="outlined"
-                                                    placeholder="00001-00000001" hint="Formato: 00001-00000001"
-                                                    @input="aplicarMascaraFactura"
-                                                    @blur="formatearNumeroFactura"></v-text-field>
+                                            <v-col md="2" cols="5">
+                                                <v-text-field v-model="compra.punto_venta" type="number"
+                                                    label="Punto de Venta *" variant="outlined"
+                                                    @blur="formatearPuntoVenta"></v-text-field>
+                                            </v-col>
+                                            <v-col md="1" cols="12" class="d-flex align-center justify-center">
+                                                <div class="text-h5" style="padding-bottom: 20px;">-</div>
+                                            </v-col>
+                                            <v-col md="4" cols="6">
+                                                <v-text-field v-model="compra.numero_comprobante" type="number"
+                                                    label="Número *" variant="outlined"
+                                                    @blur="formatearNumeroComprobante"></v-text-field>
                                             </v-col>
                                         </v-row>
 
@@ -402,7 +408,6 @@
             return {
                 proveedores: [],
                 url: import.meta.env.VITE_URL,
-                numeroFacturaMascara: '',
                 esCompraFiscal: true,
                 compra: {
                     tipo_comprobante: null,
@@ -570,34 +575,14 @@
                     this.compra.punto_venta = String(this.compra.punto_venta).padStart(5, '0');
                 }
             },
-            aplicarMascaraFactura(event) {
-                let valor = this.numeroFacturaMascara.replace(/[^0-9]/g, '');
-
-                if (valor.length > 13) {
-                    valor = valor.substring(0, 13);
-                }
-
-                if (valor.length > 5) {
-                    this.numeroFacturaMascara = valor.substring(0, 5) + '-' + valor.substring(5);
-                } else {
-                    this.numeroFacturaMascara = valor;
+            formatearPuntoVenta() {
+                if (this.compra.punto_venta) {
+                    this.compra.punto_venta = String(this.compra.punto_venta).padStart(5, '0');
                 }
             },
-            formatearNumeroFactura() {
-                const valor = this.numeroFacturaMascara.replace(/[^0-9]/g, '');
-
-                if (valor.length >= 5) {
-                    const puntoVenta = valor.substring(0, 5).padStart(5, '0');
-                    const numero = valor.substring(5).padStart(8, '0');
-
-                    this.compra.punto_venta = puntoVenta;
-                    this.compra.numero_comprobante = numero;
-                    this.numeroFacturaMascara = puntoVenta + '-' + numero;
-                } else if (valor.length > 0) {
-                    const puntoVenta = valor.padStart(5, '0');
-                    this.compra.punto_venta = puntoVenta;
-                    this.compra.numero_comprobante = '';
-                    this.numeroFacturaMascara = puntoVenta + '-';
+            formatearNumeroComprobante() {
+                if (this.compra.numero_comprobante) {
+                    this.compra.numero_comprobante = String(this.compra.numero_comprobante).padStart(8, '0');
                 }
             },
             checkEnter(event) {
@@ -773,7 +758,8 @@
                 this.proveedor = '';
                 this.cargarDetalle = false;
                 this.tab = 'one';
-                this.numeroFacturaMascara = '';
+                this.compra.punto_venta = null;
+                this.compra.numero_comprobante = '';
                 this.esCompraFiscal = true;
                 this.compra = {
                     tipo_comprobante: null,
