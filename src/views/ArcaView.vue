@@ -29,6 +29,56 @@
                 <v-card :class="{ 'opacity-50 pointer-events-none': !cuitCargado }">
                     <v-card-title class="text-h5">Configuración AFIP (ARCA)</v-card-title>
                     <v-card-text>
+                        <!-- Datos requeridos para facturación -->
+                        <v-alert type="warning" variant="tonal" class="mb-4">
+                            <template v-slot:title>
+                                <span class="font-weight-bold">Datos requeridos para facturación electrónica</span>
+                            </template>
+                            <div class="mt-3">
+                                Complete los siguientes datos que son <strong>obligatorios</strong> para la
+                                configuración de facturación
+                                electrónica con AFIP:
+                            </div>
+                        </v-alert>
+
+                        <v-row class="mb-4">
+                            <v-col cols="12" md="6">
+                                <v-text-field v-model="comercio.cuit" label="CUIT (sólo números)" variant="outlined"
+                                    type="number" required hint="El CUIT debe estar registrado en AFIP"
+                                    persistent-hint />
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field v-model="comercio.iibb" label="Ingresos Brutos" variant="outlined"
+                                    required hint="Número de inscripción en Ingresos Brutos" persistent-hint />
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field v-model="comercio.inicio_actividades" label="Inicio de actividades"
+                                    variant="outlined" type="date" required
+                                    hint="Fecha de inicio de actividades registrada en AFIP" persistent-hint />
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-select v-model="comercio.tdf"
+                                    :items="[{ title: 'Sí', value: 1 }, { title: 'No', value: 0 }]"
+                                    label="¿Reside en Tierra del Fuego?" item-title="title" item-value="value"
+                                    variant="outlined" required
+                                    hint="Seleccione si el comercio está ubicado en Tierra del Fuego" persistent-hint />
+                            </v-col>
+                        </v-row>
+
+                        <v-row class="mb-4">
+                            <v-col cols="12">
+                                <v-btn color="success" size="large" :loading="guardandoDatosComercio"
+                                    @click="guardarDatosComercio" prepend-icon="mdi-content-save">
+                                    Guardar datos del comercio
+                                </v-btn>
+                                <v-alert v-if="mensajeDatosComercio" :type="mensajeTipoDatosComercio" class="mt-3">
+                                    {{ mensajeDatosComercio }}
+                                </v-alert>
+                            </v-col>
+                        </v-row>
+
+                        <v-divider class="mb-4"></v-divider>
+
                         <!-- Resumen del proceso -->
                         <v-alert type="info" variant="tonal" class="mb-4">
                             <template v-slot:title>
@@ -252,6 +302,15 @@
                 mensajeTipo: 'success',
                 url: import.meta.env.VITE_URL,
                 loading: false,
+                comercio: {
+                    cuit: '',
+                    iibb: '',
+                    inicio_actividades: '',
+                    tdf: 0
+                },
+                guardandoDatosComercio: false,
+                mensajeDatosComercio: '',
+                mensajeTipoDatosComercio: 'success',
                 instruccionesPaso2: [
                     {
                         paso: 1,
@@ -603,6 +662,10 @@
                     })
                     .then(response => {
                         this.cuit = response.data.cuit || '';
+                        this.comercio.cuit = response.data.cuit || '';
+                        this.comercio.iibb = response.data.iibb || '';
+                        this.comercio.inicio_actividades = response.data.inicio_actividades || '';
+                        this.comercio.tdf = response.data.tdf !== undefined ? response.data.tdf : 0;
                     })
                     .catch(error => {
                         console.log(error);
@@ -613,6 +676,46 @@
             },
             irAConfiguracion() {
                 this.$router.push({ name: "configuracion" });
+            },
+
+            guardarDatosComercio() {
+                // Validar que estén todos los campos completos
+                if (!this.comercio.cuit || !this.comercio.iibb || !this.comercio.inicio_actividades || this.comercio.tdf === undefined) {
+                    this.mensajeDatosComercio = 'Todos los campos son obligatorios';
+                    this.mensajeTipoDatosComercio = 'error';
+                    return;
+                }
+
+                this.guardandoDatosComercio = true;
+                this.mensajeDatosComercio = '';
+
+                let datos = new FormData();
+                datos.append('cuit', this.comercio.cuit);
+                datos.append('iibb', this.comercio.iibb);
+                datos.append('inicio_actividades', this.comercio.inicio_actividades);
+                datos.append('tdf', this.comercio.tdf);
+
+                axios.post(this.url + '/' + this.usuario.tpv + '/comercio/actualizar', datos, {
+                    headers: {
+                        Authorization: this.usuario.token
+                    }
+                })
+                    .then(response => {
+                        this.mensajeDatosComercio = 'Datos del comercio guardados correctamente';
+                        this.mensajeTipoDatosComercio = 'success';
+                        // Actualizar el cuit también en la variable local
+                        this.cuit = this.comercio.cuit;
+                        this.$swal('Guardado', 'Los datos del comercio han sido guardados', 'success');
+                    })
+                    .catch(error => {
+                        this.mensajeDatosComercio = 'Error al guardar los datos: ' + (error.response?.data?.message || error.message);
+                        this.mensajeTipoDatosComercio = 'error';
+                        this.$swal('Error', 'Ha ocurrido un error al guardar los datos', 'error');
+                        console.log(error);
+                    })
+                    .finally(() => {
+                        this.guardandoDatosComercio = false;
+                    });
             },
 
             // Métodos para modal de imágenes
@@ -637,6 +740,10 @@
             },
             puntoVenta() {
                 this.credencialesGuardadas = false;
+            },
+            'comercio.cuit'() {
+                // Sincronizar el CUIT del comercio con el del paso 1
+                this.cuit = this.comercio.cuit;
             }
         },
         computed: {

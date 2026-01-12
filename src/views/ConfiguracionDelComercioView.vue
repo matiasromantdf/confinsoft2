@@ -24,6 +24,12 @@
                                     type="number"></v-text-field>
                             </v-col>
                             <v-col cols="12" md="4">
+                                <v-select v-model="comercio.tdf"
+                                    :items="[{ title: 'Sí', value: 1 }, { title: 'No', value: 0 }]"
+                                    label="Tierra del Fuego" item-title="title" item-value="value"
+                                    variant="outlined"></v-select>
+                            </v-col>
+                            <v-col cols="12" md="4">
                                 <v-text-field v-model="comercio.direccion" label="Dirección"
                                     variant="outlined"></v-text-field>
                             </v-col>
@@ -48,12 +54,6 @@
                             <v-col cols="12" md="4">
                                 <v-text-field v-model="comercio.inicio_actividades" label="Inicio de actividades"
                                     variant="outlined" type="date"></v-text-field>
-                            </v-col>
-                            <v-col cols="12" md="4">
-                                <v-select v-model="comercio.tdf"
-                                    :items="[{ title: 'Sí', value: 1 }, { title: 'No', value: 0 }]"
-                                    label="Tierra del Fuego" item-title="title" item-value="value"
-                                    variant="outlined"></v-select>
                             </v-col>
                             <v-col cols="12" md="6">
                                 <v-select v-model="comercio.impresion" :items="modosDeImpresion"
