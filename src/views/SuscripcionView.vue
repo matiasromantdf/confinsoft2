@@ -82,28 +82,72 @@
                         </v-card-text>
                         <v-card-actions>
                             <v-container>
-                                <v-row justify="center">
-                                    <v-col cols="12" md="8" class="text-center">
+                                <v-row justify="center" class="text-center">
+                                    <v-col cols="12" md="6" class="text-center">
+                                        <!-- Botón 1 mes -->
                                         <v-btn color="primary" size="large" variant="elevated" :loading="cargandoPago"
-                                            :disabled="cargandoPago" @click="test" prepend-icon="mdi-credit-card"
-                                            class="mb-3">
+                                            :disabled="cargandoPago" @click="pagarSuscripcion(1)"
+                                            prepend-icon="mdi-credit-card" block>
                                             <template v-if="cargandoPago">
                                                 Preparando pago...
                                             </template>
                                             <template v-else>
-                                                Renovar suscripción hasta el {{ proximoVencimiento }}
+                                                <div>
+                                                    <div>Pagar 1 mes</div>
+                                                    <div class="text-caption">ARS$
+                                                        {{ formatearMoneda(usuario.comercio.precio) }}
+                                                    </div>
+                                                </div>
                                             </template>
                                         </v-btn>
-
-                                        <div v-if="cargandoPago" class="text-caption text-medium-emphasis">
-                                            <v-icon size="small" class="mr-1">mdi-loading mdi-spin</v-icon>
-                                            Conectando con MercadoPago, por favor espera...
-                                        </div>
-
-                                        <div v-else class="text-caption text-medium-emphasis">
-                                            Al hacer clic se abrirá la pasarela de pago de MercadoPago
+                                    </v-col>
+                                    <v-col cols="12" md="6" class="text-center">
+                                        <!-- Botón 3 meses con badge -->
+                                        <div class="position-relative d-inline-block" style="width: 100%;">
+                                            <v-chip color="black" size="small" class="discount-badge">
+                                                10% descuento
+                                            </v-chip>
+                                            <v-btn color="primary" size="large" variant="elevated"
+                                                :loading="cargandoPago" :disabled="cargandoPago"
+                                                @click="pagarSuscripcion(3)" prepend-icon="mdi-credit-card-multiple"
+                                                block>
+                                                <template v-if="cargandoPago">
+                                                    Preparando pago...
+                                                </template>
+                                                <template v-else>
+                                                    <div>
+                                                        <div>Pagar 3 meses</div>
+                                                        <div class="text-caption">
+                                                            <span class="text-decoration-line-through">ARS$
+                                                                {{ formatearMoneda(usuario.comercio.precio * 3) }}</span>
+                                                            <span class="ml-2 font-weight-bold">ARS$
+                                                                {{ formatearMoneda(usuario.comercio.precio * 3 * 0.9) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </v-btn>
                                         </div>
                                     </v-col>
+
+                                </v-row>
+                                <v-row justify="center" class="mt-3" align="center">
+                                    <div v-if="cargandoPago" class="text-caption text-medium-emphasis">
+                                        <v-icon size="small" class="mr-1">mdi-loading mdi-spin</v-icon>
+                                        Conectando con MercadoPago, por favor espera...
+                                    </div>
+
+                                    <div v-else class="text-caption text-medium-emphasis">
+                                        Al hacer clic se abrirá la pasarela de pago de MercadoPago
+                                    </div>
+
+
+                                </v-row>
+                                <v-row justify="center" align="center">
+                                    <div v-if="periodosSeleccionados" class="mt-3">
+                                        <v-chip color="primary" variant="tonal" prepend-icon="mdi-calendar-check">
+                                            Renovar hasta el {{ proximoVencimiento }}
+                                        </v-chip>
+                                    </div>
                                 </v-row>
 
                                 <!-- Comentado - Débito automático -->
@@ -118,49 +162,49 @@
                             </v-container>
                         </v-card-actions>
                     </v-card>
-                </v-col>
-            </v-row>
-            <!-- Indicación visual para dirigir la atención hacia el brick -->
-            <v-row v-if="walletCreated && !cargandoPago" justify="center" class="my-4">
-                <v-col cols="12" class="text-center">
-                    <v-icon color="primary" size="x-large" style="animation: bounce 2s infinite;">
-                        mdi-arrow-down-circle
-                    </v-icon>
-                    <div class="text-body-2 font-weight-medium text-primary mt-2">
-                        Completa tu pago aquí abajo
-                    </div>
-                </v-col>
-            </v-row>
-
-            <v-row justify="center">
-                <v-col md="8" sm="12">
-                    <!-- El contenedor siempre debe estar presente para que MercadoPago pueda encontrarlo -->
-                    <div id="wallet_container" :style="{ display: cargandoPago ? 'none' : 'block' }"
-                        :class="{ 'wallet-highlight': walletCreated && !cargandoPago }"></div>
-
-                    <!-- Mensaje de carga mientras se prepara el wallet -->
-                    <v-card v-if="cargandoPago" variant="outlined" class="pa-4 text-center">
-                        <v-progress-circular indeterminate color="primary" class="mb-3"></v-progress-circular>
-                        <div class="text-body-2 font-weight-medium mb-2">Preparando pasarela de pago</div>
-                        <div class="text-caption text-medium-emphasis">Conectando con MercadoPago...</div>
-                    </v-card>
-
-                    <!-- Mensaje de confirmación cuando el wallet está listo -->
-                    <v-card v-if="walletCreated && !cargandoPago" variant="outlined" class="mt-4 pa-4" color="success"
-                        style="animation: slideIn 0.5s ease-out;">
-                        <div class="d-flex align-center mb-3">
-                            <v-icon color="success" class="mr-2" size="large">mdi-check-circle</v-icon>
-                            <div>
-                                <div class="text-h6 font-weight-bold text-success">¡Pasarela de pago lista!</div>
+                    <!-- Indicación visual para dirigir la atención hacia el brick -->
+                    <v-row v-if="walletCreated && !cargandoPago" justify="center" class="my-4">
+                        <v-col cols="12" class="text-center">
+                            <v-icon color="primary" size="x-large" style="animation: bounce 2s infinite;">
+                                mdi-arrow-down-circle
+                            </v-icon>
+                            <div class="text-body-2 font-weight-medium text-primary mt-2">
+                                Completa tu pago aquí abajo
                             </div>
-                        </div>
-                        <v-alert type="info" variant="tonal" density="compact" icon="mdi-information-outline">
-                            Una vez completado el pago, tu suscripción se renovará automáticamente.
-                        </v-alert>
-                    </v-card>
+                        </v-col>
+                    </v-row>
+
+                    <v-row justify="center">
+                        <v-col md="8" sm="12">
+                            <!-- El contenedor siempre debe estar presente para que MercadoPago pueda encontrarlo -->
+                            <div id="wallet_container" :style="{ display: cargandoPago ? 'none' : 'block' }"
+                                :class="{ 'wallet-highlight': walletCreated && !cargandoPago }"></div>
+
+                            <!-- Mensaje de carga mientras se prepara el wallet -->
+                            <v-card v-if="cargandoPago" variant="outlined" class="pa-4 text-center">
+                                <v-progress-circular indeterminate color="primary" class="mb-3"></v-progress-circular>
+                                <div class="text-body-2 font-weight-medium mb-2">Preparando pasarela de pago</div>
+                                <div class="text-caption text-medium-emphasis">Conectando con MercadoPago...</div>
+                            </v-card>
+
+                            <!-- Mensaje de confirmación cuando el wallet está listo -->
+                            <v-card v-if="walletCreated && !cargandoPago" variant="outlined" class="mt-4 pa-4"
+                                color="success" style="animation: slideIn 0.5s ease-out;">
+                                <div class="d-flex align-center mb-3">
+                                    <v-icon color="success" class="mr-2" size="large">mdi-check-circle</v-icon>
+                                    <div>
+                                        <div class="text-h6 font-weight-bold text-success">¡Pasarela de pago lista!
+                                        </div>
+                                    </div>
+                                </div>
+                                <v-alert type="info" variant="tonal" density="compact" icon="mdi-information-outline">
+                                    Una vez completado el pago, tu suscripción se renovará automáticamente.
+                                </v-alert>
+                            </v-card>
+                        </v-col>
+                    </v-row>
                 </v-col>
             </v-row>
-
         </v-container>
     </div>
 </template>
@@ -179,6 +223,7 @@
                 cargandoText: 'cargando suscripción...',
                 suscripcion: {},
                 walletCreated: false,
+                periodosSeleccionados: 0,
             }
         },
         setup() {
@@ -188,10 +233,12 @@
         mounted() {
         },
         methods: {
-            test() {
+            pagarSuscripcion(periodos) {
                 this.cargandoPago = true;
+                this.periodosSeleccionados = periodos;
                 let data = {
-                    tpv: this.usuario.tpv
+                    tpv: this.usuario.tpv,
+                    periodos: periodos
                 }
                 axios.post(this.url + '/' + this.usuario.tpv + '/comercio/pagarSuscripcion', data, {
                     headers: {
@@ -259,12 +306,11 @@
         },
         computed: {
             proximoVencimiento() {
-                // let date = new Date(this.usuario.comercio.vencimiento);
-                // //sumar 30 dias
-                // date.setDate(date.getDate() + 30);
-                // return date.toLocaleDateString();
+                if (!this.periodosSeleccionados) {
+                    return '';
+                }
                 let fechaVencimiento = new Date(this.usuario.comercio.vencimiento);
-                fechaVencimiento.setMonth(fechaVencimiento.getMonth() + 1);
+                fechaVencimiento.setMonth(fechaVencimiento.getMonth() + this.periodosSeleccionados);
                 return fechaVencimiento.toLocaleDateString();
             }
         }
@@ -335,5 +381,22 @@
         bottom: -2px;
         border-radius: 8px;
         animation: pulse 2s infinite;
+    }
+
+    .gap-4 {
+        gap: 1rem;
+    }
+
+    .discount-badge {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        z-index: 2;
+        font-size: 0.7rem;
+        background-color: #ff4081;
+    }
+
+    .position-relative {
+        position: relative;
     }
 </style>
