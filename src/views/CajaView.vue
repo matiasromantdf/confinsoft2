@@ -50,7 +50,7 @@
                                 </template>
                                 <template v-slot:item.total="{ item }">
                                     <span class="font-weight-bold text-success">${{ formatearMoneda(item.total)
-                                    }}</span>
+                                        }}</span>
                                 </template>
                                 <template v-slot:item.medios_de_pago="{ item }">
                                     <div v-if="item.medios_de_pago && item.medios_de_pago.length > 0">
@@ -161,6 +161,7 @@
                 });
             },
             verUltimasCajas() {
+                if (this.usuario.rol != 1) return;
                 axios.get(this.url + '/' + this.usuario.tpv + '/cajas/ultimas', {
                     headers: {
                         Authorization: this.usuario.token
@@ -185,9 +186,7 @@
         },
         mounted() {
             this.getCaja();
-            if (usuario.rol == 1) {
-                this.verUltimasCajas();
-            }
+            this.verUltimasCajas();
         },
 
 
