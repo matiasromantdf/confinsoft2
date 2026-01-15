@@ -56,13 +56,13 @@
                         @click="$router.push('/facturas')" v-if="usuario.rol == 1"></v-list-item>
                     <v-list-item title="IVA Ventas" prepend-icon="mdi-file-document-outline" value="iva-ventas"
                         @click="$router.push('/iva-ventas')" v-if="usuario.rol == 1"></v-list-item>
-                    <v-list-item title="Historico Ventas" prepend-icon="mdi-calendar-month-outline"
+                    <v-list-item title="Historial Ventas" prepend-icon="mdi-calendar-month-outline"
                         value="listar-ventas" @click="$router.push('/historial-de-ventas')"
                         v-if="usuario.rol == 1"></v-list-item>
                     <v-list-item title="Comisiones" prepend-icon="mdi-chart-pie" value="comisiones"
                         @click="$router.push('/reporte-de-comisiones')"
                         v-if="usuario.comercioTiene('comisiones') && usuario.rol == 1"></v-list-item>
-                    <v-list-item title="Ventas totales" prepend-icon="mdi-sigma" value="ventas-totales"
+                    <v-list-item title="Por Medios de pago" prepend-icon="mdi-sigma" value="ventas-totales"
                         @click="$router.push('/ventas-totales')" v-if="usuario.rol == 1"></v-list-item>
                     <v-list-item title="Por artículo" prepend-icon="mdi-shopping-outline" value="ventas-articulos"
                         @click="$router.push('/ventas-por-articulo')" v-if="usuario.rol == 1"></v-list-item>

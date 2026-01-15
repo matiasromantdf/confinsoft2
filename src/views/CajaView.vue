@@ -41,7 +41,7 @@
                     <v-card title="últimas cajas" v-if="usuario.rol == 1">
                         <v-card-text>
                             <v-data-table :headers="headers" :items="cajasAnteriores" :items-per-page="5" class=""
-                                no-data-text="sin datos...">
+                                no-data-text="sin datos..." :items-per-page-text="'Filas'">
                                 <template v-slot:item.fecha_apertura="{ item }">
                                     {{ fechaConvertida(item.fecha_apertura) }}
                                 </template>
@@ -51,6 +51,15 @@
                                 <template v-slot:item.total="{ item }">
                                     <span class="font-weight-bold text-success">${{ formatearMoneda(item.total)
                                     }}</span>
+                                </template>
+                                <template v-slot:item.medios_de_pago="{ item }">
+                                    <div v-if="item.medios_de_pago && item.medios_de_pago.length > 0">
+                                        <div v-for="(medio, index) in item.medios_de_pago" :key="index"
+                                            class="text-caption">
+                                            <strong>{{ medio.nombre }}:</strong> ${{ formatearMoneda(medio.monto) }}
+                                        </div>
+                                    </div>
+                                    <span v-else class="text-caption text-grey">Sin datos</span>
                                 </template>
                                 <template v-slot:item.fecha_cierre="{ item }">
                                     {{ fechaConvertida(item.fecha_cierre) }}
@@ -82,6 +91,7 @@
                     { title: 'Apertura', value: 'fecha_apertura' },
                     { title: 'Ventas', value: 'ventas' },
                     { title: 'Total', value: 'total' },
+                    { title: 'Medios de Pago', value: 'medios_de_pago' },
                     { title: 'Cierre', value: 'fecha_cierre' },
                 ]
 
