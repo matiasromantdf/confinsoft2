@@ -185,7 +185,9 @@
         },
         mounted() {
             this.getCaja();
-            this.verUltimasCajas();
+            if (usuario.rol == 1) {
+                this.verUltimasCajas();
+            }
         },
 
 
