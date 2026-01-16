@@ -124,6 +124,8 @@
                     v-if="usuario.comercioTiene('/comisiones')"></v-list-item>
                 <v-list-item title="Gráficos" value="graficos" @click="$router.push('/graficos')"
                     v-if="usuario.rol == 1"></v-list-item>
+                <v-list-item title="Tutoriales" prepend-icon="mdi-school" value="tutoriales"
+                    @click="$router.push('/tutoriales')"></v-list-item>
 
 
             </v-list>
@@ -157,7 +159,8 @@
             //     window.open('https://wa.me/5492901520850?text=Hola%20quiero%20información%20de%20ConFin%20Soft', '_blank');
             // }
             sendMail() {
-                window.location.href = 'mailto:confinsoft@gmail.com';
+                //enviar un mail con asunto "Consulta sobre CajaPro" y cuerpo "Hola, necesito ayuda con..."
+                window.location.href = 'mailto:confinsoft@gmail.com?subject=Consulta%20sobre%20CajaPro&body=Hola,%20necesito%20ayuda%20con...';
             }
         }
 
