@@ -209,7 +209,7 @@
 
                                     <template v-slot:item.precio="{ item }">
                                         <span class="font-weight-medium">${{ parseFloat(item.precio).toFixed(2)
-                                            }}</span>
+                                        }}</span>
                                     </template>
 
 
@@ -250,7 +250,7 @@
                                         v-if="parseFloat(calcularDescuentosDetalle()) > 0">
                                         <span>Descuentos por item:</span>
                                         <span class="font-weight-medium text-orange">-${{ calcularDescuentosDetalle()
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <div class="d-flex justify-space-between mb-2"
                                         v-if="parseFloat(ventaSeleccionada?.descuento || 0) > 0">
@@ -300,7 +300,7 @@
                 cabeceras: [
                     { title: 'Numero', key: 'numero', value: 'numero' },
                     { title: 'Fecha', key: 'fecha', value: item => this.formatearFecha(item.created_at) },
-                    { title: 'Monto', key: 'monto', value: item => item.monto },
+                    { title: 'Bruto', key: 'monto', value: item => item.monto },
                     { title: 'Recargo Financ.', key: 'recargo', value: item => item.recargo },
                     { title: 'Descuento', key: 'descuento', value: 'descuento' },
                     { title: 'Cliente', key: 'cliente', value: item => item.cliente.nombre },
