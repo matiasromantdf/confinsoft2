@@ -14,6 +14,8 @@
 
                                     <v-btn @click="dialogoNuevo = true" prepend-icon="mdi-plus" class="mr-4 border"
                                         tonal color="primary" v-if="usuario.rol == 1">Nuevo</v-btn>
+                                    <v-btn v-if="usuario.rol == 1" @click="exportarAExcel" prepend-icon="mdi-file-excel"
+                                        class="mr-4 border" tonal color="success">Exportar Excel</v-btn>
                                     <NuevoArticuloComponent v-if="dialogoNuevo" @cerrar-modal="dialogoNuevo = false"
                                         @actualizar-articulos="getArticulos" />
                                     <v-spacer></v-spacer>
@@ -72,6 +74,7 @@
     import NuevoArticuloComponent from '../components/NuevoArticuloComponent.vue';
     import EditarArticuloComponent from '@/components/EditarArticuloComponent.vue';
     import swal from 'sweetalert2';
+    import * as XLSX from 'xlsx';
     export default {
         data() {
             return {
@@ -177,6 +180,43 @@
                         this.buscar();
                     }
                 }
+            },
+            exportarAExcel() {
+                // Preparar datos para exportar
+                const datosExportar = this.articulos.map(articulo => ({
+                    'Código': articulo.codigo,
+                    'Nombre': articulo.descripcion,
+                    'Precio': articulo.precio,
+                    'Costo': articulo.costo,
+                    'Stock': articulo.stock,
+                    'Tipo': articulo.es_producto == 1 ? 'Producto' : 'Artículo',
+                    'Categoría': articulo.categoria ? articulo.categoria.nombre : ''
+                }));
+
+                // Crear libro de trabajo
+                const worksheet = XLSX.utils.json_to_sheet(datosExportar);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Artículos');
+
+                // Ajustar ancho de columnas
+                const columnWidths = [
+                    { wch: 10 },  // Código
+                    { wch: 30 },  // Nombre
+                    { wch: 10 },  // Precio
+                    { wch: 10 },  // Comisión
+                    { wch: 10 },  // Costo
+                    { wch: 10 },  // Stock
+                    { wch: 12 },  // Tipo
+                    { wch: 20 }   // Categoría
+                ];
+                worksheet['!cols'] = columnWidths;
+
+                // Generar nombre de archivo con fecha
+                const fecha = new Date().toISOString().split('T')[0];
+                const nombreArchivo = `articulos_${fecha}.xlsx`;
+
+                // Descargar archivo
+                XLSX.writeFile(workbook, nombreArchivo);
             }
         },
         mounted() {
