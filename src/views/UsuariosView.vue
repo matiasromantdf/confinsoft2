@@ -190,6 +190,11 @@
                     email: this.nuevoUsuarioEmail,
                     password: this.nuevoUsuario.password
                 }
+                if (!datos.nombre || !datos.password) {
+                    this.$swal('Error', 'El nombre y la contraseña son obligatorios', 'error');
+                    this.guardandoNuevo = false;
+                    return;
+                }
                 axios.post(this.url + '/' + this.usuario.tpv + '/usuarios/vendedores', datos, {
                     headers: {
                         Authorization: this.usuario.token
