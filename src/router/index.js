@@ -157,6 +157,11 @@ const router = createRouter({
       name: "tutoriales",
       component: () => import("../views/TutorialesView.vue"),
     },
+    {
+      path: "/imprimir-etiquetas",
+      name: "imprimir-etiquetas",
+      component: () => import("../views/ImprimirEtiquetasView.vue"),
+    },
   ],
 });
 router.beforeEach((to, from, next) => {

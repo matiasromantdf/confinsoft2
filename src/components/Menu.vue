@@ -17,6 +17,9 @@
                     </v-list>
 
                 </v-menu>
+                <v-btn icon @click="resetAnuncios" title="Mostrar anuncios">
+                    <v-icon>mdi-bell</v-icon>
+                </v-btn>
                 <v-btn icon>
                     <v-icon @click="sendMail()">mdi-chat-question-outline</v-icon>
                 </v-btn>
@@ -41,6 +44,8 @@
                     </template>
                     <v-list-item title="Articulos" prepend-icon="mdi-view-list" value="listadoArticulos"
                         @click="$router.push('/listado-de-articulos')"></v-list-item>
+                    <v-list-item title="Imprimir etiquetas" prepend-icon="mdi-printer" value="imprimirEtiquetas"
+                        @click="$router.push('/imprimir-etiquetas')"></v-list-item>
                     <v-list-item title="Categorias" prepend-icon="mdi-shape-outline" value="listadoCategorias"
                         @click="$router.push('/listado-de-categorias')" v-if="usuario.rol == 1"></v-list-item>
                 </v-list-group>
@@ -161,6 +166,15 @@
             sendMail() {
                 //enviar un mail con asunto "Consulta sobre CajaPro" y cuerpo "Hola, necesito ayuda con..."
                 window.location.href = 'mailto:confinsoft@gmail.com?subject=Consulta%20sobre%20CajaPro&body=Hola,%20necesito%20ayuda%20con...';
+            },
+            async resetAnuncios() {
+                Object.keys(localStorage)
+                    .filter((key) => key.startsWith('announcementDismissed_'))
+                    .forEach((key) => localStorage.removeItem(key));
+                await this.$router.push('/');
+                setTimeout(() => {
+                    window.dispatchEvent(new Event('announcements:reset'));
+                }, 100);
             }
         }
 

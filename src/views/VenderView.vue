@@ -227,6 +227,21 @@
           @cerrarModalPagos="modalRegistroVenta = false" :variacion="variacion" @venta-registrada="reinicializar()"
           :comprobantes="comprobantes" :comisionistas="comisionistas" />
       </transition>
+
+      <v-dialog v-model="mostrarAnuncio" max-width="520" persistent>
+        <v-card>
+          <v-card-title>{{ anuncioActual ? anuncioActual.titulo : '' }}</v-card-title>
+          <v-card-text>
+            <div v-if="anuncioActual" v-html="anuncioActual.mensaje"></div>
+            <v-checkbox v-model="noMostrarAnuncio" label="No mostrar mas"></v-checkbox>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn variant="text" @click="cerrarAnuncio">Cerrar</v-btn>
+            <v-btn color="primary" v-if="hayMasAnuncios" @click="siguienteAnuncio">Siguiente</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
@@ -281,6 +296,19 @@
         comprobantes: [],
         comisionistas: [],
         hideHelp: localStorage.getItem('hideHelpVenderView') === 'true' ? true : false,
+        mostrarAnuncio: false,
+        noMostrarAnuncio: false,
+        anuncioIndex: 0,
+        anuncios: [
+          {
+            id: 1,
+            titulo: '🎇 Nueva funcionalidad!',
+            mensaje: '<b>Ahora podés imprimir etiquetas!!</b> <br>Dentro del menú, en "Articulos" vas a ver un submenú "imprimir etiquetas". ¡Probalo y ahorrá tiempo en el etiquetado en góndola!',
+            created_at: '2026-02-15T00:00:00Z',
+            updated_at: '2026-02-15T00:00:00Z',
+            expires_at: '2026-03-15T23:59:59Z'
+          }
+        ]
 
 
       };
@@ -608,6 +636,42 @@
         localStorage.setItem('hideHelpVenderView', 'true');
         this.hideHelp = true;
       },
+      estaDismissed(id) {
+        return localStorage.getItem(`announcementDismissed_${id}`) === 'true';
+      },
+      dismissAnuncio(id) {
+        localStorage.setItem(`announcementDismissed_${id}`, 'true');
+      },
+      iniciarAnuncios() {
+        this.anuncioIndex = 0;
+        if (this.anunciosActivos.length > 0) {
+          this.mostrarAnuncio = true;
+          this.noMostrarAnuncio = false;
+        }
+      },
+      cerrarAnuncio() {
+        const actual = this.anuncioActual;
+        if (actual && this.noMostrarAnuncio) {
+          this.dismissAnuncio(actual.id);
+        }
+        this.noMostrarAnuncio = false;
+        if (this.hayMasAnuncios) {
+          this.anuncioIndex += 1;
+          this.mostrarAnuncio = true;
+        } else {
+          this.mostrarAnuncio = false;
+        }
+      },
+      siguienteAnuncio() {
+        this.noMostrarAnuncio = false;
+        if (this.hayMasAnuncios) {
+          this.anuncioIndex += 1;
+          this.mostrarAnuncio = true;
+        }
+      },
+      onAnunciosReset() {
+        this.iniciarAnuncios();
+      },
       buscarCodigoIVA() {
         let url = this.url + '/' + this.usuario.tpv + '/facturas/consultarCondicionIvaReceptor';
         let data = {
@@ -669,6 +733,13 @@
       if (!this.hideHelp) {
         this.mostrarAyuda();
       }
+      setTimeout(() => {
+        this.iniciarAnuncios();
+      }, 300);
+      window.addEventListener('announcements:reset', this.onAnunciosReset);
+    },
+    beforeUnmount() {
+      window.removeEventListener('announcements:reset', this.onAnunciosReset);
     },
     setup() {
       const usuario = useUserStore();
@@ -677,6 +748,25 @@
       }
     },
     computed: {
+      anunciosActivos() {
+        const ahora = new Date();
+        return this.anuncios.filter((anuncio) => {
+          if (this.estaDismissed(anuncio.id)) {
+            return false;
+          }
+          if (!anuncio.expires_at) {
+            return true;
+          }
+          const expira = new Date(anuncio.expires_at);
+          return expira.getTime() >= ahora.getTime();
+        });
+      },
+      anuncioActual() {
+        return this.anunciosActivos[this.anuncioIndex] || null;
+      },
+      hayMasAnuncios() {
+        return this.anuncioIndex < this.anunciosActivos.length - 1;
+      },
       total() {
         let total = 0;
         this.detalle.forEach(item => {
