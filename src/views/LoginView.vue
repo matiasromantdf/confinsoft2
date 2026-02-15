@@ -32,6 +32,9 @@
                         <v-spacer></v-spacer>
                         <v-btn text @click.prevent="recuperarPass()">Olvide mi contraseña</v-btn>
                     </v-card-actions>
+                    <v-btn @click="enviarAyuda" title="Enviar email de ayuda" color="primary" variant="text">
+                        <v-icon>mdi-help-circle-outline</v-icon> Ayuda
+                    </v-btn>
                 </v-card>
             </v-col>
         </v-row>
@@ -130,6 +133,9 @@
             },
             recuperarPass() {
                 this.$router.push('/reset-pass');
+            },
+            enviarAyuda() {
+                window.location.href = 'mailto:confinsoft@gmail.com?subject=Ayuda%20CajaPro&body=Hola%20necesito%20ayuda%20con%20CajaPro';
             }
         },
         setup() {
