@@ -20,9 +20,6 @@
                 <v-btn icon @click="resetAnuncios" title="Mostrar anuncios">
                     <v-icon>mdi-bell</v-icon>
                 </v-btn>
-                <v-btn icon>
-                    <v-icon @click="sendMail()">mdi-chat-question-outline</v-icon>
-                </v-btn>
             </template>
         </v-app-bar>
 
@@ -129,9 +126,17 @@
                     v-if="usuario.comercioTiene('/comisiones')"></v-list-item>
                 <v-list-item title="Gráficos" value="graficos" @click="$router.push('/graficos')"
                     v-if="usuario.rol == 1"></v-list-item>
-                <v-list-item title="Tutoriales" prepend-icon="mdi-school" value="tutoriales"
-                    @click="$router.push('/tutoriales')"></v-list-item>
 
+                <v-list-group value="Ayuda">
+                    <template v-slot:activator="{ props }">
+                        <v-list-item v-bind="props" prepend-icon="mdi-help-circle-outline" title="Ayuda"></v-list-item>
+                    </template>
+                    <v-list-item title="Contacto" prepend-icon="mdi-email-outline" value="contacto"
+                        @click="$router.push('/contacto')"></v-list-item>
+                    <v-list-item title="Tutoriales" prepend-icon="mdi-school" value="tutoriales"
+                        @click="$router.push('/tutoriales')"></v-list-item>
+
+                </v-list-group>
 
             </v-list>
 
