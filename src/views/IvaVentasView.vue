@@ -61,6 +61,9 @@
                                     <template v-slot:item.numero_completo="{ item }">
                                         {{ item.numero_completo }}
                                     </template>
+                                    <template v-slot:item.fact_relacionada="{ item }">
+                                        {{ item.fact_relacionada || '-' }}
+                                    </template>
                                     <template v-slot:item.neto_gravado_21="{ item }">
                                         {{ formatear(item.neto_gravado_21) }}
                                     </template>
@@ -198,6 +201,7 @@
                     { title: 'N° Comprobante', value: 'numero_completo', sortable: false },
                     { title: 'Cliente', value: 'cliente_nombre', sortable: true },
                     { title: 'DNI/CUIT', value: 'cliente_dni', sortable: false },
+                    { title: 'Fact. Relacionada', value: 'fact_relacionada', sortable: true },
                     { title: 'Neto 21%', value: 'neto_gravado_21', sortable: true },
                     { title: 'IVA 21%', value: 'iva_21', sortable: true },
                     { title: 'Neto 10.5%', value: 'neto_gravado_10_5', sortable: true },
