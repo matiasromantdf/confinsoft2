@@ -209,7 +209,7 @@
 
                                     <template v-slot:item.precio="{ item }">
                                         <span class="font-weight-medium">${{ parseFloat(item.precio).toFixed(2)
-                                        }}</span>
+                                            }}</span>
                                     </template>
 
 
@@ -250,7 +250,7 @@
                                         v-if="parseFloat(calcularDescuentosDetalle()) > 0">
                                         <span>Descuentos por item:</span>
                                         <span class="font-weight-medium text-orange">-${{ calcularDescuentosDetalle()
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <div class="d-flex justify-space-between mb-2"
                                         v-if="parseFloat(ventaSeleccionada?.descuento || 0) > 0">
@@ -534,7 +534,7 @@
             eliminarVenta(item) {
                 this.$swal({
                     title: '¿Estás seguro?',
-                    text: "Se eliminará la venta #" + item.numero,
+                    text: "Se eliminará la venta #" + item.numero + " y se generará una nota de crédito si tiene factura. Esta acción no se puede deshacer.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
