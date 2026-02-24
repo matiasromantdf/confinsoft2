@@ -554,6 +554,21 @@
                                 'La venta se ha eliminado correctamente',
                                 'success'
                             );
+                            //si la venta tiene factura, también eliminar la factura
+                            if (item.factura) {
+                                axios.post(this.url + '/' + this.usuario.tpv + '/notasCredito/generar', {
+                                    venta_id: item.id
+                                }, {
+                                    headers: {
+                                        Authorization: this.usuario.token
+                                    }
+                                })
+                                    .then(response => {
+                                        console.log('Nota de crédito generada por eliminación de venta');
+                                    }).catch(error => {
+                                        console.log(error);
+                                    });
+                            }
                             this.getVentas();
                         }).catch(error => {
                             console.log(error);

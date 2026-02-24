@@ -84,16 +84,29 @@
 
                             <!-- Slot para acciones -->
                             <template v-slot:item.acciones="{ item }">
-                                <v-btn icon size="small" color="primary" @click="verFactura(item)"
-                                    :title="`Ver factura N° ${String(item.factura?.numero_factura).padStart(8, '0')}`"
-                                    class="mr-1">
-                                    <v-icon>mdi-eye</v-icon>
-                                </v-btn>
-                                <v-btn v-if="!item.factura?.nota_de_credito" icon size="small" color="warning"
-                                    @click="generarNotaCredito(item)"
-                                    :title="`Generar nota de crédito para factura N° ${String(item.factura?.numero_factura).padStart(8, '0')}`">
-                                    <v-icon>mdi-file-document-minus</v-icon>
-                                </v-btn>
+                                <v-menu location="bottom end">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn v-bind="props" icon size="small" color="primary"
+                                            :title="`Acciones factura N° ${String(item.factura?.numero_factura).padStart(8, '0')}`">
+                                            <v-icon>mdi-dots-vertical</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <v-list density="compact">
+                                        <v-list-item @click="verFactura(item)">
+                                            <template v-slot:prepend>
+                                                <v-icon>mdi-eye</v-icon>
+                                            </template>
+                                            <v-list-item-title>Ver factura</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item v-if="!item.factura?.nota_de_credito"
+                                            @click="generarNotaCredito(item)">
+                                            <template v-slot:prepend>
+                                                <v-icon>mdi-file-document-minus</v-icon>
+                                            </template>
+                                            <v-list-item-title>Generar nota de credito</v-list-item-title>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
                             </template> </v-data-table>
 
                         <v-row class="mt-4" justify="end">
@@ -281,9 +294,10 @@
                 });
             },
             generarNotaCredito(item) {
+                console.log('Generar nota de crédito para factura:', item);
                 this.$swal({
                     title: '¿Generar nota de crédito?',
-                    text: `Se generará una nota de crédito para la factura N° ${String(item.factura?.numero_factura).padStart(8, '0')}. Esta acción no se puede deshacer.`,
+                    text: `Se generará una nota de crédito para la factura N° ${String(item.factura?.numero_factura).padStart(8, '0')} y anulación de la venta. Esta acción no se puede deshacer.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#f57c00',
@@ -293,7 +307,6 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         this.loading = true;
-
                         axios.post(this.url + '/' + this.usuario.tpv + '/notasCredito/generar', {
                             venta_id: item.id
                         }, {
@@ -301,6 +314,14 @@
                                 Authorization: this.usuario.token
                             }
                         }).then(response => {
+                            //hacer rollback de la venta original, para que no quede como facturada
+
+                            axios.post(this.url + '/' + this.usuario.tpv + '/ventas/rollback/' + item.id, {}, {
+                                headers: {
+                                    Authorization: this.usuario.token
+                                }
+                            });
+
                             this.$swal(
                                 'Nota de crédito generada',
                                 `Se ha generado exitosamente la nota de crédito para la factura N° ${String(item.factura?.numero_factura).padStart(8, '0')}`,
