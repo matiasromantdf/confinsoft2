@@ -73,6 +73,15 @@
 
                 </v-list-group>
 
+                <v-list-group value="Graficos" v-if="usuario.rol == 1">
+                    <template v-slot:activator="{ props }">
+                        <v-list-item v-bind="props" prepend-icon="" title="Gráficos"></v-list-item>
+                    </template>
+                    <v-list-item title="Ventas diarias" prepend-icon="mdi-chart-line" value="ventas-diarias"
+                        @click="$router.push('/graficos')"></v-list-item>
+                    <v-list-item title="Por categoría" prepend-icon="mdi-shape-outline" value="ventas-categorias"
+                        @click="$router.push('/ventas-por-categoria')"></v-list-item>
+                </v-list-group>
 
                 <v-list-group value="Compras" v-if="usuario.rol == 1">
                     <template v-slot:activator="{ props }">
@@ -124,8 +133,6 @@
                 <v-list-item title="Barberos" value="listadoComisionistas"
                     @click="$router.push('/listado-de-comisionistas')"
                     v-if="usuario.comercioTiene('/comisiones')"></v-list-item>
-                <v-list-item title="Gráficos" value="graficos" @click="$router.push('/graficos')"
-                    v-if="usuario.rol == 1"></v-list-item>
 
                 <v-list-group value="Ayuda">
                     <template v-slot:activator="{ props }">
