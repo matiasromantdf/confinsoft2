@@ -98,6 +98,11 @@ const router = createRouter({
       component: () => import("../views/VentasPorCategoriaView.vue"),
     },
     {
+      path: "/admin/usuarios-activos",
+      name: "admin-usuarios-activos",
+      component: () => import("../views/AdminUsuariosActivosView.vue"),
+    },
+    {
       path: "/configuracion",
       name: "configuracion",
       component: () => import("../views/ConfiguracionDelComercioView.vue"),
