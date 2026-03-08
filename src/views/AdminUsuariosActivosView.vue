@@ -25,8 +25,16 @@
 
                         <v-row v-if="usuariosActivos && usuariosActivos.length > 0" class="mt-4">
                             <v-col cols="12">
-                                <v-data-table :headers="headers" :items="usuariosActivos" :items-per-page="20"
-                                    items-per-page-text="Filas por página" no-data-text="Sin datos" class="elevation-1">
+                                <v-data-table 
+                                    :headers="headers" 
+                                    :items="usuariosActivos" 
+                                    :items-per-page="20"
+                                    items-per-page-text="Filas por página" 
+                                    no-data-text="Sin datos" 
+                                    class="elevation-1"
+                                    fixed-header
+                                    height="600"
+                                >
                                     <template #item.ultima_venta="{ item }">
                                         {{ formatearFechaHora(item.ultima_venta) }}
                                     </template>
