@@ -89,6 +89,9 @@
                     </template>
                     <v-list-item title="Ver usuarios activos" prepend-icon="mdi-account-check-outline"
                         value="admin-usuarios-activos" @click="$router.push('/admin/usuarios-activos')"></v-list-item>
+                    <v-list-item title="Usuarios registrados" prepend-icon="mdi-account-plus-outline"
+                        value="admin-usuarios-registrados"
+                        @click="$router.push('/admin/usuarios-registrados')"></v-list-item>
                 </v-list-group>
 
                 <v-list-group value="Compras" v-if="usuario.rol == 1">

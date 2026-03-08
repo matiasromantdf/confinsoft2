@@ -103,6 +103,11 @@ const router = createRouter({
       component: () => import("../views/AdminUsuariosActivosView.vue"),
     },
     {
+      path: "/admin/usuarios-registrados",
+      name: "admin-usuarios-registrados",
+      component: () => import("../views/AdminUsuariosRegistradosView.vue"),
+    },
+    {
       path: "/configuracion",
       name: "configuracion",
       component: () => import("../views/ConfiguracionDelComercioView.vue"),
