@@ -144,8 +144,8 @@
         },
         mounted() {
             if (import.meta.env.MODE == 'development') {
-                this.username = 'prueba';
-                this.password = 'prueba';
+                this.username = 'mroman.tdf@gmail.com';
+                this.password = '';
             }
         }
     }

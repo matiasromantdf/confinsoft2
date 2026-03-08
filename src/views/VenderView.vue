@@ -40,9 +40,10 @@
                             <v-text-field label="Buscar" v-model="search" append-icon="mdi-magnify" single-line
                               hide-details variant="outlined" @click:append="buscarArticulos"
                               @keyup="buscarArticulos($event)" ref="inputBuscarArticulo"></v-text-field>
-                            <v-data-table :headers="headers" :items="articulos" item-key="codigo" :loading="cargando"
-                              no-data-text="No se encontraron artículos" items-per-page-text="Artículos por página"
-                              :hover=true loading-text="cargando artículos...">
+                            <v-data-table :headers="headers" :items="articulosFiltrados" item-key="codigo"
+                              :loading="cargando" no-data-text="No se encontraron artículos"
+                              items-per-page-text="Artículos por página" :hover=true
+                              loading-text="cargando artículos...">
                               <template v-slot:item="{ item, props }">
                                 <tr v-bind="props" @click="seleccionarArticulo(item)" style="cursor:pointer;">
                                   <td>{{ item.codigo }}</td>
@@ -292,6 +293,7 @@
           { title: 'Acciones', value: 'actions', sortable: false },
         ],
         articulos: [],
+        articulosFiltrados: [],
         cargando: false,
         comprobantes: [],
         comisionistas: [],
@@ -314,20 +316,35 @@
       };
     },
     methods: {
-      buscarArticulos() {
-        if (this.search.length < 3) {
-          return;
-        }
+      cargarArticulos() {
         this.cargando = true;
-        axios.get(this.url + '/' + this.usuario.tpv + '/articulos/buscar/' + this.search,
-          { headers: { Authorization: this.usuario.token } })
+        axios.get(this.url + '/' + this.usuario.tpv + '/articulos', { headers: { Authorization: this.usuario.token } })
           .then(response => {
-            this.articulos = response.data.data;
+            this.articulos = response.data;
+            this.articulosFiltrados = response.data;
           })
           .catch(error => {
             console.log(error);
           })
           .finally(() => this.cargando = false);
+      },
+      buscarArticulos() {
+        if (this.search.length < 1) {
+          return;
+        }
+        this.cargando = true;
+        //filtrar el array de articulos por codigo o descripcion que contenga el string de busqueda
+        this.articulosFiltrados = this.articulos.filter(a => a.codigo.includes(this.search) || a.descripcion.toLowerCase().includes(this.search.toLowerCase()));
+        // axios.get(this.url + '/' + this.usuario.tpv + '/articulos/buscar/' + this.search,
+        //   { headers: { Authorization: this.usuario.token } })
+        //   .then(response => {
+        //     this.articulos = response.data.data;
+        //   })
+        //   .catch(error => {
+        //     console.log(error);
+        //   })
+        //   .finally(() => this.cargando = false);
+        this.cargando = false;
       },
       seleccionarArticulo(item) {
         this.articulo.id = item.id;
@@ -340,6 +357,7 @@
         this.articulo.foto = item.foto;
         this.agregarAlDetalle();
         this.modalBusquedaArticulo = false;
+        this.articulosFiltrados = this.articulos;
 
         this.search = '';
         this.$nextTick(() => {
@@ -358,11 +376,11 @@
         });
         return formatoARS.format(valor);
       },
-      async checkEnter(event) {
+      checkEnter(event) {
         if (event.key === 'Enter') {
-          await this.buscarArticulo();
-          this.articulo.cantidad = 1;
-          this.agregarAlDetalle();
+          event.preventDefault();
+          event.stopPropagation();
+          this.buscarArticulo();
         }
       },
       setCliente(cliente) {
@@ -370,83 +388,54 @@
         this.cliente = cliente;
         console.log(this.cliente);
       },
-      async buscarArticulo() {
+      buscarArticulo() {
         if (this.articulo.codigo != '') {
           this.buscandoArticulo = true;
           document.getElementById('codigo').disabled = true;
 
-          axios.get(this.url + '/' + this.usuario.tpv + '/articulos/' + this.articulo.codigo, { headers: { Authorization: this.usuario.token } })
-            .then(response => {
-              if (response.data.codigo == this.articulo.codigo) {
-                this.buscandoArticulo = false;
-                this.articulo.id = response.data.id;
-                this.articulo.codigo = response.data.codigo;
-                this.articulo.descripcion = response.data.descripcion;
-                this.articulo.precio = response.data.precio;
-                this.articulo.stock = response.data.stock;
-                this.articulo.costo = response.data.costo;
-                this.articulo.iva = response.data.iva;
-                this.articulo.foto = response.data.foto;
+          let articuloEncontrado = this.articulos.find(a => a.codigo === this.articulo.codigo);
+          if (articuloEncontrado != undefined) {
+            this.buscandoArticulo = false;
+            this.articulo.id = articuloEncontrado.id;
+            this.articulo.codigo = articuloEncontrado.codigo;
+            this.articulo.descripcion = articuloEncontrado.descripcion;
+            this.articulo.precio = articuloEncontrado.precio;
+            this.articulo.stock = articuloEncontrado.stock;
+            this.articulo.costo = articuloEncontrado.costo;
+            this.articulo.iva = articuloEncontrado.iva;
+            this.articulo.foto = articuloEncontrado.foto;
 
-                let campoCantidad = document.getElementById('campoCantidad');
-                this.agregarAlDetalle();
-                document.getElementById('codigo').disabled = false;
+            let campoCantidad = document.getElementById('campoCantidad');
+            this.agregarAlDetalle();
+            document.getElementById('codigo').disabled = false;
+            document.getElementById('codigo').focus();
+          }
+          else {
+            this.buscandoArticulo = false;
+            document.getElementById('codigo').disabled = false;
+
+            this.$swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'El artículo no existe!',
+              confirmButtonText: 'Aceptar',
+              allowEnterKey: false
+            }).then(() => {
+              this.$nextTick(() => {
                 document.getElementById('codigo').focus();
-              }
-              else {
-                this.$swal.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: 'El artículo no existe!',
-                })
-                this.articulo = {
-                  id: '',
-                  descripcion: '',
-                  precio: '',
-                  stock: '',
-                  costo: '',
-                  cantidad: 1,
-                  codigo: '',
-                };
-
-                // this.$nextTick(() => {
-                //   document.getElementById('codigo').focus();
-                // });
-              }
-            })
-            .catch(error => {
-              console.log(error);
-              this.$swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'El artículo no existe!',
-                confirmButtonText: 'Aceptar',
-                didOpen: () => {
-                  const swalmodal = this.$swal.getPopup();
-                  //hacer foco en el boton de aceptar
-                  swalmodal.querySelector('button').focus();
-
-                },
-                didClose: () => {
-                  document.getElementById('codigo').disabled = false;
-                  document.getElementById('codigo').focus();
-                  this.buscandoArticulo = false;
-                }
-              })
-              this.articulo = {
-                id: '',
-                descripcion: '',
-                precio: '',
-                stock: '',
-                costo: '',
-                cantidad: 1,
-              };
-            })
-            .finally(() => {
-              // document.getElementById('codigo').disabled = false;
-              // document.getElementById('codigo').focus();
-              // this.buscandoArticulo = false;
+              });
             });
+            this.articulo = {
+              id: '',
+              descripcion: '',
+              precio: '',
+              stock: '',
+              costo: '',
+              cantidad: 1,
+              codigo: '',
+            };
+          }
+
 
         }
       },
@@ -507,6 +496,7 @@
 
       },
       reinicializar() {
+        // this.cargarArticulos();
         this.detalle = [];
         this.cliente = {
           id: 0,
@@ -705,6 +695,7 @@
       }
     },
     mounted() {
+      this.cargarArticulos();
       //hacer foco en el campo de codigo
       this.$nextTick(() => {
         document.getElementById('codigo').focus();
