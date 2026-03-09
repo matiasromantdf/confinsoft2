@@ -320,7 +320,7 @@
       async cargarArticulos() {
         this.cargando = true;
         try {
-          const response = await axios.get(this.url + '/' + this.usuario.tpv + '/articulos', { headers: { Authorization: this.usuario.token } });
+          const response = await axios.get(this.url + '/' + this.usuario.tpv + '/articulos-minimal', { headers: { Authorization: this.usuario.token } });
           this.articulos = response.data;
           this.articulosFiltrados = response.data;
           localStorage.setItem(this.claveUltimaCargaArticulos(), new Date().toISOString());
