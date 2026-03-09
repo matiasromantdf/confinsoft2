@@ -33,7 +33,7 @@
             <v-row justify="center" class="mt-4">
                 <v-col md="6" sm="12">
                     <v-card elevation="10">
-                        <v-card-title class="d-flex align-center justify-center bg-green-lighten-3">
+                        <v-card-title class="d-flex align-center" style="color:green">
                             <v-icon class="mr-2">mdi-cash-plus</v-icon>
                             Ingresos a Caja
                         </v-card-title>
@@ -64,7 +64,7 @@
                 </v-col>
                 <v-col md="6" sm="12">
                     <v-card elevation="10">
-                        <v-card-title class="d-flex align-center justify-space-between bg-red-lighten-4">
+                        <v-card-title class="d-flex align-center justify-space-between " style="color:red">
                             <span>
                                 <v-icon class="mr-2">mdi-cash-minus</v-icon>
                                 Egresos de Caja
@@ -84,7 +84,7 @@
                                 </template>
                                 <template v-slot:item.importe="{ item }">
                                     <span class="font-weight-bold text-error">${{ formatearMoneda(item.importe)
-                                        }}</span>
+                                    }}</span>
                                 </template>
                                 <template v-slot:item.detalles="{ item }">
                                     {{ item.detalles || '-' }}
@@ -97,7 +97,8 @@
 
             <v-dialog v-model="dialogEgreso" max-width="520">
                 <v-card>
-                    <v-card-title class="d-flex align-center bg-error">
+                    <v-card-title class="d-flex align-center justify-center" style="color:red">
+
                         <v-icon class="mr-2">mdi-cash-minus</v-icon>
                         Registrar Egreso
                     </v-card-title>
@@ -115,7 +116,7 @@
                         <v-btn variant="text" @click="cerrarModalEgreso" :disabled="guardandoEgreso">
                             Cancelar
                         </v-btn>
-                        <v-btn color="error" @click="guardarEgreso" :loading="guardandoEgreso">
+                        <v-btn color="primary" @click="guardarEgreso" :loading="guardandoEgreso">
                             Guardar
                         </v-btn>
                     </v-card-actions>
@@ -140,7 +141,7 @@
                                 </template>
                                 <template v-slot:item.total="{ item }">
                                     <span class="font-weight-bold text-success">${{ formatearMoneda(item.total)
-                                        }}</span>
+                                    }}</span>
                                 </template>
                                 <template v-slot:item.medios_de_pago="{ item }">
                                     <div v-if="item.medios_de_pago && item.medios_de_pago.length > 0">
@@ -156,7 +157,7 @@
                                 </template>
                                 <template v-slot:item.total_retiros="{ item }">
                                     <span class="font-weight-bold text-error">${{ formatearMoneda(item.total_retiros)
-                                    }}</span>
+                                        }}</span>
                                 </template>
                             </v-data-table>
                         </v-card-text>
