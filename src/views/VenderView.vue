@@ -310,23 +310,74 @@
             updated_at: '2026-02-15T00:00:00Z',
             expires_at: '2026-03-15T23:59:59Z'
           }
-        ]
+        ],
+        articulosSyncIntervalId: null
 
 
       };
     },
     methods: {
-      cargarArticulos() {
+      async cargarArticulos() {
         this.cargando = true;
-        axios.get(this.url + '/' + this.usuario.tpv + '/articulos', { headers: { Authorization: this.usuario.token } })
-          .then(response => {
-            this.articulos = response.data;
-            this.articulosFiltrados = response.data;
-          })
-          .catch(error => {
-            console.log(error);
-          })
-          .finally(() => this.cargando = false);
+        try {
+          const response = await axios.get(this.url + '/' + this.usuario.tpv + '/articulos', { headers: { Authorization: this.usuario.token } });
+          this.articulos = response.data;
+          this.articulosFiltrados = response.data;
+          localStorage.setItem(this.claveUltimaCargaArticulos(), new Date().toISOString());
+        } catch (error) {
+          console.log(error);
+        } finally {
+          this.cargando = false;
+        }
+      },
+      claveUltimaCargaArticulos() {
+        return `articulosLastLoad_${this.usuario.tpv}`;
+      },
+      parsearFecha(valor) {
+        if (!valor) return null;
+        const fechaTexto = String(valor).replace(' ', 'T');
+        const fecha = new Date(fechaTexto);
+        return isNaN(fecha.getTime()) ? null : fecha;
+      },
+      obtenerFechaActualizacion(data) {
+        if (!data) return null;
+        if (typeof data === 'string') return data;
+        return (
+          data.lastUpdated ||
+          data.last_updated ||
+          data.updated_at ||
+          data.fecha ||
+          null
+        );
+      },
+      async verificarActualizacionArticulos() {
+        try {
+          const ultimaCargaGuardada = localStorage.getItem(this.claveUltimaCargaArticulos());
+          if (!ultimaCargaGuardada) return;
+
+          const response = await axios.get(
+            `${this.url}/${this.usuario.tpv}/articulos/consultar/lastUpdated`,
+            { headers: { Authorization: this.usuario.token } }
+          );
+
+          const fechaActualizacionApi = this.parsearFecha(this.obtenerFechaActualizacion(response.data));
+          const fechaUltimaCarga = this.parsearFecha(ultimaCargaGuardada);
+
+          if (fechaActualizacionApi && fechaUltimaCarga && fechaActualizacionApi > fechaUltimaCarga) {
+            await this.cargarArticulos();
+            this.$swal.fire({
+              toast: true,
+              position: 'top-end',
+              icon: 'info',
+              title: 'Artículos actualizados automáticamente',
+              showConfirmButton: false,
+              timer: 2200,
+              timerProgressBar: true
+            });
+          }
+        } catch (error) {
+          console.log('Error consultando actualización de artículos:', error);
+        }
       },
       buscarArticulos() {
         if (this.search.length < 1) {
@@ -696,6 +747,9 @@
     },
     mounted() {
       this.cargarArticulos();
+      this.articulosSyncIntervalId = setInterval(() => {
+        this.verificarActualizacionArticulos();
+      }, 30000);
       //hacer foco en el campo de codigo
       this.$nextTick(() => {
         document.getElementById('codigo').focus();
@@ -730,6 +784,9 @@
       window.addEventListener('announcements:reset', this.onAnunciosReset);
     },
     beforeUnmount() {
+      if (this.articulosSyncIntervalId) {
+        clearInterval(this.articulosSyncIntervalId);
+      }
       window.removeEventListener('announcements:reset', this.onAnunciosReset);
     },
     setup() {
