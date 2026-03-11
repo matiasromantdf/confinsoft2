@@ -440,11 +440,13 @@
         console.log(this.cliente);
       },
       buscarArticulo() {
-        if (this.articulo.codigo != '') {
+        const codigoBuscado = String(this.articulo.codigo || '').replace(/\s+/g, '').toLowerCase();
+
+        if (codigoBuscado != '') {
           this.buscandoArticulo = true;
           document.getElementById('codigo').disabled = true;
 
-          let articuloEncontrado = this.articulos.find(a => a.codigo === this.articulo.codigo);
+          let articuloEncontrado = this.articulos.find(a => String(a.codigo || '').replace(/\s+/g, '').toLowerCase() === codigoBuscado);
           if (articuloEncontrado != undefined) {
             this.buscandoArticulo = false;
             this.articulo.id = articuloEncontrado.id;
