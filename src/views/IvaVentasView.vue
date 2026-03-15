@@ -212,7 +212,12 @@
         },
         methods: {
             formatearFactura(comp) {
-                return comp
+                if (!comp.es_nota_credito || !comp.fact_relacionada) {
+                    return '-';
+                }
+                let puntoVenta = comp.fact_relacionada.pto_venta.toString().padStart(4, '0');
+                let numero = comp.fact_relacionada.numero_factura.toString().padStart(8, '0');
+                return `${puntoVenta}-${numero}`;
             },
             consultarLibroIva() {
                 if (!this.fechaDesde || !this.fechaHasta) {
