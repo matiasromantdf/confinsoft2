@@ -62,7 +62,7 @@
                                         {{ item.numero_completo }}
                                     </template>
                                     <template v-slot:item.fact_relacionada="{ item }">
-                                        {{ formatearFactura(item) || '-' }}
+                                        {{ formatearFactura(item) }}
                                     </template>
                                     <template v-slot:item.neto_gravado_21="{ item }">
                                         {{ formatear(item.neto_gravado_21) }}
