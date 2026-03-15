@@ -212,8 +212,8 @@
         },
         methods: {
             formatearFactura(comp) {
-                let numero = comp.numero_factura;
-                let punto_venta = comp.punto_venta;
+                let numero = comp.fact_relacionada.numero_factura;
+                let punto_venta = comp.fact_relacionada.punto_venta;
                 //completar con ceros a la izquierda
                 if (numero) {
                     numero = numero.toString().padStart(8, '0');
