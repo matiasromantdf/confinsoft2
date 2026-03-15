@@ -62,7 +62,7 @@
                                         {{ item.numero_completo }}
                                     </template>
                                     <template v-slot:item.fact_relacionada="{ item }">
-                                        {{ item.fact_relacionada || '-' }}
+                                        {{ formatearFactura(item) || '-' }}
                                     </template>
                                     <template v-slot:item.neto_gravado_21="{ item }">
                                         {{ formatear(item.neto_gravado_21) }}
@@ -211,6 +211,25 @@
             }
         },
         methods: {
+            formatearFactura(comp) {
+                let numero = comp.numero_factura;
+                let punto_venta = comp.punto_venta;
+                //completar con ceros a la izquierda
+                if (numero) {
+                    numero = numero.toString().padStart(8, '0');
+                } else {
+                    numero = '';
+                }
+                if (punto_venta) {
+                    punto_venta = punto_venta.toString().padStart(4, '0');
+                } else {
+                    punto_venta = '';
+                }
+                if (numero && punto_venta) {
+                    return `${punto_venta}-${numero}`;
+                }
+
+            },
             consultarLibroIva() {
                 if (!this.fechaDesde || !this.fechaHasta) {
                     this.$swal('Error', 'Debes seleccionar un rango de fechas', 'error');
