@@ -212,22 +212,15 @@
         },
         methods: {
             formatearFactura(comp) {
+                if (comp.fact_relacionada == null) {
+                    return '-';
+                }
                 let numero = comp.fact_relacionada.numero_factura;
                 let punto_venta = comp.fact_relacionada.punto_venta;
                 //completar con ceros a la izquierda
-                if (numero) {
-                    numero = numero.toString().padStart(8, '0');
-                } else {
-                    numero = '';
-                }
-                if (punto_venta) {
-                    punto_venta = punto_venta.toString().padStart(4, '0');
-                } else {
-                    punto_venta = '';
-                }
-                if (numero && punto_venta) {
-                    return `${punto_venta}-${numero}`;
-                }
+                numero = numero.toString().padStart(8, '0');
+                punto_venta = punto_venta.toString().padStart(4, '0');
+                return `${punto_venta}-${numero}`;
 
             },
             consultarLibroIva() {
