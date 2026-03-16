@@ -68,6 +68,8 @@
                         @click="$router.push('/ventas-totales')" v-if="usuario.rol == 1"></v-list-item>
                     <v-list-item title="Por artículo" prepend-icon="mdi-shopping-outline" value="ventas-articulos"
                         @click="$router.push('/ventas-por-articulo')" v-if="usuario.rol == 1"></v-list-item>
+                    <v-list-item title="Por usuario" prepend-icon="mdi-account-multiple-outline" value="ventas-usuario"
+                        @click="$router.push('/ventas-por-usuario')" v-if="usuario.rol == 1"></v-list-item>
 
 
 

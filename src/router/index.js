@@ -93,6 +93,11 @@ const router = createRouter({
       component: () => import("../views/VentasPorArticuloView.vue"),
     },
     {
+      path: "/ventas-por-usuario",
+      name: "ventas-por-usuario",
+      component: () => import("../views/VentasPorUsuarioView.vue"),
+    },
+    {
       path: "/ventas-por-categoria",
       name: "ventas-por-categoria",
       component: () => import("../views/VentasPorCategoriaView.vue"),
