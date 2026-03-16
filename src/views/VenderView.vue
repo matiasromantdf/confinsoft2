@@ -504,6 +504,8 @@
 
         // Calcular subtotal
         this.articulo.subtotal = (this.articulo.cantidad * this.articulo.precio);
+        //formatear subtotal a 2 decimales
+        this.articulo.subtotal = parseFloat(this.articulo.subtotal.toFixed(2));
 
         // Clonar el objeto para evitar referencias
         let articuloAlDetalle = JSON.parse(JSON.stringify(this.articulo));
@@ -822,6 +824,8 @@
         this.detalle.forEach(item => {
           total += item.subtotal;
         });
+        //redondear total a 2 decimales
+        total = parseFloat(total.toFixed(2));
         return total;
       },
       costo() {
@@ -829,7 +833,9 @@
         this.detalle.forEach(item => {
           costo += item.costo * item.cantidad;
         });
-        return costo * 1;
+        //redondear costo a 2 decimales
+        costo = parseFloat(costo.toFixed(2));
+        return costo;
       },
       contador() {
         let cont = 0;
