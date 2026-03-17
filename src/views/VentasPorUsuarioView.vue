@@ -6,6 +6,11 @@
                 <v-card-title>
                     <h3>Ventas por usuario</h3>
                 </v-card-title>
+                <v-card-subtitle class="mb-4 bg-blue-lighten-4 ml-2 mr-2 rounded pa-3 text-wrap">
+                    Reporte de ventas por usuario para el período seleccionado. Permite consultar las ventas realizadas
+                    por cada usuario en sus respectivas cajas con los totales por categoría y el total general del
+                    período.
+                </v-card-subtitle>
                 <v-card-text>
                     <v-row>
                         <v-col cols="12" md="4">

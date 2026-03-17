@@ -7,6 +7,10 @@
                         <v-icon class="mr-2">mdi-file-document-outline</v-icon>
                         Libro IVA Ventas
                     </v-card-title>
+                    <v-card-subtitle class="mb-4 bg-blue-lighten-4 ml-2 mr-2 rounded pa-3">
+                        Reporte de libro IVA ventas para el período seleccionado. Permite consultar y exportar el
+                        detalle de facturas emitidas con sus respectivos importes netos, IVA y total.
+                    </v-card-subtitle>
                     <v-card-text>
                         <v-row>
                             <v-col cols="12" md="4">

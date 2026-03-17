@@ -7,8 +7,8 @@
                         <h2>Facturas</h2>
                     </v-card-title>
                     <v-card-subtitle class="mb-4 bg-orange-lighten-4 ml-2 mr-2 rounded pa-3">
-                        Solo se muestran las facturas emitidas. Las ventas sin facturar no aparecerán en esta sección.
-                        Para consultar ventas sin facturar, ir a la sección "Historial de Ventas".
+                        Reporte de facturas emitidas en el rango seleccionado, las ventas sin facturar no aparecerán en
+                        esta sección.
                     </v-card-subtitle>
 
                     <v-card-text class="mt-2">

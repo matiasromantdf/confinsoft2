@@ -6,6 +6,10 @@
                     <v-card-title>
                         <h3>Historial de ventas</h3>
                     </v-card-title>
+                    <v-card-subtitle class="mb-4 bg-blue-lighten-4 ml-2 mr-2 rounded pa-3 text-wrap">
+                        Reporte de historial de todas las ventas en el periodo seleccionado. Incluye ventas facturadas y
+                        no facturadas. Se puede consultar el detalle de cada venta, reimprimir tickets y anular ventas.
+                    </v-card-subtitle>
                     <v-card-text>
                         <v-row class="mt-1">
                             <v-col cols="12" md="4">
