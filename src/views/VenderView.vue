@@ -539,9 +539,9 @@
         this.detalle.forEach(item => {
           if (item.codigo == this.CodigoParaCambioPrecio) {
             let subtotalAnterior = item.subtotal;
-            let nuevoPrecio = item.precio - (item.precio * (this.porcBonif / 100));
-            item.subtotal = (nuevoPrecio * item.cantidad);
-            item.variacion = item.subtotal - subtotalAnterior;
+            let nuevoPrecio = parseFloat((item.precio - (item.precio * (this.porcBonif / 100))).toFixed(2));
+            item.subtotal = parseFloat((nuevoPrecio * item.cantidad).toFixed(2));
+            item.variacion = parseFloat((item.subtotal - subtotalAnterior).toFixed(2));
             item.porc_bonif = this.porcBonif;
           }
         });
@@ -626,7 +626,7 @@
                 }
                 let ultimoIndice = 0;
                 this.detalle[ultimoIndice].cantidad = valor;
-                this.detalle[ultimoIndice].subtotal = this.detalle[ultimoIndice].precio * valor;
+                this.detalle[ultimoIndice].subtotal = parseFloat((this.detalle[ultimoIndice].precio * valor).toFixed(2));
               },
               allowOutsideClick: () => !this.$swal.isLoading()
             })
@@ -664,7 +664,7 @@
               return false;
             }
             item.cantidad = valor;
-            item.subtotal = item.precio * valor;
+            item.subtotal = parseFloat((item.precio * valor).toFixed(2));
           },
           allowOutsideClick: () => !this.$swal.isLoading()
         })
@@ -840,10 +840,9 @@
       contador() {
         let cont = 0;
         this.detalle.forEach(item => {
-          cont += parseInt(item.cantidad);
-          console.log(cont);
+          cont += parseFloat(item.cantidad);
         });
-        return parseInt(cont);
+        return parseFloat(cont.toFixed(2));
       },
       fotoUltimoArticulo() {
         let ultimoIndice = this.detalle.length - 1;
