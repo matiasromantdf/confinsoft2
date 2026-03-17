@@ -838,11 +838,7 @@
         return costo;
       },
       contador() {
-        let cont = 0;
-        this.detalle.forEach(item => {
-          cont += parseFloat(item.cantidad);
-        });
-        return parseFloat(cont.toFixed(2));
+        return this.detalle.length;
       },
       fotoUltimoArticulo() {
         let ultimoIndice = this.detalle.length - 1;
