@@ -318,7 +318,7 @@
                                 Authorization: this.usuario.token
                             }
                         }).then(response => {
-                            if (response.nota.numero_nota) {
+                            if (response.data.nota?.numero_nota) {
                                 //hacer rollback de la venta original, para que no quede como facturada
 
                                 axios.post(this.url + '/' + this.usuario.tpv + '/ventas/rollback/' + item.id, {}, {
