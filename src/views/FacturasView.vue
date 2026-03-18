@@ -301,7 +301,7 @@
                 console.log('Generar nota de crédito para factura:', item);
                 this.$swal({
                     title: '¿Generar nota de crédito?',
-                    text: `Se generará una nota de crédito para la factura N° ${String(item.factura?.numero_factura).padStart(8, '0')} y anulación de la venta. Esta acción no se puede deshacer.`,
+                    text: `Se generará una nota de crédito para la factura N° ${String(item.factura?.numero_factura).padStart(8, '0')} y anulación de la venta, reintegrando stock y actualizando la caja.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#f57c00',
