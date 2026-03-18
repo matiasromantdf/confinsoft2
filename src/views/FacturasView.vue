@@ -318,21 +318,31 @@
                                 Authorization: this.usuario.token
                             }
                         }).then(response => {
-                            //hacer rollback de la venta original, para que no quede como facturada
+                            if (response.nota.numero_nota) {
+                                //hacer rollback de la venta original, para que no quede como facturada
 
-                            axios.post(this.url + '/' + this.usuario.tpv + '/ventas/rollback/' + item.id, {}, {
-                                headers: {
-                                    Authorization: this.usuario.token
-                                }
-                            });
+                                axios.post(this.url + '/' + this.usuario.tpv + '/ventas/rollback/' + item.id, {}, {
+                                    headers: {
+                                        Authorization: this.usuario.token
+                                    }
+                                });
 
-                            this.$swal(
-                                'Nota de crédito generada',
-                                `Se ha generado exitosamente la nota de crédito para la factura N° ${String(item.factura?.numero_factura).padStart(8, '0')}`,
-                                'success'
-                            );
-                            // Recargar la lista de facturas para mostrar la nota de crédito
-                            this.consultarFacturas();
+                                this.$swal(
+                                    'Nota de crédito generada',
+                                    `Se ha generado exitosamente la nota de crédito para la factura N° ${String(item.factura?.numero_factura).padStart(8, '0')}`,
+                                    'success'
+                                );
+
+                                // Recargar la lista de facturas para mostrar la nota de crédito
+                                this.consultarFacturas();
+                            }
+                            else {
+                                this.$swal(
+                                    'Error',
+                                    'No se pudo generar la nota de crédito. Intente nuevamente.',
+                                    'error'
+                                );
+                            }
                         }).catch(error => {
                             console.error('Error al generar nota de crédito:', error);
 

@@ -83,8 +83,12 @@
                                                 <v-list-item @click="reimprimir(item)">
                                                     <v-list-item-title>Reimprimir</v-list-item-title>
                                                 </v-list-item>
-                                                <v-list-item @click="eliminarVenta(item)">
-                                                    <v-list-item-title>Eliminar Venta</v-list-item-title>
+                                                <v-list-item @click="eliminarVenta(item)" :disabled="!!item.factura">
+                                                    <v-list-item-title>
+                                                        Eliminar Venta
+                                                        <v-icon v-if="item.factura" size="small" color="warning"
+                                                            class="ml-1">mdi-lock</v-icon>
+                                                    </v-list-item-title>
                                                 </v-list-item>
                                             </v-list>
                                         </v-menu>
@@ -213,7 +217,7 @@
 
                                     <template v-slot:item.precio="{ item }">
                                         <span class="font-weight-medium">${{ parseFloat(item.precio).toFixed(2)
-                                            }}</span>
+                                        }}</span>
                                     </template>
 
 
@@ -254,7 +258,7 @@
                                         v-if="parseFloat(calcularDescuentosDetalle()) > 0">
                                         <span>Descuentos por item:</span>
                                         <span class="font-weight-medium text-orange">-${{ calcularDescuentosDetalle()
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <div class="d-flex justify-space-between mb-2"
                                         v-if="parseFloat(ventaSeleccionada?.descuento || 0) > 0">
@@ -536,9 +540,18 @@
                 })
             },
             eliminarVenta(item) {
+                if (item.factura) {
+                    this.$swal({
+                        title: 'No se puede eliminar',
+                        text: `La venta #${item.numero} tiene la factura Nº ${item.factura.numero_factura} asociada y no puede ser eliminada.`,
+                        icon: 'warning',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    return;
+                }
                 this.$swal({
                     title: '¿Estás seguro?',
-                    text: "Se eliminará la venta #" + item.numero + " y se generará una nota de crédito si tiene factura. Esta acción no se puede deshacer.",
+                    text: "Se eliminará la venta #" + item.numero + ". Esta acción no se puede deshacer.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
@@ -558,21 +571,6 @@
                                 'La venta se ha eliminado correctamente',
                                 'success'
                             );
-                            //si la venta tiene factura, también eliminar la factura
-                            if (item.factura) {
-                                axios.post(this.url + '/' + this.usuario.tpv + '/notasCredito/generar', {
-                                    venta_id: item.id
-                                }, {
-                                    headers: {
-                                        Authorization: this.usuario.token
-                                    }
-                                })
-                                    .then(response => {
-                                        console.log('Nota de crédito generada por eliminación de venta');
-                                    }).catch(error => {
-                                        console.log(error);
-                                    });
-                            }
                             this.getVentas();
                         }).catch(error => {
                             console.log(error);
