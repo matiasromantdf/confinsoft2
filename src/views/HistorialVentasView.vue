@@ -52,17 +52,29 @@
                         <v-row>
                             <v-col>
                                 <v-data-table :items="ventas" :headers="cabeceras" no-data-text="sin datos"
-                                    items-per-page-text="filas">
+                                    items-per-page-text="filas"
+                                    :row-props="({ item }) => item.deleted_at ? { class: 'venta-anulada-row' } : {}">
                                     <template v-slot:item.numero="{ item }">
-                                        <div class="d-flex align-center">
-                                            <span>{{ item.numero }}</span>
+                                        <div class="d-flex align-center flex-wrap gap-1">
+                                            <span
+                                                :class="{ 'text-decoration-line-through text-grey': item.deleted_at }">{{ item.numero }}</span>
+                                            <v-chip v-if="item.deleted_at" color="error" size="x-small" variant="tonal"
+                                                class="ml-1">
+                                                <v-icon start size="x-small">mdi-cancel</v-icon>
+                                                Anulada
+                                            </v-chip>
                                             <v-tooltip v-if="item.factura" location="top">
                                                 <template v-slot:activator="{ props }">
-                                                    <v-icon v-bind="props" color="success" size="small" class="ml-2">
-                                                        mdi-file-document-check
+                                                    <v-icon v-bind="props"
+                                                        :color="item.factura.nota_de_credito ? 'grey' : 'success'"
+                                                        size="small" class="ml-1">
+                                                        {{ item.factura.nota_de_credito ? 'mdi-file-document-remove' : 'mdi-file-document-check' }}
                                                     </v-icon>
                                                 </template>
-                                                <span>Factura Nº {{ item.factura.numero_factura }}</span>
+                                                <span v-if="item.factura.nota_de_credito">NC Nº
+                                                    {{ item.factura.nota_de_credito.numero_nota }} (Factura Nº
+                                                    {{ item.factura.numero_factura }})</span>
+                                                <span v-else>Factura Nº {{ item.factura.numero_factura }}</span>
                                             </v-tooltip>
                                         </div>
                                     </template>
@@ -80,14 +92,23 @@
                                                 <v-list-item @click="mostrarDetalle(item)">
                                                     <v-list-item-title>Ver detalle</v-list-item-title>
                                                 </v-list-item>
-                                                <v-list-item @click="reimprimir(item)">
-                                                    <v-list-item-title>Reimprimir</v-list-item-title>
-                                                </v-list-item>
-                                                <v-list-item @click="eliminarVenta(item)" :disabled="!!item.factura">
-                                                    <v-list-item-title>
-                                                        Eliminar Venta
-                                                        <v-icon v-if="item.factura" size="small" color="warning"
-                                                            class="ml-1">mdi-lock</v-icon>
+                                                <template v-if="!item.deleted_at">
+                                                    <v-list-item @click="reimprimir(item)">
+                                                        <v-list-item-title>Reimprimir</v-list-item-title>
+                                                    </v-list-item>
+                                                    <v-list-item @click="eliminarVenta(item)"
+                                                        :disabled="!!item.factura">
+                                                        <v-list-item-title>
+                                                            Eliminar Venta
+                                                            <v-icon v-if="item.factura" size="small" color="warning"
+                                                                class="ml-1">mdi-lock</v-icon>
+                                                        </v-list-item-title>
+                                                    </v-list-item>
+                                                </template>
+                                                <v-list-item v-else disabled>
+                                                    <v-list-item-title class="text-error">
+                                                        <v-icon size="small" class="mr-1">mdi-cancel</v-icon>
+                                                        Venta anulada
                                                     </v-list-item-title>
                                                 </v-list-item>
                                             </v-list>
@@ -217,7 +238,7 @@
 
                                     <template v-slot:item.precio="{ item }">
                                         <span class="font-weight-medium">${{ parseFloat(item.precio).toFixed(2)
-                                            }}</span>
+                                        }}</span>
                                     </template>
 
 
@@ -258,7 +279,7 @@
                                         v-if="parseFloat(calcularDescuentosDetalle()) > 0">
                                         <span>Descuentos por item:</span>
                                         <span class="font-weight-medium text-orange">-${{ calcularDescuentosDetalle()
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <div class="d-flex justify-space-between mb-2"
                                         v-if="parseFloat(ventaSeleccionada?.descuento || 0) > 0">
@@ -606,4 +627,9 @@
 
 </script>
 
-<style scoped></style>
+<style scoped>
+    :deep(.venta-anulada-row) {
+        background-color: rgba(244, 67, 54, 0.06) !important;
+        opacity: 0.8;
+    }
+</style>
