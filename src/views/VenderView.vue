@@ -423,7 +423,9 @@
       formatear(valor) {
         let formatoARS = new Intl.NumberFormat('es-AR', {
           style: 'currency',
-          currency: 'ARS'
+          currency: 'ARS',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 3
         });
         return formatoARS.format(valor);
       },
@@ -504,8 +506,8 @@
 
         // Calcular subtotal
         this.articulo.subtotal = (this.articulo.cantidad * this.articulo.precio);
-        //formatear subtotal a 2 decimales
-        this.articulo.subtotal = parseFloat(this.articulo.subtotal.toFixed(2));
+        //formatear subtotal a 3 decimales
+        this.articulo.subtotal = parseFloat(this.articulo.subtotal.toFixed(3));
 
         // Clonar el objeto para evitar referencias
         let articuloAlDetalle = JSON.parse(JSON.stringify(this.articulo));
@@ -539,9 +541,9 @@
         this.detalle.forEach(item => {
           if (item.codigo == this.CodigoParaCambioPrecio) {
             let subtotalAnterior = item.subtotal;
-            let nuevoPrecio = parseFloat((item.precio - (item.precio * (this.porcBonif / 100))).toFixed(2));
-            item.subtotal = parseFloat((nuevoPrecio * item.cantidad).toFixed(2));
-            item.variacion = parseFloat((item.subtotal - subtotalAnterior).toFixed(2));
+            let nuevoPrecio = parseFloat((item.precio - (item.precio * (this.porcBonif / 100))).toFixed(3));
+            item.subtotal = parseFloat((nuevoPrecio * item.cantidad).toFixed(3));
+            item.variacion = parseFloat((item.subtotal - subtotalAnterior).toFixed(3));
             item.porc_bonif = this.porcBonif;
           }
         });
@@ -611,22 +613,22 @@
               inputAttributes: {
                 autocapitalize: 'off',
                 type: 'number',
-                step: '0.01',
-                min: '0.01'
+                step: '0.001',
+                min: '0.001'
               },
               showCancelButton: true,
               confirmButtonText: 'Aceptar',
               cancelButtonText: 'Cancelar',
               showLoaderOnConfirm: true,
               preConfirm: (cantidad) => {
-                const valor = parseFloat(cantidad);
+                const valor = parseFloat(parseFloat(cantidad).toFixed(3));
                 if (isNaN(valor) || valor <= 0) {
                   this.$swal.showValidationMessage('Debe ingresar una cantidad válida mayor a 0');
                   return false;
                 }
                 let ultimoIndice = 0;
                 this.detalle[ultimoIndice].cantidad = valor;
-                this.detalle[ultimoIndice].subtotal = parseFloat((this.detalle[ultimoIndice].precio * valor).toFixed(2));
+                this.detalle[ultimoIndice].subtotal = parseFloat((this.detalle[ultimoIndice].precio * valor).toFixed(3));
               },
               allowOutsideClick: () => !this.$swal.isLoading()
             })
@@ -650,21 +652,21 @@
           inputAttributes: {
             autocapitalize: 'off',
             type: 'number',
-            step: '0.01',
-            min: '0.01'
+            step: '0.001',
+            min: '0.001'
           },
           showCancelButton: true,
           confirmButtonText: 'Aceptar',
           cancelButtonText: 'Cancelar',
           showLoaderOnConfirm: true,
           preConfirm: (cantidad) => {
-            const valor = parseFloat(cantidad);
+            const valor = parseFloat(parseFloat(cantidad).toFixed(3));
             if (isNaN(valor) || valor <= 0) {
               this.$swal.showValidationMessage('Debe ingresar una cantidad válida mayor a 0');
               return false;
             }
             item.cantidad = valor;
-            item.subtotal = parseFloat((item.precio * valor).toFixed(2));
+            item.subtotal = parseFloat((item.precio * valor).toFixed(3));
           },
           allowOutsideClick: () => !this.$swal.isLoading()
         })
@@ -824,8 +826,8 @@
         this.detalle.forEach(item => {
           total += item.subtotal;
         });
-        //redondear total a 2 decimales
-        total = parseFloat(total.toFixed(2));
+        //redondear total a 3 decimales
+        total = parseFloat(total.toFixed(3));
         return total;
       },
       costo() {
@@ -833,8 +835,8 @@
         this.detalle.forEach(item => {
           costo += item.costo * item.cantidad;
         });
-        //redondear costo a 2 decimales
-        costo = parseFloat(costo.toFixed(2));
+        //redondear costo a 3 decimales
+        costo = parseFloat(costo.toFixed(3));
         return costo;
       },
       contador() {
