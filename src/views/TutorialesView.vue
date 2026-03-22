@@ -54,6 +54,11 @@
                         descripcion: 'Aprende cómo registrar ventas en CajaPro paso a paso',
                         link: 'https://youtu.be/9pefNHus4wQ'
                     },
+                    {
+                        titulo: 'Reporte de ventas y cajas',
+                        descripcion: 'Aprende a consultar y analizar los reportes de ventas y caja',
+                        link: 'https://youtu.be/YbpYrlWClic'
+                    },
                 ]
             }
         }
