@@ -85,7 +85,7 @@
                         @click="$router.push('/ventas-por-categoria')"></v-list-item>
                 </v-list-group>
 
-                <!-- <v-list-group value="Admin" v-if="esAdminPrincipal">
+                <v-list-group value="Admin" v-if="esAdminPrincipal">
                     <template v-slot:activator="{ props }">
                         <v-list-item v-bind="props" prepend-icon="" title="Admin"></v-list-item>
                     </template>
@@ -94,7 +94,7 @@
                     <v-list-item title="Usuarios registrados" prepend-icon="mdi-account-plus-outline"
                         value="admin-usuarios-registrados"
                         @click="$router.push('/admin/usuarios-registrados')"></v-list-item>
-                </v-list-group> -->
+                </v-list-group>
 
                 <v-list-group value="Compras" v-if="usuario.rol == 1">
                     <template v-slot:activator="{ props }">
