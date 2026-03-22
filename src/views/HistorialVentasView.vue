@@ -20,8 +20,13 @@
                                 <v-text-field label="hasta" v-model="hasta" type="date"
                                     variant="outlined"></v-text-field>
                             </v-col>
-                            <v-col cols="12" md="4" class="text-center">
+                            <v-col cols="12" md="4" class="d-flex align-center justify-center justify-md-end ga-2">
                                 <v-btn :loading="cargando2" color="primary" @click="getVentas()">Buscar</v-btn>
+                                <v-btn color="success" :disabled="ventas.length === 0 || cargando || cargando2"
+                                    @click="exportarExcel">
+                                    <v-icon left>mdi-file-excel</v-icon>
+                                    Exportar a Excel
+                                </v-btn>
                             </v-col>
                         </v-row>
 
@@ -78,6 +83,21 @@
                                             </v-tooltip>
                                         </div>
                                     </template>
+                                    <template v-slot:item.facturacion="{ item }">
+                                        <div class="d-flex flex-column ga-1 py-1">
+                                            <v-chip :color="getEstadoFacturacionColor(item)" size="small"
+                                                variant="outlined">
+                                                {{ getEstadoFacturacionTexto(item) }}
+                                            </v-chip>
+                                            <span v-if="item.factura" class="text-caption">
+                                                {{ getDescripcionFactura(item.factura) }}
+                                            </span>
+                                            <span v-if="item.factura?.nota_de_credito"
+                                                class="text-caption text-warning">
+                                                {{ getDescripcionNotaCredito(item.factura.nota_de_credito) }}
+                                            </span>
+                                        </div>
+                                    </template>
                                     <template v-slot:item.verDetalle="{ item }">
                                         <v-btn @click="mostrarDetalle(item)" variant="flat">Ver detalle</v-btn>
                                     </template>
@@ -96,12 +116,9 @@
                                                     <v-list-item @click="reimprimir(item)">
                                                         <v-list-item-title>Reimprimir</v-list-item-title>
                                                     </v-list-item>
-                                                    <v-list-item @click="eliminarVenta(item)"
-                                                        :disabled="!!item.factura">
+                                                    <v-list-item @click="eliminarVenta(item)">
                                                         <v-list-item-title>
-                                                            Eliminar Venta
-                                                            <v-icon v-if="item.factura" size="small" color="warning"
-                                                                class="ml-1">mdi-lock</v-icon>
+                                                            {{ item.factura ? 'Anular Venta' : 'Eliminar Venta' }}
                                                         </v-list-item-title>
                                                     </v-list-item>
                                                 </template>
@@ -119,7 +136,6 @@
 
                             </v-col>
                         </v-row>
-
 
                     </v-card-text>
 
@@ -143,6 +159,11 @@
                 <!-- Información del encabezado de la venta -->
                 <v-card-text class="pa-0">
                     <v-container fluid class="pa-4">
+                        <v-alert v-if="ventaSeleccionada" :type="getEstadoVentaAlertType(ventaSeleccionada)"
+                            variant="tonal" class="mb-4">
+                            {{ getEstadoVentaDetalle(ventaSeleccionada) }}
+                        </v-alert>
+
                         <v-row class="mb-4">
                             <v-col cols="12" class="pb-0">
                                 <h6 class="text-h6 mb-3 text-primary">Información General</h6>
@@ -178,10 +199,86 @@
                                 <v-card variant="outlined" class="pa-3 h-100">
                                     <div class="text-caption text-grey-darken-1">Estado Facturación</div>
                                     <div class="text-body-1 font-weight-medium">
-                                        <v-chip :color="ventaSeleccionada?.factura ? 'success' : 'grey'"
-                                            variant="outlined" size="small">
-                                            {{ ventaSeleccionada?.factura ? `Facturada #${ventaSeleccionada.factura.numero_factura}` : 'Sin facturar' }}
+                                        <v-chip :color="getEstadoFacturacionColor(ventaSeleccionada)" variant="outlined"
+                                            size="small">
+                                            {{ getEstadoFacturacionTexto(ventaSeleccionada) }}
                                         </v-chip>
+                                    </div>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+
+                        <v-row class="mb-4" v-if="ventaSeleccionada?.factura">
+                            <v-col cols="12">
+                                <h6 class="text-h6 mb-3 text-primary">Información de Facturación</h6>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                <v-card variant="outlined" class="pa-3 h-100">
+                                    <div class="text-caption text-grey-darken-1">Comprobante</div>
+                                    <div class="text-body-1 font-weight-medium">
+                                        {{ getDescripcionFactura(ventaSeleccionada.factura) }}
+                                    </div>
+                                </v-card>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                <v-card variant="outlined" class="pa-3 h-100">
+                                    <div class="text-caption text-grey-darken-1">Fecha Factura</div>
+                                    <div class="text-body-1 font-weight-medium">
+                                        {{ formatearFecha(ventaSeleccionada.factura.fecha || ventaSeleccionada.factura.created_at) }}
+                                    </div>
+                                </v-card>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                <v-card variant="outlined" class="pa-3 h-100">
+                                    <div class="text-caption text-grey-darken-1">CAE</div>
+                                    <div class="text-body-2 font-weight-medium">
+                                        {{ ventaSeleccionada.factura.cae || 'N/A' }}
+                                    </div>
+                                </v-card>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                <v-card variant="outlined" class="pa-3 h-100">
+                                    <div class="text-caption text-grey-darken-1">Vto. CAE</div>
+                                    <div class="text-body-1 font-weight-medium">
+                                        {{ formatearFecha(ventaSeleccionada.factura.vto_cae) || 'N/A' }}
+                                    </div>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+
+                        <v-row class="mb-4" v-if="ventaSeleccionada?.factura?.nota_de_credito">
+                            <v-col cols="12">
+                                <h6 class="text-h6 mb-3 text-warning">Nota de Crédito</h6>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                <v-card variant="outlined" class="pa-3 h-100 border-warning">
+                                    <div class="text-caption text-grey-darken-1">Comprobante</div>
+                                    <div class="text-body-1 font-weight-medium text-warning">
+                                        {{ getDescripcionNotaCredito(ventaSeleccionada.factura.nota_de_credito) }}
+                                    </div>
+                                </v-card>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                <v-card variant="outlined" class="pa-3 h-100 border-warning">
+                                    <div class="text-caption text-grey-darken-1">Fecha NC</div>
+                                    <div class="text-body-1 font-weight-medium">
+                                        {{ formatearFecha(ventaSeleccionada.factura.nota_de_credito.fecha || ventaSeleccionada.factura.nota_de_credito.created_at) }}
+                                    </div>
+                                </v-card>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                <v-card variant="outlined" class="pa-3 h-100 border-warning">
+                                    <div class="text-caption text-grey-darken-1">CAE NC</div>
+                                    <div class="text-body-2 font-weight-medium">
+                                        {{ ventaSeleccionada.factura.nota_de_credito.cae || 'N/A' }}
+                                    </div>
+                                </v-card>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                <v-card variant="outlined" class="pa-3 h-100 border-warning">
+                                    <div class="text-caption text-grey-darken-1">Vto. CAE NC</div>
+                                    <div class="text-body-1 font-weight-medium">
+                                        {{ formatearFecha(ventaSeleccionada.factura.nota_de_credito.vto_cae) || 'N/A' }}
                                     </div>
                                 </v-card>
                             </v-col>
@@ -238,7 +335,7 @@
 
                                     <template v-slot:item.precio="{ item }">
                                         <span class="font-weight-medium">${{ parseFloat(item.precio).toFixed(2)
-                                        }}</span>
+                                            }}</span>
                                     </template>
 
 
@@ -279,7 +376,7 @@
                                         v-if="parseFloat(calcularDescuentosDetalle()) > 0">
                                         <span>Descuentos por item:</span>
                                         <span class="font-weight-medium text-orange">-${{ calcularDescuentosDetalle()
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <div class="d-flex justify-space-between mb-2"
                                         v-if="parseFloat(ventaSeleccionada?.descuento || 0) > 0">
@@ -320,6 +417,7 @@
 
 <script>
     import axios from 'axios';
+    import * as XLSX from 'xlsx';
     import { useUserStore } from '../stores/user';
     export default {
         data() {
@@ -329,6 +427,7 @@
                 cabeceras: [
                     { title: 'Numero', key: 'numero', value: 'numero' },
                     { title: 'Fecha', key: 'fecha', value: item => this.formatearFecha(item.created_at) },
+                    { title: 'Facturación', key: 'facturacion', sortable: false },
                     { title: 'Bruto', key: 'monto', value: item => item.monto },
                     { title: 'Recargo Financ.', key: 'recargo', value: item => item.recargo },
                     { title: 'Descuento', key: 'descuento', value: 'descuento' },
@@ -384,6 +483,61 @@
                 if (!fecha) return '';
                 const opciones = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
                 return new Date(fecha).toLocaleDateString('es-AR', opciones);
+            },
+            getTipoFacturaTexto(tipo) {
+                const tipos = {
+                    1: 'Factura A',
+                    2: 'Nota de Débito A',
+                    3: 'Nota de Crédito A',
+                    4: 'Recibo A',
+                    5: 'Nota de Venta al contado A',
+                    6: 'Factura B',
+                    7: 'Nota de Débito B',
+                    8: 'Nota de Crédito B',
+                    9: 'Recibo B',
+                    10: 'Nota de Venta al contado B',
+                    11: 'Factura C',
+                    12: 'Nota de Débito C',
+                    13: 'Nota de Crédito C'
+                };
+                return tipos[tipo] || `Tipo ${tipo}`;
+            },
+            getDescripcionFactura(factura) {
+                if (!factura) return 'Sin facturar';
+                return `${this.getTipoFacturaTexto(factura.tipo_factura)} N° ${String(factura.numero_factura).padStart(8, '0')}`;
+            },
+            getDescripcionNotaCredito(nota) {
+                if (!nota) return '';
+                return `${this.getTipoFacturaTexto(nota.tipo_nota)} N° ${String(nota.numero_nota).padStart(8, '0')}`;
+            },
+            getEstadoFacturacionTexto(venta) {
+                if (!venta?.factura) return 'Sin facturar';
+                if (venta.factura?.nota_de_credito) return 'Factura anulada con NC';
+                return 'Facturada';
+            },
+            getEstadoFacturacionColor(venta) {
+                if (!venta?.factura) return 'grey';
+                if (venta.factura?.nota_de_credito) return 'warning';
+                return 'success';
+            },
+            getEstadoVentaAlertType(venta) {
+                if (venta?.factura?.nota_de_credito) return 'warning';
+                if (venta?.deleted_at) return 'error';
+                if (venta?.factura) return 'success';
+                return 'info';
+            },
+            getEstadoVentaDetalle(venta) {
+                if (!venta) return '';
+                if (venta.factura?.nota_de_credito) {
+                    return `Venta anulada. Se emitió ${this.getDescripcionNotaCredito(venta.factura.nota_de_credito)} para la ${this.getDescripcionFactura(venta.factura)}.`;
+                }
+                if (venta.deleted_at) {
+                    return 'Venta anulada sin nota de crédito asociada.';
+                }
+                if (venta.factura) {
+                    return `Venta vigente con ${this.getDescripcionFactura(venta.factura)}.`;
+                }
+                return 'Venta vigente sin facturación electrónica asociada.';
             },
             getVentas() {
                 let desdeConHora = this.desde + ' 00:00:00';
@@ -455,6 +609,117 @@
                     '6': 'Cuenta Corriente'
                 };
                 return medios[medio] || 'Desconocido';
+            },
+            formatearMonto(monto) {
+                return Number(monto || 0).toLocaleString('es-AR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            },
+            exportarExcel() {
+                if (this.ventas.length === 0) {
+                    this.$swal('Advertencia', 'No hay datos para exportar.', 'warning');
+                    return;
+                }
+
+                const ventasParaExportar = this.ventas.map(venta => ({
+                    'ID Venta': venta.id,
+                    'Numero Venta': venta.numero,
+                    'Fecha Venta': this.formatearFecha(venta.created_at),
+                    'Fecha Actualizacion': this.formatearFecha(venta.updated_at),
+                    'Estado': venta.deleted_at ? 'Anulada' : 'Vigente',
+                    'Estado Facturacion': this.getEstadoFacturacionTexto(venta),
+                    'Cliente': venta.cliente?.nombre || '',
+                    'Monto': parseFloat(venta.monto || 0),
+                    'Costo': parseFloat(venta.costo || 0),
+                    'Descuento': parseFloat(venta.descuento || 0),
+                    'Recargo': parseFloat(venta.recargo || 0),
+                    'Deleted At': venta.deleted_at || '',
+                    'Factura Tipo': venta.factura ? this.getTipoFacturaTexto(venta.factura.tipo_factura) : '',
+                    'Factura Numero': venta.factura?.numero_factura || '',
+                    'Factura Fecha': venta.factura?.fecha || '',
+                    'Factura CAE': venta.factura?.cae || '',
+                    'Factura Vto CAE': venta.factura?.vto_cae || '',
+                    'Nota Credito Tipo': venta.factura?.nota_de_credito ? this.getTipoFacturaTexto(venta.factura.nota_de_credito.tipo_nota) : '',
+                    'Nota Credito Numero': venta.factura?.nota_de_credito?.numero_nota || '',
+                    'Nota Credito Fecha': venta.factura?.nota_de_credito?.fecha || '',
+                    'Nota Credito CAE': venta.factura?.nota_de_credito?.cae || '',
+                    'Nota Credito Vto CAE': venta.factura?.nota_de_credito?.vto_cae || '',
+                    'Cantidad Pagos': venta.pagos?.length || 0,
+                    'Cantidad Items': venta.detalle?.length || 0
+                }));
+
+                const detallesParaExportar = this.ventas.flatMap(venta => {
+                    if (!venta.detalle || venta.detalle.length === 0) {
+                        return [];
+                    }
+
+                    return venta.detalle.map(item => ({
+                        'ID Venta': venta.id,
+                        'Numero Venta': venta.numero,
+                        'Fecha Venta': this.formatearFecha(venta.created_at),
+                        'Cliente': venta.cliente?.nombre || '',
+                        'Estado Venta': venta.deleted_at ? 'Anulada' : 'Vigente',
+                        'Estado Facturacion': this.getEstadoFacturacionTexto(venta),
+                        'ID Detalle': item.id,
+                        'Articulo ID': item.articulo_id || '',
+                        'Codigo': item.codigo || '',
+                        'Descripcion': item.descripcion || '',
+                        'Cantidad': parseFloat(item.cantidad || 0),
+                        'Precio Unitario': parseFloat(item.precio || 0),
+                        'Porcentaje Bonif': parseFloat(item.porc_bonif || 0),
+                        'Descuento Calculado': this.calcularDescuentoItem(item),
+                        'IVA': parseFloat(item.iva || 0),
+                        'Costo': parseFloat(item.costo || 0),
+                        'Subtotal': this.calcularSubtotalItem(item)
+                    }));
+                });
+
+                const pagosParaExportar = this.ventas.flatMap(venta => {
+                    if (!venta.pagos || venta.pagos.length === 0) {
+                        return [];
+                    }
+
+                    return venta.pagos.map(pago => ({
+                        'ID Venta': venta.id,
+                        'Numero Venta': venta.numero,
+                        'Fecha Venta': this.formatearFecha(venta.created_at),
+                        'Cliente': venta.cliente?.nombre || '',
+                        'Estado Venta': venta.deleted_at ? 'Anulada' : 'Vigente',
+                        'Estado Facturacion': this.getEstadoFacturacionTexto(venta),
+                        'ID Pago': pago.id,
+                        'Medio Codigo': pago.medio,
+                        'Medio Pago': this.obtenerMedioPago(pago.medio),
+                        'Monto': parseFloat(pago.monto || 0),
+                        'Recargo': parseFloat(pago.recargo || 0),
+                        'Created At': this.formatearFecha(pago.created_at),
+                        'Updated At': this.formatearFecha(pago.updated_at)
+                    }));
+                });
+
+                const resumenParaExportar = [{
+                    'Desde': this.desde,
+                    'Hasta': this.hasta,
+                    'Total Ventas': this.totalVentas,
+                    'Monto Total': Number((this.totalMonto || '0').toString().replace(/\./g, '').replace(',', '.')),
+                    'Promedio por Venta': Number((this.promedioVenta || '0').toString().replace(/\./g, '').replace(',', '.'))
+                }];
+
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(resumenParaExportar), 'Resumen');
+                XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(ventasParaExportar), 'Ventas');
+                XLSX.utils.book_append_sheet(
+                    workbook,
+                    XLSX.utils.json_to_sheet(detallesParaExportar.length > 0 ? detallesParaExportar : [{ Info: 'No hay detalle de productos para exportar.' }]),
+                    'Detalle'
+                );
+                XLSX.utils.book_append_sheet(
+                    workbook,
+                    XLSX.utils.json_to_sheet(pagosParaExportar.length > 0 ? pagosParaExportar : [{ Info: 'No hay pagos para exportar.' }]),
+                    'Pagos'
+                );
+
+                XLSX.writeFile(workbook, `Historial_Ventas_${this.desde}_${this.hasta}.xlsx`);
             },
             // eliminar(item) {
             //     this.$swal({
@@ -561,48 +826,96 @@
                 })
             },
             eliminarVenta(item) {
-                if (item.factura) {
-                    this.$swal({
-                        title: 'No se puede eliminar',
-                        text: `La venta #${item.numero} tiene la factura Nº ${item.factura.numero_factura} asociada y no puede ser eliminada.`,
-                        icon: 'warning',
-                        confirmButtonText: 'Aceptar'
-                    });
-                    return;
-                }
+                const esVentaFacturada = !!item.factura;
+                const titulo = esVentaFacturada ? '¿Generar nota de crédito?' : '¿Estás seguro?';
+                const texto = esVentaFacturada
+                    ? `Se generará una nota de crédito para la factura N° ${String(item.factura?.numero_factura).padStart(8, '0')} y anulación de la venta, reintegrando stock y actualizando la caja.`
+                    : "Se eliminará la venta #" + item.numero + ". Se reintegrará el stock y se actualizará la caja.";
+                const confirmButtonColor = esVentaFacturada ? '#f57c00' : '#d33';
+                const confirmButtonText = esVentaFacturada ? 'Sí, generar!' : 'Sí, eliminar';
+
                 this.$swal({
-                    title: '¿Estás seguro?',
-                    text: "Se eliminará la venta #" + item.numero + ". Se reintegrará el stock y se actualizará la caja.",
+                    title: titulo,
+                    text: texto,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
+                    confirmButtonColor: confirmButtonColor,
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Sí, eliminar',
+                    confirmButtonText: confirmButtonText,
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         this.cargando = true;
-                        axios.post(this.url + '/' + this.usuario.tpv + '/ventas/rollback/' + item.id, {}, {
-                            headers: {
-                                Authorization: this.usuario.token
-                            }
-                        }).then(response => {
-                            this.$swal(
-                                'Venta eliminada',
-                                'La venta se ha eliminado correctamente',
-                                'success'
-                            );
-                            this.getVentas();
-                        }).catch(error => {
-                            console.log(error);
-                            this.$swal(
-                                'Error',
-                                'No se pudo eliminar la venta',
-                                'error'
-                            );
-                        }).finally(() => {
-                            this.cargando = false;
-                        });
+                        if (esVentaFacturada) {
+                            axios.post(this.url + '/' + this.usuario.tpv + '/notasCredito/generar', {
+                                venta_id: item.id
+                            }, {
+                                headers: {
+                                    Authorization: this.usuario.token
+                                }
+                            }).then(response => {
+                                if (response.data.nota?.numero_nota) {
+                                    axios.post(this.url + '/' + this.usuario.tpv + '/ventas/rollback/' + item.id, {}, {
+                                        headers: {
+                                            Authorization: this.usuario.token
+                                        }
+                                    });
+
+                                    this.$swal(
+                                        'Nota de crédito generada',
+                                        `Se ha generado exitosamente la nota de crédito para la factura N° ${String(item.factura?.numero_factura).padStart(8, '0')}`,
+                                        'success'
+                                    );
+
+                                    this.getVentas();
+                                }
+                                else {
+                                    this.$swal(
+                                        'Error',
+                                        'No se pudo generar la nota de crédito. Intente nuevamente.',
+                                        'error'
+                                    );
+                                }
+                            }).catch(error => {
+                                console.error('Error al generar nota de crédito:', error);
+
+                                let mensajeError = 'Error al generar la nota de crédito. Intente nuevamente.';
+                                if (error.response && error.response.data && error.response.data.message) {
+                                    mensajeError = error.response.data.message;
+                                }
+
+                                this.$swal(
+                                    'Error',
+                                    mensajeError,
+                                    'error'
+                                );
+                            }).finally(() => {
+                                this.cargando = false;
+                            });
+                        } else {
+                            axios.post(this.url + '/' + this.usuario.tpv + '/ventas/rollback/' + item.id, {}, {
+                                headers: {
+                                    Authorization: this.usuario.token
+                                }
+                            }).then(() => {
+                                this.$swal(
+                                    'Venta eliminada',
+                                    'La venta se ha eliminado correctamente',
+                                    'success'
+                                );
+
+                                this.getVentas();
+                            }).catch(error => {
+                                console.log(error);
+                                this.$swal(
+                                    'Error',
+                                    'No se pudo eliminar la venta',
+                                    'error'
+                                );
+                            }).finally(() => {
+                                this.cargando = false;
+                            });
+                        }
                     }
                 });
             }

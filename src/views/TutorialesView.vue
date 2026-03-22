@@ -49,6 +49,11 @@
                         descripcion: 'Aprende cómo cargar tus primeros artículos al sistema de manera rápida y sencilla',
                         link: 'https://www.youtube.com/watch?v=e6b3c4CEKyQ'
                     },
+                    {
+                        titulo: 'Registrar ventas',
+                        descripcion: 'Aprende cómo registrar ventas en CajaPro paso a paso',
+                        link: 'https://youtu.be/9pefNHus4wQ'
+                    },
                 ]
             }
         }

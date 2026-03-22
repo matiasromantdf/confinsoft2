@@ -54,8 +54,8 @@
                     </template>
                     <v-list-item title="Caja" prepend-icon="mdi-cash-check" value="caja"
                         @click="$router.push('/caja')"></v-list-item>
-                    <v-list-item title="Facturas" prepend-icon="mdi-receipt-text" value="facturas"
-                        @click="$router.push('/facturas')" v-if="usuario.rol == 1"></v-list-item>
+                    <!-- <v-list-item title="Facturas" prepend-icon="mdi-receipt-text" value="facturas"
+                        @click="$router.push('/facturas')" v-if="usuario.rol == 1"></v-list-item> -->
                     <v-list-item title="IVA Ventas" prepend-icon="mdi-file-document-outline" value="iva-ventas"
                         @click="$router.push('/iva-ventas')" v-if="usuario.rol == 1"></v-list-item>
                     <v-list-item title="Historial Ventas" prepend-icon="mdi-calendar-month-outline"
@@ -85,7 +85,7 @@
                         @click="$router.push('/ventas-por-categoria')"></v-list-item>
                 </v-list-group>
 
-                <v-list-group value="Admin" v-if="esAdminPrincipal">
+                <!-- <v-list-group value="Admin" v-if="esAdminPrincipal">
                     <template v-slot:activator="{ props }">
                         <v-list-item v-bind="props" prepend-icon="" title="Admin"></v-list-item>
                     </template>
@@ -94,7 +94,7 @@
                     <v-list-item title="Usuarios registrados" prepend-icon="mdi-account-plus-outline"
                         value="admin-usuarios-registrados"
                         @click="$router.push('/admin/usuarios-registrados')"></v-list-item>
-                </v-list-group>
+                </v-list-group> -->
 
                 <v-list-group value="Compras" v-if="usuario.rol == 1">
                     <template v-slot:activator="{ props }">

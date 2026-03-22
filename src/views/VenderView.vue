@@ -122,10 +122,9 @@
                               <p v-else>{{ item.porc_bonif }}</p>
                             </td>
                             <td>{{ item.iva }}</td>
-                            <td class="cantidad-cell" @dblclick="cambiarCantidad(item)">
+                            <td class="cantidad-cell" @click="cambiarCantidad(item)">
                               <span>{{ item.cantidad }}</span>
-                              <v-icon class="edit-cantidad-icon" size="18"
-                                @click="cambiarCantidad(item)">mdi-pencil</v-icon>
+                              <v-icon class="edit-cantidad-icon" size="18">mdi-pencil</v-icon>
                             </td>
                             <td>{{ formatear(item.subtotal) }}</td>
                             <td>
