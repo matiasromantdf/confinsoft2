@@ -111,7 +111,6 @@
                     this.loading = false;
                     if (response.status == 200) {
                         let datosUsuario = response.data;
-                        datosUsuario.comercio = response.data;
                         this.usuario.setUsuario(datosUsuario);
                         setTimeout(() => {
                             this.$router.push('/');
