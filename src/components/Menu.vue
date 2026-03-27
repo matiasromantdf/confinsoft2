@@ -6,6 +6,8 @@
             <template v-slot:append>
                 <v-menu v-if="this.usuario.token != ''">
                     <template v-slot:activator="{ props }">
+                        {{ usuario.nombre }}
+
                         <v-btn icon v-bind="props">
                             <v-icon>mdi-account-circle</v-icon>
                         </v-btn>
@@ -26,11 +28,26 @@
 
         <v-navigation-drawer v-model="drawer" color="indigo-darken-1" v-if="usuario.isLogged" temporary
             class="sin-scroll">
-
-
             <v-list v-model:opened="open">
-                <v-list-item :prepend-avatar="usuario.comercio.logo" :title="usuario.comercio.nombre"
-                    :subtitle="usuario.email"></v-list-item>
+                <v-list-item :prepend-avatar="usuario.comercio.logo ? usuario.comercio.logo : genericStoreIcon"
+                    v-if="usuario.rol == 1">
+                    <v-btn variant="flat" rounded="lg" color="white" @click="agregarComercio()"
+                        style="font-size: 0.7em;">
+                        <v-icon start size="16">mdi-plus</v-icon>
+                        nuevo comercio
+                    </v-btn>
+                </v-list-item>
+
+                <v-list-item>
+                    <label class="text-white" v-if="usuario.rol == 1">Seleccionar comercio</label>
+                    <v-select v-if="usuario.rol == 1" :items="usuario.comercios" item-title="nombre" return-object
+                        variant="outlined" density="compact" hide-details @update:modelValue="cargarConNuevoComercio"
+                        class="mt-2" :menu-props="{ maxHeight: '300px' }" v-model="comercioSeleccionado">
+                    </v-select>
+                    <p v-else class="text-white" style="height: 20px;">{{ usuario.comercio.nombre }}</p>
+
+                </v-list-item>
+
 
                 <v-divider class="mt-6"></v-divider>
                 <v-list-item title="Vender" prepend-icon="mdi-cash-register" value="inicio"
@@ -166,11 +183,14 @@
 </template>
 <script>
     import { useUserStore } from '../stores/user';
+    import storeIcon from '../assets/store.png';
     export default {
         data() {
             return {
                 drawer: true,
                 open: [],
+                genericStoreIcon: storeIcon,
+                comercioSeleccionado: null,
             };
         },
         setup() {
@@ -183,6 +203,14 @@
             }
         },
         methods: {
+            cargarConNuevoComercio(comercio) {
+                if (!comercio) {
+                    return;
+                }
+                this.comercioSeleccionado = comercio;
+                this.usuario.setComercioSeleccionado(comercio);
+            },
+
             cerrarSesion() {
                 this.usuario.logOff();
                 this.$router.push({ name: 'login' });
@@ -202,7 +230,13 @@
                 setTimeout(() => {
                     window.dispatchEvent(new Event('announcements:reset'));
                 }, 100);
+            },
+            agregarComercio() {
+                this.$router.push('/crear-nuevo-comercio');
             }
+        },
+        mounted() {
+            this.comercioSeleccionado = this.usuario.comercio;
         }
 
 

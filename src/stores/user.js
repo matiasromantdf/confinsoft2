@@ -9,6 +9,7 @@ export const useUserStore = defineStore("usuario", {
     rol: null,
     tpv: null,
     comercio: null,
+    comercios: [],
     nombre: null,
     horaServidor: null,
   }),
@@ -48,8 +49,9 @@ export const useUserStore = defineStore("usuario", {
       this.token = data.token;
       this.token_caja = data.token_caja;
       this.rol = data.rol;
-      this.tpv = data.tpv;
-      this.comercio = data.comercio;
+      this.comercios = data.comercios;
+      this.comercio = data.comercios[0];
+      this.tpv = this.comercio.tpv;
       this.horaServidor = data.horaServidor;
     },
     logOff() {
@@ -59,7 +61,12 @@ export const useUserStore = defineStore("usuario", {
       this.token_caja = null;
       this.rol = null;
       this.tpv = null;
+      this.comercios = [];
       this.comercio = null;
+    },
+    setComercioSeleccionado(comercio) {
+      this.comercio = comercio;
+      this.tpv = comercio.tpv;
     },
     comercioTiene(plugin) {
       if (this.comercio == null) {

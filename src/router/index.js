@@ -8,6 +8,7 @@ import ListadoDeClientesVue from "@/views/ListadoDeClientes.vue";
 import Caja from "@/views/CajaView.vue";
 import HistorialDeVentas from "@/views/HistorialVentasView.vue";
 import Arca from "@/views/ArcaView.vue";
+import CrearNuevoComercioView from "@/views/CrearNuevoComercioView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -186,6 +187,11 @@ const router = createRouter({
       path: "/contacto",
       name: "contacto",
       component: () => import("../views/ContactoView.vue"),
+    },
+    {
+      path: "/crear-nuevo-comercio",
+      name: "crear-nuevo-comercio",
+      component: CrearNuevoComercioView,
     },
   ],
 });

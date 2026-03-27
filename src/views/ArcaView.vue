@@ -103,6 +103,35 @@
 
                         <!-- Expansion Panels -->
                         <v-expansion-panels variant="accordion" class="mb-4">
+                            <!-- en caso de renovación. si estas renovando los certificados, sigue estos pasos -->
+                            <v-expansion-panel>
+                                <v-expansion-panel-title>
+                                    <div class="d-flex align-center">
+                                        <v-icon color="primary" class="mr-3">mdi-refresh</v-icon>
+                                        <span class="text-h6">Renovación de certificados digitales</span>
+                                    </div>
+                                </v-expansion-panel-title>
+                                <v-expansion-panel-text>
+                                    <v-alert class="mb-3">
+                                        Si ya tenías configurados los certificados digitales pero están próximos a
+                                        vencer,
+                                        estos son los pasos para la renovación.<br>
+                                        1. Generar nuevos archivos .key y .csr siguiendo el paso 1.<br>
+                                        2. En ARCA buscamos "Administración de certificados digitales"<br>
+                                        3. Vas a ver el mismo alias que creaste la primera vez, haces clic en "VER"<br>
+                                        4. Haces clic en "Agregar certificado"<br>
+                                        5. Subís el nuevo archivo .csr generado, presionas "Agregar" y te lleva a la
+                                        pantalla de
+                                        del punto 13 (paso 2) del manual. Descargás el nuevo .crt que te da.<br>
+                                        6. Subís el nuevo .crt y el nuevo .key al sistema siguiendo el paso 3 del
+                                        manual.<br>
+                                        En el paso 4 de la configuración, el número de punto de venta debe ser
+                                        el mismo que tenías configurado antes, no es necesario crear uno nuevo en AFIP.
+                                    </v-alert>
+                                </v-expansion-panel-text>
+                            </v-expansion-panel>
+
+
                             <!-- Paso 1: Generar archivos -->
                             <v-expansion-panel>
                                 <v-expansion-panel-title>
@@ -219,7 +248,8 @@
                                 </v-expansion-panel-title>
                                 <v-expansion-panel-text>
                                     <v-alert type="info" variant="tonal" class="mb-3" density="compact">
-                                        <strong>Importante:</strong> Es el punto de venta que creamos en el paso 26 en
+                                        <strong>Importante:</strong> Es el punto de venta que creamos en el paso 26
+                                        en
                                         - AFIP.
                                         Si estás renovando las credenciales, este dato ya está en el sistema.
                                     </v-alert>
@@ -239,7 +269,8 @@
                                 </v-expansion-panel-title>
                                 <v-expansion-panel-text>
                                     <v-alert type="info" variant="tonal" class="mb-3" density="compact">
-                                        <strong>Primero guardá la configuración</strong> y después podés usar "Probar
+                                        <strong>Primero guardá la configuración</strong> y después podés usar
+                                        "Probar
                                         Conexión" para
                                         verificar que las credenciales funcionen correctamente.
                                     </v-alert>
@@ -661,11 +692,13 @@
                         }
                     })
                     .then(response => {
+
                         this.cuit = response.data.cuit || '';
                         this.comercio.cuit = response.data.cuit || '';
                         this.comercio.iibb = response.data.iibb || '';
                         this.comercio.inicio_actividades = response.data.inicio_actividades || '';
                         this.comercio.tdf = response.data.tdf !== undefined ? response.data.tdf : 0;
+                        this.puntoVenta = response.data.pto_venta || '';
                     })
                     .catch(error => {
                         console.log(error);
@@ -680,7 +713,7 @@
 
             guardarDatosComercio() {
                 // Validar que estén todos los campos completos
-                if (!this.comercio.cuit || !this.comercio.iibb || !this.comercio.inicio_actividades || this.comercio.tdf === undefined) {
+                if (!this.comercio.cuit || !this.comercio.iibb || !this.comercio.inicio_actividades || this.comercio.tdf === undefined || !this.comercio.punto_venta) {
                     this.mensajeDatosComercio = 'Todos los campos son obligatorios';
                     this.mensajeTipoDatosComercio = 'error';
                     return;
@@ -694,7 +727,7 @@
                 datos.append('iibb', this.comercio.iibb);
                 datos.append('inicio_actividades', this.comercio.inicio_actividades);
                 datos.append('tdf', this.comercio.tdf);
-
+                datos.append('punto_venta', this.comercio.punto_venta);
                 axios.post(this.url + '/' + this.usuario.tpv + '/comercio/actualizar', datos, {
                     headers: {
                         Authorization: this.usuario.token

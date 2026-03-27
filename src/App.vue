@@ -2,9 +2,15 @@
   import Menu from './components/Menu.vue'
   import { useUserStore } from './stores/user'
   import { computed } from 'vue'
+  import { useRoute } from 'vue-router'
 
   const usuario = useUserStore()
+  const route = useRoute()
   const diasDeSuscripcion = computed(() => usuario.diasDeSuscripcion)
+  const routeComponentKey = computed(() => {
+    const comercioId = usuario.comercio?.id ?? usuario.comercio?.nombre ?? 'sin-comercio'
+    return `${route.fullPath}-${comercioId}`
+  })
 </script>
 
 <template>
@@ -14,7 +20,7 @@
 
       <router-view v-slot="{ Component }">
         <transition name="fade" mode="out-in">
-          <component :is="Component" />
+          <component :is="Component" :key="routeComponentKey" />
         </transition>
       </router-view>
     </v-main>
