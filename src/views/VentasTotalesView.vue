@@ -125,13 +125,15 @@
             },
             getVentas() {
                 this.cargando = true;
+                let desdeConHora = this.desde + 'T00:00:00';
+                let hastaConHora = this.hasta + 'T23:59:59';
                 axios.get(this.url + '/' + this.usuario.tpv + '/ventas/filtradas', {
                     headers: {
                         Authorization: this.usuario.token
                     },
                     params: {
-                        desde: this.desde,
-                        hasta: this.hasta,
+                        desde: desdeConHora,
+                        hasta: hastaConHora,
                         param: 'periodo'
                     }
                 })
