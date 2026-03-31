@@ -43,6 +43,14 @@
                     <v-select v-if="usuario.rol == 1" :items="usuario.comercios" item-title="nombre" return-object
                         variant="outlined" density="compact" hide-details @update:modelValue="cargarConNuevoComercio"
                         class="mt-2" :menu-props="{ maxHeight: '300px' }" v-model="comercioSeleccionado">
+                        <template v-slot:item="{ props, item }">
+                            <v-list-item v-bind="props" :title="item?.raw?.nombre || ''">
+                                <template v-slot:subtitle>
+                                    <span
+                                        class="text-caption text-medium-emphasis">{{ comentarioRecortado(item) }}</span>
+                                </template>
+                            </v-list-item>
+                        </template>
                     </v-select>
                     <p v-else class="text-white" style="height: 20px;">{{ usuario.comercio.nombre }}</p>
 
@@ -209,6 +217,17 @@
                 }
                 this.comercioSeleccionado = comercio;
                 this.usuario.setComercioSeleccionado(comercio);
+                this.usuario.token_caja = comercio.pivot.token_caja;
+            },
+            comentarioRecortado(item) {
+
+                if (!item.raw.comentario) {
+                    return '';
+                }
+                if (item.raw.comentario.length > 20) {
+                    return item.raw.comentario.substring(0, 20) + '...';
+                }
+                return item.raw.comentario;
             },
 
             cerrarSesion() {

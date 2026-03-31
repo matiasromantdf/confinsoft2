@@ -162,47 +162,45 @@
                             </v-container>
                         </v-card-actions>
                     </v-card>
-                    <!-- Indicación visual para dirigir la atención hacia el brick -->
-                    <v-row v-if="walletCreated && !cargandoPago" justify="center" class="my-4">
-                        <v-col cols="12" class="text-center">
-                            <v-icon color="primary" size="x-large" style="animation: bounce 2s infinite;">
-                                mdi-arrow-down-circle
-                            </v-icon>
-                            <div class="text-body-2 font-weight-medium text-primary mt-2">
-                                Completa tu pago aquí abajo
-                            </div>
-                        </v-col>
-                    </v-row>
 
-                    <v-row justify="center">
-                        <v-col md="8" sm="12">
-                            <!-- El contenedor siempre debe estar presente para que MercadoPago pueda encontrarlo -->
-                            <div id="wallet_container" :style="{ display: cargandoPago ? 'none' : 'block' }"
-                                :class="{ 'wallet-highlight': walletCreated && !cargandoPago }"></div>
+                    <v-dialog v-model="walletDialog" max-width="780" scrollable persistent>
+                        <v-card>
+                            <v-card-title class="d-flex align-center">
+                                <span class="text-h6">Pago de Suscripción</span>
+                                <v-spacer></v-spacer>
+                                <v-btn icon variant="text" @click="cerrarModalPago" :disabled="cargandoPago">
+                                    <v-icon>mdi-close</v-icon>
+                                </v-btn>
+                            </v-card-title>
 
-                            <!-- Mensaje de carga mientras se prepara el wallet -->
-                            <v-card v-if="cargandoPago" variant="outlined" class="pa-4 text-center">
-                                <v-progress-circular indeterminate color="primary" class="mb-3"></v-progress-circular>
-                                <div class="text-body-2 font-weight-medium mb-2">Preparando pasarela de pago</div>
-                                <div class="text-caption text-medium-emphasis">Conectando con MercadoPago...</div>
-                            </v-card>
+                            <v-card-text>
+                                <v-card v-if="cargandoPago" variant="outlined" class="pa-4 text-center">
+                                    <v-progress-circular indeterminate color="primary"
+                                        class="mb-3"></v-progress-circular>
+                                    <div class="text-body-2 font-weight-medium mb-2">Preparando pasarela de pago</div>
+                                    <div class="text-caption text-medium-emphasis">Conectando con MercadoPago...</div>
+                                </v-card>
 
-                            <!-- Mensaje de confirmación cuando el wallet está listo -->
-                            <v-card v-if="walletCreated && !cargandoPago" variant="outlined" class="mt-4 pa-4"
-                                color="success" style="animation: slideIn 0.5s ease-out;">
-                                <div class="d-flex align-center mb-3">
-                                    <v-icon color="success" class="mr-2" size="large">mdi-check-circle</v-icon>
-                                    <div>
-                                        <div class="text-h6 font-weight-bold text-success">¡Pasarela de pago lista!
+                                <v-card v-if="walletCreated && !cargandoPago" variant="outlined" class="mb-4 pa-3"
+                                    color="success" style="animation: slideIn 0.5s ease-out;">
+                                    <div class="d-flex align-center">
+                                        <v-icon color="success" class="mr-2" size="large">mdi-check-circle</v-icon>
+                                        <div class="text-body-1 font-weight-bold text-success">Pasarela de pago lista
                                         </div>
                                     </div>
-                                </div>
-                                <v-alert type="info" variant="tonal" density="compact" icon="mdi-information-outline">
-                                    Una vez completado el pago, tu suscripción se renovará automáticamente.
-                                </v-alert>
-                            </v-card>
-                        </v-col>
-                    </v-row>
+                                </v-card>
+
+                                <div id="wallet_container" :style="{ display: cargandoPago ? 'none' : 'block' }"></div>
+                            </v-card-text>
+
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn variant="text" @click="cerrarModalPago" :disabled="cargandoPago">
+                                    Cerrar
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                 </v-col>
             </v-row>
         </v-container>
@@ -223,6 +221,7 @@
                 cargandoText: 'cargando suscripción...',
                 suscripcion: {},
                 walletCreated: false,
+                walletDialog: false,
                 periodosSeleccionados: 0,
             }
         },
@@ -233,9 +232,18 @@
         mounted() {
         },
         methods: {
-            pagarSuscripcion(periodos) {
+            async pagarSuscripcion(periodos) {
+                this.walletDialog = true;
                 this.cargandoPago = true;
+                this.walletCreated = false;
                 this.periodosSeleccionados = periodos;
+
+                await this.$nextTick();
+                const walletContainer = document.getElementById('wallet_container');
+                if (walletContainer) {
+                    walletContainer.innerHTML = '';
+                }
+
                 let data = {
                     tpv: this.usuario.tpv,
                     periodos: periodos
@@ -261,23 +269,11 @@
                             // El wallet se creó exitosamente
                             this.walletCreated = true;
                             this.cargandoPago = false;
-
-                            // Hacer scroll automático hacia el brick después de un breve delay
-                            this.$nextTick(() => {
-                                setTimeout(() => {
-                                    const walletContainer = document.getElementById('wallet_container');
-                                    if (walletContainer) {
-                                        walletContainer.scrollIntoView({
-                                            behavior: 'smooth',
-                                            block: 'center'
-                                        });
-                                    }
-                                }, 500); // Delay para asegurar que el brick esté completamente renderizado
-                            });
                         }).catch((error) => {
                             // Error al crear el wallet
                             console.error('Error creando wallet:', error);
                             this.cargandoPago = false;
+                            this.walletDialog = false;
                             this.$swal('Error', 'Hubo un problema al cargar la pasarela de pago. Por favor, intenta nuevamente.', 'error');
                         });
 
@@ -285,8 +281,12 @@
                     .catch(error => {
                         console.log(error);
                         this.cargandoPago = false;
+                        this.walletDialog = false;
                     });
 
+            },
+            cerrarModalPago() {
+                this.walletDialog = false;
             },
             adherirseDA() {
                 //redireccionar a la pagina de adherirse a debito automaticohttps://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808490c3cfa40190ccdf376202c5

@@ -13,6 +13,10 @@
                                 <v-icon size="small" class="mr-1">mdi-account</v-icon>
                                 <strong>{{ usuario.nombre }}</strong>
                             </div>
+                            <div class="mb-1">
+                                <v-icon size="small" class="mr-1">mdi-storefront-outline</v-icon>
+                                <strong>{{ usuario.comercio.nombre }}</strong>
+                            </div>
                             <div class="mb-1 text-caption">
                                 <v-icon size="small" class="mr-1">mdi-email</v-icon>
                                 {{ usuario.email }}

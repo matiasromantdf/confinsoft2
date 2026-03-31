@@ -127,7 +127,7 @@
                     stock: 1,
                     proveedor_id: '',
                     categoria_id: '',
-                    iva: '',
+                    iva: 0,
                     comision: 0,
                     es_producto: false,
                 },

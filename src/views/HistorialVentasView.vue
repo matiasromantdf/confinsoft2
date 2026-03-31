@@ -335,7 +335,7 @@
 
                                     <template v-slot:item.precio="{ item }">
                                         <span class="font-weight-medium">${{ parseFloat(item.precio).toFixed(2)
-                                            }}</span>
+                                        }}</span>
                                     </template>
 
 
@@ -376,7 +376,7 @@
                                         v-if="parseFloat(calcularDescuentosDetalle()) > 0">
                                         <span>Descuentos por item:</span>
                                         <span class="font-weight-medium text-orange">-${{ calcularDescuentosDetalle()
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <div class="d-flex justify-space-between mb-2"
                                         v-if="parseFloat(ventaSeleccionada?.descuento || 0) > 0">
@@ -455,10 +455,11 @@
         },
         computed: {
             totalVentas() {
-                return this.ventas.length;
+                return this.ventas.filter(venta => !venta.deleted_at).length;
             },
             totalMonto() {
                 const total = this.ventas.reduce((sum, venta) => {
+                    if (venta.deleted_at) return sum;
                     return sum + parseFloat(venta.monto || 0);
                 }, 0);
                 return total.toLocaleString('es-AR', {
@@ -467,11 +468,12 @@
                 });
             },
             promedioVenta() {
-                if (this.ventas.length === 0) return '0.00';
-                const total = this.ventas.reduce((sum, venta) => {
+                const ventasVigentes = this.ventas.filter(venta => !venta.deleted_at);
+                if (ventasVigentes.length === 0) return '0.00';
+                const total = ventasVigentes.reduce((sum, venta) => {
                     return sum + parseFloat(venta.monto || 0);
                 }, 0);
-                const promedio = total / this.ventas.length;
+                const promedio = total / ventasVigentes.length;
                 return promedio.toLocaleString('es-AR', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
